@@ -1,0 +1,13 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.env.local
+*.log
+.DS_Store
+dist/
+build/
+
+# 개인 설정/시크릿
+worker/.dev.vars
+worker/secrets.json

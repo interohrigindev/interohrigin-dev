@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인터오리진 경영진 보고 — 차주용 담당 프로젝트 현황 (2026-05-27)</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --panel: #ffffff;
+    --panel-2: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-soft: #334155;
+    --text-dim: #64748b;
+    --text-mute: #94a3b8;
+    --accent: #2563eb;
+    --accent-2: #4f46e5;
+    --accent-soft: #dbeafe;
+    --green: #16a34a;
+    --green-soft: #dcfce7;
+    --yellow: #ca8a04;
+    --yellow-soft: #fef3c7;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --orange: #ea580c;
+    --orange-soft: #ffedd5;
+    --purple: #7c3aed;
+    --purple-soft: #ede9fe;
+    --pink: #db2777;
+    --pink-soft: #fce7f3;
+    --teal: #0d9488;
+    --teal-soft: #ccfbf1;
+    --grey: #64748b;
+    --grey-soft: #f1f5f9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    line-height: 1.6;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: ui-monospace, "SF Mono", monospace; }
+
+  /* ===== 헤더 ===== */
+  .topbar {
+    background: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%);
+    color: white;
+    padding: 26px 40px;
+    border-bottom: 1px solid #1e40af;
+  }
+  .topbar .inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .topbar .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 4px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .topbar h1 {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .topbar h1 small {
+    display: block; font-size: 13px; font-weight: 500;
+    color: rgba(255,255,255,0.85); margin-top: 6px; letter-spacing: 0;
+  }
+  .topbar .meta-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .topbar .header-meta {
+    font-size: 11px; color: rgba(255,255,255,0.85); text-align: right; line-height: 1.7;
+  }
+  .topbar .header-meta strong { color: white; }
+  .top-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    transition: all 0.15s;
+  }
+  .top-btn:hover { background: rgba(255,255,255,0.25); }
+  .top-btn.primary { background: white; color: var(--accent-2); border-color: white; }
+  .top-btn.primary:hover { background: #f1f5ff; }
+
+  /* ===== 탭 ===== */
+  .tab-nav {
+    background: white; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .tab-nav-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; gap: 4px; padding: 0 40px;
+    overflow-x: auto; scrollbar-width: thin;
+  }
+  .tab {
+    padding: 14px 16px; color: var(--text-dim);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; background: transparent;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap; transition: all 0.15s;
+    position: relative;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab .tab-emoji { margin-right: 6px; }
+  .tab .unread-dot {
+    position: absolute; top: 8px; right: 4px;
+    width: 8px; height: 8px;
+    background: var(--red); border-radius: 50%;
+    display: none;
+  }
+  .tab.has-unread .unread-dot { display: block; }
+
+  /* ===== 메인 ===== */
+  main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .section { margin-bottom: 32px; }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--border);
+    gap: 16px; flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.3px;
+    color: var(--text); display: flex; align-items: center; gap: 10px;
+  }
+  .section-head h2::before {
+    content: ""; width: 6px; height: 22px;
+    background: var(--accent); border-radius: 3px;
+  }
+  .section-head .desc { font-size: 12px; color: var(--text-dim); }
+
+  /* ===== 임원용 헤드라인 박스 ===== */
+  .exec-headline {
+    background: linear-gradient(135deg, #f0f9ff 0%, #eef2ff 100%);
+    border: 1px solid #c7d2fe;
+    border-left: 6px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .exec-headline .h-eyebrow {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .exec-headline h2 {
+    font-size: 22px; font-weight: 800; color: var(--text);
+    margin-bottom: 10px; line-height: 1.3;
+  }
+  .exec-headline .h-summary {
+    font-size: 14px; color: var(--text-soft); line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .exec-headline .h-summary strong { color: var(--accent-2); }
+  .exec-headline .h-tags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding-top: 12px; border-top: 1px solid #c7d2fe;
+  }
+  .exec-headline .h-tag {
+    background: white; border: 1px solid #c7d2fe;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; color: var(--accent-2); font-weight: 600;
+  }
+
+  /* ===== KPI ===== */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+  }
+  .kpi-row.k5 { grid-template-columns: repeat(5, 1fr); }
+  .kpi-row.k4 { grid-template-columns: repeat(4, 1fr); }
+  .kpi {
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+    position: relative; overflow: hidden;
+  }
+  .kpi::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--accent);
+  }
+  .kpi.k-green::before { background: var(--green); }
+  .kpi.k-orange::before { background: var(--orange); }
+  .kpi.k-purple::before { background: var(--purple); }
+  .kpi.k-yellow::before { background: var(--yellow); }
+  .kpi.k-red::before { background: var(--red); }
+  .kpi.k-teal::before { background: var(--teal); }
+  .kpi.k-pink::before { background: var(--pink); }
+  .kpi .label {
+    font-size: 11px; color: var(--text-dim);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  .kpi .value { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--text); }
+  .kpi .sub { font-size: 11px; color: var(--text-mute); margin-top: 4px; }
+
+  /* ===== 카드 ===== */
+  .card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .card h3 {
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.3px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h3 .emoji { font-size: 14px; }
+  .card.warn-card { border-color: #fde68a; background: #fffbeb; }
+  .card.warn-card h3 { color: var(--yellow); }
+  .card.success-card { border-color: #bbf7d0; background: #f0fdf4; }
+  .card.success-card h3 { color: var(--green); }
+  .card.danger-card { border-color: #fecaca; background: #fef2f2; }
+  .card.danger-card h3 { color: var(--red); }
+
+  /* ===== KV ===== */
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 4px 16px; font-size: 13px; }
+  .kv dt { color: var(--text-dim); font-weight: 600; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .kv dd { color: var(--text); padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .kv dt:last-of-type, .kv dd:last-of-type { border-bottom: none; }
+  .kv dd strong { color: var(--accent); }
+  .kv dd code { background: var(--grey-soft); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+  /* ===== Bulleted ===== */
+  ul.bulleted { list-style: none; font-size: 13px; }
+  ul.bulleted li {
+    padding: 6px 0 6px 22px; position: relative;
+    border-bottom: 1px dashed var(--border); line-height: 1.6;
+  }
+  ul.bulleted li::before {
+    content: "▸"; position: absolute; left: 4px; top: 6px;
+    color: var(--accent); font-weight: 700;
+  }
+  ul.bulleted li:last-child { border-bottom: none; }
+  ul.bulleted li strong { color: var(--accent); }
+
+  /* ===== 그리드 ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  @media (max-width: 980px) {
+    .grid-2, .grid-3, .grid-4, .grid-2-1 { grid-template-columns: 1fr; }
+    .kpi-row, .kpi-row.k5, .kpi-row.k4 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ===== 프로젝트 표 ===== */
+  .group-box {
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+  }
+  .group-box .group-head {
+    background: var(--accent-soft); padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-box .group-head .title {
+    font-size: 14px; font-weight: 800; color: var(--accent-2);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .group-box .group-head .count {
+    background: white; color: var(--accent);
+    padding: 2px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 700;
+  }
+  .group-box .group-head .total { font-size: 11px; color: var(--text-dim); }
+  .group-box.completed .group-head { background: var(--green-soft); }
+  .group-box.completed .group-head .title { color: var(--green); }
+  .group-box.completed .group-head .count { color: var(--green); }
+
+  .ptable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ptable thead th {
+    background: var(--panel-2); color: var(--text-dim);
+    font-weight: 700; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .ptable thead th.center { text-align: center; }
+  .ptable thead th.right { text-align: right; }
+  .ptable tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .ptable tbody tr:hover { background: var(--panel-2); cursor: pointer; }
+  .ptable tbody tr:last-child { border-bottom: none; }
+  .ptable td { padding: 14px; vertical-align: middle; }
+  .ptable td.center { text-align: center; }
+  .ptable td.right { text-align: right; }
+  .ptable .pname { font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .ptable .pname .task-badge {
+    background: var(--grey-soft); color: var(--text-dim);
+    padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700;
+  }
+  .ptable .ppro-cell { min-width: 220px; }
+  .ptable .ppro-cell .row { display: flex; align-items: center; gap: 8px; }
+  .ptable .ppro-cell .bar { flex: 1; height: 8px; background: var(--grey-soft); border-radius: 4px; overflow: hidden; }
+  .ptable .ppro-cell .bar > div { height: 100%; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 4px; }
+  .ptable .ppro-cell .pct { font-size: 12px; color: var(--text); font-weight: 700; min-width: 36px; text-align: right; }
+
+  .pri {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; text-align: center; min-width: 40px;
+  }
+  .pri-urgent { background: var(--red-soft); color: var(--red); }
+  .pri-high { background: var(--purple-soft); color: var(--purple); }
+  .pri-med { background: var(--accent-soft); color: var(--accent); }
+  .pri-low { background: var(--green-soft); color: var(--green); }
+
+  /* ===== 배지 ===== */
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.3px; white-space: nowrap;
+  }
+  .b-active   { background: var(--green-soft);  color: var(--green); }
+  .b-progress { background: var(--accent-soft); color: var(--accent); }
+  .b-hotfix   { background: var(--red-soft);    color: var(--red); }
+  .b-paused   { background: var(--grey-soft);   color: var(--grey); }
+  .b-planning { background: var(--yellow-soft); color: var(--yellow); }
+  .b-completed{ background: var(--purple-soft); color: var(--purple); }
+  .b-beta     { background: var(--teal-soft);   color: var(--teal); }
+  .b-launched { background: var(--pink-soft);   color: var(--pink); }
+  .b-warn     { background: var(--orange-soft); color: var(--orange); }
+
+  /* ===== 진행 게이지 ===== */
+  .gauge-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .gauge-row .lbl { font-size: 12px; color: var(--text-soft); min-width: 110px; }
+  .gauge-row .bar { flex: 1; height: 10px; background: var(--grey-soft); border-radius: 5px; overflow: hidden; }
+  .gauge-row .bar > div { height: 100%; border-radius: 5px; transition: width 0.4s; }
+  .gauge-row .val { font-size: 12px; font-weight: 700; min-width: 40px; text-align: right; }
+
+  /* ===== 통합 시스템 ===== */
+  .system-diagram { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 32px; text-align: center; }
+  .db-node {
+    background: linear-gradient(135deg, var(--accent-soft), #c7d2fe);
+    border: 2px solid var(--accent); border-radius: 12px;
+    padding: 18px 32px; display: inline-block; min-width: 400px;
+    margin-bottom: 32px;
+  }
+  .db-node .label { font-size: 11px; color: var(--accent-2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .db-node .name { font-size: 20px; font-weight: 800; color: var(--text); }
+  .db-node .id { font-size: 12px; color: var(--text-dim); font-family: ui-monospace, monospace; margin-top: 6px; }
+  .module-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 980px) { .module-row { grid-template-columns: repeat(2, 1fr); } }
+  .module-card {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; position: relative; text-align: left;
+  }
+  .module-card::before {
+    content: ""; position: absolute; left: 50%; top: -16px;
+    transform: translateX(-50%); width: 2px; height: 16px; background: var(--accent);
+  }
+  .module-card .mname { font-size: 14px; font-weight: 800; color: var(--accent-2); margin-bottom: 4px; }
+  .module-card .mstat { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: var(--text-dim); }
+  .module-card .mdesc { font-size: 12px; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+
+  /* ===== 타임라인 ===== */
+  .timeline { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+  .te { border-left: 2px solid var(--border); padding: 8px 0 16px 18px; margin-left: 8px; position: relative; }
+  .te::before {
+    content: ""; position: absolute; left: -7px; top: 14px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: white; border: 2px solid var(--accent);
+  }
+  .te.milestone::before { background: var(--accent); }
+  .te:last-child { padding-bottom: 0; }
+  .te-date { font-size: 11px; color: var(--text-dim); font-family: ui-monospace, monospace; font-weight: 600; margin-bottom: 2px; }
+  .te-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+  .te-content {
+    font-size: 12px; color: var(--text-soft); line-height: 1.6;
+    white-space: pre-wrap; background: var(--panel-2);
+    padding: 10px 12px; border-radius: 6px; margin-top: 6px; border: 1px solid var(--border);
+  }
+  .te-source { font-size: 10px; color: var(--text-mute); margin-top: 6px; font-family: ui-monospace, monospace; }
+
+  /* ===== 테이블 ===== */
+  table.t {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; font-size: 12px;
+  }
+  table.t th, table.t td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.t th {
+    background: var(--panel-2); color: var(--text-dim);
+    font-weight: 700; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  table.t tr:last-child td { border-bottom: none; }
+  table.t td.right, table.t th.right { text-align: right; font-family: ui-monospace, monospace; }
+  table.t tr.subtotal td { background: var(--accent-soft); font-weight: 700; }
+  table.t tr.total td { background: #c7d2fe; font-weight: 800; }
+  table.t tr.group-row td {
+    background: var(--panel-2); font-weight: 800; color: var(--accent);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; padding: 11px 12px;
+  }
+  .ph { color: var(--text-mute); font-style: italic; }
+
+  /* ===== Notice ===== */
+  .notice { background: var(--yellow-soft); border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #713f12; line-height: 1.6; }
+  .notice strong { color: var(--yellow); }
+  .notice code { background: white; padding: 1px 6px; border-radius: 3px; font-family: ui-monospace, monospace; color: var(--accent); border: 1px solid #fde68a; }
+  .notice.info { background: var(--accent-soft); border-color: #93c5fd; color: #1e3a8a; }
+  .notice.info strong { color: var(--accent); }
+  .notice.info code { border-color: #93c5fd; }
+  .notice.success { background: var(--green-soft); border-color: #86efac; color: #166534; }
+  .notice.success strong { color: var(--green); }
+  .notice.danger { background: var(--red-soft); border-color: #fca5a5; color: #991b1b; }
+
+  /* ===== 통계 ===== */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+  .stat .num { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .stat .lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 700; margin-top: 2px; }
+
+  /* ====================================================== */
+  /* ===== 프로젝트별 토론 영역 (핵심 신규 기능) ===== */
+  /* ====================================================== */
+  .discussion {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 24px;
+  }
+  .discussion .d-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .discussion .d-title {
+    font-size: 16px; font-weight: 800; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .discussion .d-count {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 2px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 700;
+  }
+  .discussion .d-actions { display: flex; gap: 8px; }
+  .d-btn {
+    background: var(--grey-soft); border: 1px solid var(--border);
+    color: var(--text); padding: 5px 11px;
+    border-radius: 5px; font-size: 11px; cursor: pointer; font-weight: 600;
+  }
+  .d-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .d-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .d-btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: white; }
+
+  .d-compose {
+    background: var(--panel-2);
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .d-cat-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .d-cat-chip {
+    padding: 5px 12px; border-radius: 16px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    border: 1.5px solid var(--border); background: white;
+    color: var(--text-dim); transition: all 0.15s;
+  }
+  .d-cat-chip:hover { border-color: var(--border-strong); }
+  .d-cat-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .d-cat-chip.cat-question.active { background: var(--accent); border-color: var(--accent); }
+  .d-cat-chip.cat-request.active { background: var(--purple); border-color: var(--purple); }
+  .d-cat-chip.cat-decision.active { background: var(--orange); border-color: var(--orange); }
+  .d-cat-chip.cat-feedback.active { background: var(--green); border-color: var(--green); }
+
+  .d-author-row {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .d-input, .d-text, .d-select {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; color: var(--text); background: white;
+    font-family: inherit;
+  }
+  .d-input:focus, .d-text:focus, .d-select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .d-text { min-height: 80px; resize: vertical; }
+  .d-compose .d-row-btn {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 10px; flex-wrap: wrap; gap: 8px;
+  }
+  .d-meta { font-size: 11px; color: var(--text-dim); }
+
+  .d-thread { display: flex; flex-direction: column; gap: 10px; }
+  .d-item {
+    background: white; border: 1px solid var(--border);
+    border-left: 4px solid var(--accent); border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .d-item.cat-question  { border-left-color: var(--accent); }
+  .d-item.cat-request   { border-left-color: var(--purple); }
+  .d-item.cat-decision  { border-left-color: var(--orange); }
+  .d-item.cat-feedback  { border-left-color: var(--green); }
+  .d-item.resolved { background: var(--green-soft); border-left-color: var(--green); opacity: 0.85; }
+  .d-item .d-item-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px; flex-wrap: wrap; gap: 6px;
+  }
+  .d-item .d-item-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .d-cat-badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 10px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .d-cat-badge.cat-question  { background: var(--accent-soft); color: var(--accent); }
+  .d-cat-badge.cat-request   { background: var(--purple-soft); color: var(--purple); }
+  .d-cat-badge.cat-decision  { background: var(--orange-soft); color: var(--orange); }
+  .d-cat-badge.cat-feedback  { background: var(--green-soft); color: var(--green); }
+
+  .d-item .author { font-size: 12px; font-weight: 700; color: var(--text); }
+  .d-item .at { font-size: 11px; color: var(--text-mute); }
+  .d-item .body { font-size: 13px; color: var(--text); line-height: 1.6; margin-top: 6px; white-space: pre-wrap; word-wrap: break-word; }
+  .d-item .item-actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .d-item .replies {
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    padding-left: 12px; border-left: 2px solid var(--accent-soft);
+  }
+  .d-item .reply {
+    background: var(--panel-2); border-radius: 6px;
+    padding: 8px 12px; margin-bottom: 6px;
+  }
+  .d-item .reply .author { font-size: 11px; color: var(--accent); }
+  .d-item .reply .body { font-size: 12px; margin-top: 2px; color: var(--text-soft); }
+  .d-item .reply-compose {
+    margin-top: 8px; padding-top: 8px;
+    display: none;
+  }
+  .d-item .reply-compose.open { display: block; }
+  .d-item .reply-compose textarea {
+    width: 100%; padding: 6px 10px;
+    border: 1px solid var(--border); border-radius: 4px;
+    font-size: 12px; min-height: 50px; resize: vertical;
+    font-family: inherit;
+  }
+  .empty-thread {
+    color: var(--text-mute); font-size: 12px; padding: 20px;
+    text-align: center; border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+
+  /* ===== 푸터 ===== */
+  footer {
+    background: white; border-top: 1px solid var(--border);
+    padding: 24px 40px; text-align: center;
+    color: var(--text-dim); font-size: 11px;
+  }
+  footer code { background: var(--grey-soft); padding: 1px 6px; border-radius: 3px; }
+
+  /* ===== 모달 ===== */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: white; border-radius: 12px;
+    width: 100%; max-width: 600px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  }
+  .modal-head {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-head h3 { font-size: 16px; font-weight: 800; }
+  .modal-close {
+    background: none; border: none; font-size: 22px;
+    color: var(--text-mute); cursor: pointer; padding: 0 6px;
+  }
+  .modal-body { padding: 20px 24px; }
+  .modal-body label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.3px; margin-bottom: 4px; margin-top: 12px;
+  }
+  .modal-body input, .modal-body textarea, .modal-body select {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; font-family: inherit;
+  }
+  .modal-body textarea { min-height: 100px; resize: vertical; }
+  .modal-foot {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .modal-foot button {
+    padding: 8px 16px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    border: 1px solid var(--border); background: white;
+  }
+  .modal-foot button.primary {
+    background: var(--accent); color: white; border-color: var(--accent);
+  }
+
+  /* ===== 인쇄 ===== */
+  @media print {
+    body { background: white; }
+    .topbar { background: white !important; color: black !important; border-bottom: 2px solid black; }
+    .topbar * { color: black !important; }
+    .top-btn, .tab-nav, .d-compose, .modal-backdrop { display: none !important; }
+    .panel { display: block !important; page-break-before: always; }
+    .panel:first-of-type { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 헤더 ===== -->
+<header class="topbar">
+  <div class="inner">
+    <div>
+      <div class="eyebrow">INTEROHRIGIN · Executive Briefing</div>
+      <h1>차주용 담당 프로젝트 종합 현황<small>2026년 3~5월 · 9개 프로젝트 · 임원진 검토용 · 지속 커뮤니케이션 페이지</small></h1>
+    </div>
+    <div class="meta-buttons">
+      <div class="header-meta">
+        <div>보고일 <strong>2026-05-27 (목)</strong></div>
+        <div>담당 <strong>차주용 (PM)</strong></div>
+        <div>의견 <strong id="hd-fb-count">0건</strong> 누적</div>
+      </div>
+      <button class="top-btn" onclick="openSettingsModal()">⚙️ 설정 / 외부 연동</button>
+      <button class="top-btn primary" onclick="window.print()">📄 PDF 저장</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 탭 ===== -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner" id="tab-nav-inner"></div>
+</nav>
+
+<main>
+
+<!-- ====================================================== -->
+<!-- 패널 1: 종합 현황 -->
+<!-- ====================================================== -->
+<section class="panel active" data-panel="overview">
+
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">한 줄 요약</div>
+      <h2>9개 프로젝트 동시 운영 — 4개 완료(붐앤잽·I&amp;C·복지몰·Exhiboot), 5개 진행 평균 63%</h2>
+      <div class="h-summary">
+        가장 시급한 사항: <strong>고객관리 CS 플랫폼</strong>이 마감(4/30)을 초과해 배포·교육 단계에 있고,
+        <strong>HR 플랫폼</strong>은 4/13 마감을 지나 73%에서 보완 진행 중입니다.
+        가장 임박한 이벤트는 <strong>6월 9일 재무관리 자금계획 v1 베타 오픈</strong>입니다.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 5개</span>
+        <span class="h-tag">완료 4개</span>
+        <span class="h-tag">미결 의사결정 12건</span>
+        <span class="h-tag">마감 지연 2건</span>
+        <span class="h-tag">다음 마일스톤: 6/9 자금계획 베타</span>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>전체 KPI</h2>
+      <div class="desc">사내 프로젝트 대시보드 + 로컬 문서 종합 · 2026-05-27</div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="label">총 프로젝트</div><div class="value">9</div><div class="sub">진행 5 · 완료 4</div></div>
+      <div class="kpi k-green"><div class="label">완료</div><div class="value">4</div><div class="sub">전체 출시·운영 진입</div></div>
+      <div class="kpi k-orange"><div class="label">진행중 평균</div><div class="value">63%</div><div class="sub">5개 평균 진행률</div></div>
+      <div class="kpi k-purple"><div class="label">파이프라인</div><div class="value">78%</div><div class="sub">전체 진행률</div></div>
+      <div class="kpi k-yellow"><div class="label">미결 결정</div><div class="value">12</div><div class="sub">대표·이사 검토 대기</div></div>
+      <div class="kpi k-red"><div class="label">마감 지연</div><div class="value">2</div><div class="sub">HR(4/13) · CS(4/30)</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>경영관리본부 — 진행중 프로젝트</h2>
+      <div class="desc">사내 대시보드와 동기화 · 행 클릭 시 상세 탭으로 이동</div>
+    </div>
+    <div class="group-box">
+      <div class="group-head">
+        <div class="title">📋 진행중 <span class="count">5개</span></div>
+        <div class="total">평균 진행률 <strong style="color:var(--accent);">63%</strong> · 우선순위 긴급 1 / 상 3 / 중 1</div>
+      </div>
+      <table class="ptable">
+        <thead>
+          <tr><th>프로젝트명</th><th>담당자</th><th>진행상황</th><th class="center">우선순위</th><th class="center">마감일</th><th>현재단계</th><th class="right">작업</th></tr>
+        </thead>
+        <tbody id="ptable-active"></tbody>
+      </table>
+    </div>
+
+    <div class="group-box completed">
+      <div class="group-head">
+        <div class="title">✅ 완료된 프로젝트 <span class="count">4개</span></div>
+        <div class="total">평균 진행률 <strong style="color:var(--green);">100%</strong> · 작업 8개</div>
+      </div>
+      <table class="ptable">
+        <thead>
+          <tr><th>프로젝트명</th><th>담당자</th><th>진행상황</th><th class="center">우선순위</th><th class="center">완료일</th><th>현재단계</th><th class="right">작업</th></tr>
+        </thead>
+        <tbody id="ptable-done"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>시각화</h2>
+      <div class="desc">프로젝트별 진행률 / 월별 의사결정 활동</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📊</span> 프로젝트별 진행률</h3>
+        <div id="progress-chart"></div>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">📅</span> 월별 의사결정 문서 작성</h3>
+        <div id="activity-chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>인터오리진 통합 시스템 — 단일 Supabase, 4 모듈</h2>
+      <div class="desc">HR / CS / 복지몰 / 재무관리가 같은 데이터베이스를 공유 — 직원 마스터·권한 통합</div>
+    </div>
+    <div class="system-diagram">
+      <div class="db-node">
+        <div class="label">Shared Database</div>
+        <div class="name">통합 데이터베이스 (Pro $25/월)</div>
+        <div class="id">단일 인스턴스 · 직원/조직 마스터 공유</div>
+      </div>
+      <div class="module-row">
+        <div class="module-card">
+          <div class="mname">HR (메인)</div>
+          <div class="mstat" style="color:var(--green);">진행중 73%</div>
+          <div class="mdesc">채용 · 입사 · OJT · 평가 · 근태 · 결재 · 연차 · 임원 리포트</div>
+        </div>
+        <div class="module-card">
+          <div class="mname">CS (고객관리)</div>
+          <div class="mstat" style="color:var(--red);">진행중 75% · 긴급</div>
+          <div class="mdesc">고객 상담 · 문의 티켓 · AI 자동응답 보조 (배포·교육 단계)</div>
+        </div>
+        <div class="module-card">
+          <div class="mname">복지몰</div>
+          <div class="mstat" style="color:var(--purple);">완료 ✓ (4/24)</div>
+          <div class="mdesc">사내 복지몰 — 직원 포인트·주문·결제 (HR 통합 로그인)</div>
+        </div>
+        <div class="module-card">
+          <div class="mname">재무관리</div>
+          <div class="mstat" style="color:var(--accent);">진행중 63%</div>
+          <div class="mdesc">자금계획 · 고정비 · 자금이체 · 손익분석 (6/9 베타 예정)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="notice info">
+      <strong>이 페이지는 임원 검토용입니다.</strong>
+      각 프로젝트 탭에서 <strong>"이 프로젝트에 대한 의견·요청"</strong> 영역을 통해 차주용 PM과 직접 소통하실 수 있습니다.
+      슬랙 메시지를 가져오거나 슬랙 채널로 자동 전송하려면 우상단 <code>설정 / 외부 연동</code>에서 슬랙 Webhook URL을 입력하세요.
+    </div>
+  </div>
+
+  <!-- 전체 자유 의견 (overview discussion) -->
+  <div id="discussion-overview" data-discussion="overview"></div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 2: HR 플랫폼 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="hr">
+
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">HR 플랫폼 · 임원 요약</div>
+      <h2>입사부터 퇴사까지 직원 전 과정을 시스템화 — 핵심 5단계 완료, AI 보조 기능 추가 중</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> 채용 · 입사 · OJT 교육 · 인사 평가 · 근태/연차/결재까지 HR 모든 영역을 한 시스템에 통합.
+        <strong>왜 중요?</strong> 직원 한 명당 평균 30분 걸리던 결재·연차 신청을 자동화로 0분에 수렴시키고, 채용 전 과정에 AI 분석을 붙여 신규 입사자 검증 시간을 단축.
+        <strong>지금 상황?</strong> 핵심 채용·평가·결재 기능 가동 중. 4/24 회의에서 합의한 "전자결재 AI 자동 작성", "면접 통합 페이지"가 다음 단계.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 73% · 우선순위 상</span>
+        <span class="h-tag">마감 4월 13일 (지연 보완 중)</span>
+        <span class="h-tag">작업 15건</span>
+        <span class="h-tag">미결 6건</span>
+        <span class="h-tag">시작 2026-03-19</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi"><div class="label">진행률</div><div class="value">73%</div><div class="sub">로드맵 41단계 중 28~30단계</div></div>
+      <div class="kpi k-green"><div class="label">완료된 모듈</div><div class="value">7</div><div class="sub">채용·평가·연차·결재·OJT 등</div></div>
+      <div class="kpi k-orange"><div class="label">진행 중 작업</div><div class="value">15</div><div class="sub">사내 대시보드 기준</div></div>
+      <div class="kpi k-red"><div class="label">미결 의사결정</div><div class="value">6</div><div class="sub">대표·이사 검토 필요</div></div>
+    </div>
+  </div>
+
+  <!-- HR 추가 요청사항 - 미리 PM 기재 -->
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">이 영역은 PM이 미리 기재한 검토 요청 — 아래 토론 영역에서 답변 부탁드립니다</div>
+    </div>
+    <div class="grid-2">
+      <div class="card danger-card">
+        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
+        <ul class="bulleted">
+          <li><strong>1분기 인사 평가 정식 실행 시점</strong> — 현재 민지 + 차주용 2인 선행 테스트 중. 전사 확산 시점 결정 필요</li>
+          <li><strong>HR AI 디자인 플랫폼 (Phase 3) 비용 합의</strong> — 멀티 AI 프로바이더 운영 비용 영향 큼. 진행 여부와 예산 합의 필요</li>
+          <li><strong>채용 면접 통합 페이지 우선순위</strong> — 대표 단일 링크로 이력서·요약·질문·체크리스트를 보는 페이지. 4/24 미팅 미결</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
+        <ul class="bulleted">
+          <li><strong>4/13 마감 지연 해소</strong> — 잔여 보완 작업 15건 완료 시점 공유 예정</li>
+          <li><strong>채용 0507 Gap → 100%</strong> — 사전 질의서 / 면접 슬롯 예약 / AI 보조 면접 콘솔</li>
+          <li><strong>인수인계 자동화</strong> — 퇴사자 문서·자산·계약을 자동으로 후임자에게 전달 (착수 예정)</li>
+          <li><strong>SMS 알림 도입 여부</strong> — 이메일 외 SMS 발송 PoC. 개인정보 보안 비용 검토 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HR 기술 통계 -->
+  <div class="section">
+    <div class="section-head">
+      <h2>시스템 규모</h2>
+      <div class="desc">참고용 — 비개발자는 건너뛰셔도 됩니다</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">80+</div><div class="lbl">DB 테이블</div></div>
+      <div class="stat"><div class="num">49</div><div class="lbl">데이터 구조 업데이트</div></div>
+      <div class="stat"><div class="num">39+</div><div class="lbl">화면 페이지</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">파일 저장소</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">8</div><div class="lbl">AI 분석 종류</div></div>
+      <div class="stat"><div class="num">41</div><div class="lbl">개발 단계</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">AI 제공사</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">외부 연동</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>직원 한 명의 입사부터 퇴사까지 전 과정을 한 시스템에서 관리</dd>
+          <dt>대상 사용자</dt><dd>전 직원 · 임원 · HR 담당자 · 면접관 · 멘토</dd>
+          <dt>도입 효과</dt><dd>결재·연차 신청 자동화 / CEO가 한 화면에서 회사 전반 파악 / 채용 시 AI 보조</dd>
+          <dt>운영 정책</dt><dd>경영지원팀 선행 테스트 → 키맨 → 전사 단계 확산 (4/16 회의 합의)</dd>
+          <dt>알림 채널</dt><dd>이메일 (메인) + 카카오워크 (사내 메신저 30명 무료 한도)</dd>
+          <dt>접속 URL</dt><dd><code>interohrigin-hr2.pages.dev</code> → 향후 <strong>hr.interohrigin.com</strong></dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🤖</span> AI 기능 (어떻게 도와주나)</h3>
+        <ul class="bulleted">
+          <li><strong>이력서 분석</strong> — PDF 업로드 시 자동으로 점수·강점·약점·추천 여부 산출</li>
+          <li><strong>면접 분석</strong> — 면접 녹음을 듣고 답변 평가·종합 의견 작성</li>
+          <li><strong>평가 리포트</strong> — 평가 데이터를 받아 AI가 종합 리포트 자동 작성</li>
+          <li><strong>수습 평가</strong> — 짧은 코멘트를 입력하면 AI가 다듬어 확장된 피드백 생성</li>
+          <li><strong>인수인계 초안</strong> — 퇴사자 프로젝트·업무보고·자산 데이터를 받아 인수인계 초안 자동 작성</li>
+          <li><strong>회의록 받아쓰기</strong> — 회의 녹음을 텍스트로 변환 (한국어 정확도 27% 개선)</li>
+          <li><strong>CEO 임원 리포트</strong> — 회사 전반 데이터를 받아 한 페이지로 요약 (Claude API)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>HR 모듈 7개 영역</h2>
+      <div class="desc">각 영역에 어떤 기능이 있는지 — 임원이 이해하기 쉬운 표현으로</div>
+    </div>
+    <div class="grid-4">
+      <div class="card">
+        <h3>👥 인사 기본</h3>
+        <ul class="bulleted">
+          <li>직원 정보 관리</li>
+          <li>출퇴근 기록</li>
+          <li>전자 결재 (품의서·공문)</li>
+          <li>연차 신청·승인</li>
+          <li>급여 명세서 발급</li>
+          <li>교육 이수 관리</li>
+          <li>증명서 자동 발급 (인감 자동 날인)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🎯 채용</h3>
+        <ul class="bulleted">
+          <li>채용 공고 등록·관리</li>
+          <li>지원자 풀 + 인재 프로필</li>
+          <li>이력서 AI 분석</li>
+          <li>면접 일정·녹화·분석</li>
+          <li>합격 결정 기록</li>
+          <li>13단계 채용 프로세스 가이드</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📚 OJT · 수습</h3>
+        <ul class="bulleted">
+          <li>OJT 프로그램·등록</li>
+          <li>멘토 배정 + 일일 멘토 보고</li>
+          <li>수습 평가 (14일/42일/70일)</li>
+          <li>수습 90일 후 종료</li>
+          <li>AI 코멘트 자동 확장</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📊 평가</h3>
+        <ul class="bulleted">
+          <li>평가 기간 / 대상자 / 항목 설정</li>
+          <li>자기 평가</li>
+          <li>동료 평가 (10항목 × 10점)</li>
+          <li>월간 점검</li>
+          <li>대면 평가 기록</li>
+          <li>AI 종합 리포트 자동 작성</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>💬 사내 메신저</h3>
+        <ul class="bulleted">
+          <li>채팅방 · 메시지 · 멤버</li>
+          <li>메시지 반응 (이모지)</li>
+          <li>첨부파일 (7일 한정 링크)</li>
+          <li>외부 메신저: 카카오워크 채택 (4/24 결정)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📁 인사노무</h3>
+        <ul class="bulleted">
+          <li>연차 자동 부여·촉진 (입사일 기준, 반차 4시간)</li>
+          <li>전자 계약</li>
+          <li>인사 명령</li>
+          <li>특이사항 기록</li>
+          <li>퇴사 설문</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🤝 인수인계 (예정)</h3>
+        <ul class="bulleted">
+          <li>퇴사자 인수인계 문서 (JSON)</li>
+          <li>자산 인벤토리 (계약·기기·계정)</li>
+          <li>후임자 Q&amp;A 챗봇</li>
+          <li>AI 초안 자동 생성</li>
+          <li>구글 드라이브 스캔 후 수동 검수 반영</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📡 AI 신뢰도 관리</h3>
+        <ul class="bulleted">
+          <li>AI 분석 정확도 추적</li>
+          <li>AI 신뢰 점수 관리</li>
+          <li>AI 응답 단계 전환 기록</li>
+          <li>사주·MBTI 분석 (인사 보조)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>개발 로드맵 — 41단계 중 어디까지 왔나</h2>
+      <div class="desc">큰 단위 진행 현황</div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead>
+          <tr><th style="width:140px;">Phase</th><th>범위 (한국어 풀이)</th><th class="center" style="width:100px;">상태</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>1단계 (P-01~21)</strong></td><td>채용관리 + 인사평가 통합 — 핵심 21개 기능</td><td class="center"><span class="badge b-completed">완료</span></td></tr>
+          <tr><td><strong>1.5단계 (P-22~25)</strong></td><td>임원용 긴급 대시보드 + 평가 간소화</td><td class="center"><span class="badge b-completed">완료</span></td></tr>
+          <tr><td><strong>1.7단계 (P-26~31)</strong></td><td>인사노무 — 연차·근태·결재·증명서·조직도·급여·교육</td><td class="center"><span class="badge b-progress">진행중</span></td></tr>
+          <tr><td><strong>1.8단계</strong></td><td>수습평가 보강 + 인수인계 자동화 + 운영 피드백 31건 반영</td><td class="center"><span class="badge b-warn">착수 예정</span></td></tr>
+          <tr><td><strong>0507 Gap</strong></td><td>고도화 요구서 v1.0 대비 갭 분석 (사전 질의서·채용 자동화·디자인)</td><td class="center"><span class="badge b-progress">진행중</span></td></tr>
+          <tr><td><strong>0512 보완</strong></td><td>P0 채용 전환율 · P1 면접 품질 · P2 비용합의 후 디자인 플랫폼</td><td class="center"><span class="badge b-progress">실행중</span></td></tr>
+          <tr><td><strong>2단계 (P-32~41)</strong></td><td>시스템·업무 연동 (모듈 분리 — 메신저 제거, 채용 분리)</td><td class="center"><span class="badge b-planning">향후</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>최근 의사결정 흐름</h2>
+      <div class="desc">3월 19일 착수 → 5월 12일 보완 계획까지 9개 마일스톤</div>
+    </div>
+    <div class="timeline" id="tl-hr"></div>
+  </div>
+
+  <!-- HR 토론 -->
+  <div id="discussion-hr" data-discussion="hr"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 3: CS 플랫폼 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="cs">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">CS 플랫폼 · 임원 요약</div>
+      <h2>고객 문의·상담 응대를 시스템화 — 배포·교육 단계, 4월 마감 초과</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> 고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템.
+        <strong>왜 중요?</strong> 상담 인원 의존도를 줄이고, 어떤 문의가 자주 들어오는지 데이터화. 처음 응답까지 걸리는 시간 단축.
+        <strong>지금 상황?</strong> 기능 개발은 75%까지 완료. <span style="color:var(--red);font-weight:700;">4/30 마감을 넘긴 상태</span>로 배포 + 사용자 교육 단계 진행 중.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 75% · 긴급</span>
+        <span class="h-tag">마감 4월 30일 (초과)</span>
+        <span class="h-tag">현재 단계: 배포·교육</span>
+        <span class="h-tag">작업 1건</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi k-red"><div class="label">진행률</div><div class="value">75%</div><div class="sub">긴급 우선순위</div></div>
+      <div class="kpi k-orange"><div class="label">마감 상태</div><div class="value">초과</div><div class="sub">4/30 → 진행중</div></div>
+      <div class="kpi"><div class="label">현재 단계</div><div class="value" style="font-size:18px;">배포·교육</div><div class="sub">사내 대시보드 표기</div></div>
+      <div class="kpi k-green"><div class="label">통합 DB</div><div class="value" style="font-size:18px;">HR 공유</div><div class="sub">직원/조직 마스터 공통</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
+    </div>
+    <div class="grid-2">
+      <div class="card danger-card">
+        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
+        <ul class="bulleted">
+          <li><strong>배포 일정 확정</strong> — 4/30 마감이 이미 초과. 새 배포일과 운영 진입일 합의 필요</li>
+          <li><strong>사용자 교육 대상 부서</strong> — 어느 부서부터 교육할지 (경영지원팀 선행 정책 적용 여부)</li>
+          <li><strong>운영 인력 배정</strong> — CS 티켓 처리 책임자와 백업 인원</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
+        <ul class="bulleted">
+          <li>AI 자동응답 보조 기능 — 자주 묻는 질문(FAQ) 우선 적용</li>
+          <li>티켓 우선순위 자동 분류 (긴급도/카테고리)</li>
+          <li>월간 CS 통계 리포트 자동 생성</li>
+          <li>HR 시스템과 단일 로그인 통합</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>고객 문의를 티켓으로 분류하고 AI가 응답을 도와주는 시스템</dd>
+          <dt>대상 사용자</dt><dd>CS 담당자 · 관리자 · 고객 (외부)</dd>
+          <dt>도입 효과</dt><dd>응답 누락 방지 / 응답 시간 단축 / 자주 묻는 질문 데이터화</dd>
+          <dt>통합 구조</dt><dd>HR과 같은 데이터베이스 → 직원·권한 마스터 공유</dd>
+          <dt>현재 단계</dt><dd><strong>배포 준비 및 사용자 교육</strong></dd>
+          <dt>전제</dt><dd>HR 시스템 알림 정책과 동일 (이메일 우선)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🎯</span> 핵심 범위 (4/24 회의 노트 기반)</h3>
+        <ul class="bulleted">
+          <li>고객 상담·문의 티켓 시스템 (생성·할당·진행·완료)</li>
+          <li>AI 자동응답 보조 (Gemini 활용)</li>
+          <li>HR 통합 로그인 + 직원 마스터 공유</li>
+          <li>월간 통계 + 처리 시간 측정</li>
+          <li>외부 채널 연동은 단계적 (이메일 우선)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="notice" style="margin-top:16px;">
+      <strong>현재 상태.</strong>
+      사내 대시보드는 "배포 준비 및 교육" 단계로 표기되어 있습니다. 75% 진행 + 긴급 우선순위 / 4/30 마감 초과.
+      <strong>CS 전용 상세 기획서(docs)는 아직 별도 정리되지 않았습니다</strong> — 4/24 회의 노트 기반으로 작성되어 있어 추가 사양 정리가 필요합니다.
+      아래 토론 영역에서 추가 사양을 남겨주시면 PM이 정리하여 docs로 반영합니다.
+    </div>
+  </div>
+
+  <div id="discussion-cs" data-discussion="cs"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 4: 재무관리 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="finance">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">재무관리 · 임원 요약</div>
+      <h2>월별 자금계획을 시스템으로 — 직원이 직접 매출 입력, 자동으로 손익 산출 (6/9 베타 오픈)</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> 매출·고정비·변동비를 통합하여 월별 자금 계획을 자동으로 산출하는 시스템.
+        <strong>왜 중요?</strong> 그간 엑셀로 부서별 취합하던 자금계획을 시스템화하여 임원 보고를 실시간 갱신.
+        <strong>지금 상황?</strong> 5월 21일 입력 모델·자동 채움·편집/감사 3가지를 확정. 베타 일정이 6/4 → 6/8 → <strong>6/9</strong>로 보정.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 63% · 상</span>
+        <span class="h-tag">마감 6월 30일</span>
+        <span class="h-tag">베타 6월 9일 ★</span>
+        <span class="h-tag">3가지 핵심 결정 완료 (5/21)</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi"><div class="label">진행률</div><div class="value">63%</div><div class="sub">우선순위 상</div></div>
+      <div class="kpi k-orange"><div class="label">베타 오픈</div><div class="value" style="font-size:20px;">6/9</div><div class="sub">기존 6/4 대비 5일 보정</div></div>
+      <div class="kpi k-green"><div class="label">데이터 구조 결정</div><div class="value">3</div><div class="sub">입력 / 자동채움 / 감사로그</div></div>
+      <div class="kpi k-purple"><div class="label">고정비 항목</div><div class="value">131</div><div class="sub">18개 카테고리로 자동 합산</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
+    </div>
+    <div class="grid-2">
+      <div class="card danger-card">
+        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
+        <ul class="bulleted">
+          <li><strong>6/9 베타 결과 임원 보고 일정</strong> — 베타 직후 임원 시연·검토 일정 사전 확보</li>
+          <li><strong>fn.interohrigin.com 서브도메인 확정</strong> — 현재 README의 finance.* 표기는 outdated. 최종 주소 합의</li>
+          <li><strong>변동비 자동 채움 시점</strong> — Stage 3로 미뤘는데 임원 보고에 변동비도 필요한지 확인</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
+        <ul class="bulleted">
+          <li><strong>입력 발송 모달</strong> — 부서별 토큰 → 직원별 + 직원-브랜드 매핑 (Migration 70)</li>
+          <li><strong>고정비 자동 채움</strong> — 18개 카테고리로 묶어서 자동 입력 (Migration 71)</li>
+          <li><strong>편집 + 변경 이력</strong> — 임원 보고 후에도 편집 가능 + 모든 변경 기록 (Migration 72)</li>
+          <li><strong>베타 후 손익분석 모듈</strong> — 자금계획 → 손익분석 자동 연계</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>월별 자금계획을 직원이 직접 입력하면 자동으로 손익이 산출되는 시스템</dd>
+          <dt>대상 사용자</dt><dd>대표 (임원 보고용) · 재무 담당자 · 매출 입력 담당 직원</dd>
+          <dt>도입 효과</dt><dd>엑셀 취합 시간 단축 / 실시간 손익 가시화 / 변경 이력 자동 기록</dd>
+          <dt>입력 방식</dt><dd>직원 단위로 입력 요청 발송 → 직원이 본인 담당 브랜드 매출만 입력</dd>
+          <dt>자동 채움</dt><dd>고정비 18개 카테고리는 자동 합산 (직원 입력 불필요)</dd>
+          <dt>편집 정책</dt><dd>임원 보고 후에도 편집 모드 토글로 수정 가능 + 모든 변경 기록</dd>
+          <dt>접속 URL</dt><dd>예정: <strong>fn.interohrigin.com</strong></dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">💰</span> 5월 21일 핵심 결정 (3가지)</h3>
+        <ul class="bulleted">
+          <li><strong>① 입력 모델</strong>: 부서장 한 명에게 부서 전체 매출 입력시키던 방식 → 직원 단위로 각자 본인 담당 브랜드만 입력</li>
+          <li><strong>② 자동 채움</strong>: 고정비 131개 항목을 18개 큰 카테고리로 묶어 자동 입력. 변동비는 향후 Stage 3에 도입</li>
+          <li><strong>③ 편집·감사</strong>: 임원 보고 후에도 편집 모드 켜면 수정 가능. 모든 변경은 자동으로 이력에 기록 (누가, 언제, 무엇을 바꿨는지)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>의사결정 흐름</h2>
+      <div class="desc">5월 21일 핵심 결정 3건 + 5월 15일 배포 준비</div>
+    </div>
+    <div class="timeline" id="tl-finance"></div>
+  </div>
+
+  <div id="discussion-finance" data-discussion="finance"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 5: OPHE -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="ophe">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">OPHE 브랜드 런칭 · 임원 요약</div>
+      <h2>새 화장품 브랜드 OPHE 공식 웹사이트 — 4월 29일 베타 오픈 완료, 콘텐츠 운영 단계</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> OPHE 브랜드 공식 사이트 — 브랜드 스토리·제품 컬렉션 노출, 실제 구매는 Cafe24 쇼핑몰로 연결.
+        <strong>왜 중요?</strong> 브랜드 인지도 향상에 집중하고 쇼핑몰 운영 부담은 Cafe24에 위임하여 운영 부담 최소화.
+        <strong>지금 상황?</strong> 4월 29일 베타 오픈 성공. 현재는 콘텐츠 업로드와 운영 안정화 단계. 6월 30일 정식 운영 목표.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 63% · 상</span>
+        <span class="h-tag">베타 오픈 4월 29일 ✓</span>
+        <span class="h-tag">정식 운영 6월 30일</span>
+        <span class="h-tag">현재: 콘텐츠 업로드</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi"><div class="label">진행률</div><div class="value">63%</div><div class="sub">정식 운영까지 보완 중</div></div>
+      <div class="kpi k-green"><div class="label">베타 오픈</div><div class="value" style="font-size:20px;">4/29</div><div class="sub">완료 ✓</div></div>
+      <div class="kpi k-purple"><div class="label">레퍼런스</div><div class="value" style="font-size:16px;">Byredo</div><div class="sub">레이아웃·무드 기준</div></div>
+      <div class="kpi k-orange"><div class="label">정식 운영</div><div class="value" style="font-size:20px;">6/30</div><div class="sub">마감</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
+    </div>
+    <div class="grid-2">
+      <div class="card danger-card">
+        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
+        <ul class="bulleted">
+          <li><strong>콘텐츠 업로드 담당자·일정</strong> — 정식 운영(6/30) 전까지 채울 콘텐츠 양과 담당자</li>
+          <li><strong>NEWS / FAQ 페이지 강화</strong> — 베타 후 2차 보완안 (5/7)에 포함. 어디까지 자체 페이지로 만들지 vs Cafe24 위임</li>
+          <li><strong>다국어 정식 지원 시점</strong> — 베타는 한국어 중심. 영문/중문 도입 시점과 번역 방식</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
+        <ul class="bulleted">
+          <li>콘텐츠 업로드 완료 → 정식 운영 (6/30)</li>
+          <li>Web Vitals 자동 모니터링 도입</li>
+          <li>콘텐츠 관리 시스템(CMS) 도입 검토</li>
+          <li>2차 디자인 보완 (TalkFile 0507 기준)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>OPHE 브랜드 공식 사이트 (구매는 Cafe24로 연결)</dd>
+          <dt>대상 사용자</dt><dd>최종 소비자 · 잠재 고객</dd>
+          <dt>도입 효과</dt><dd>브랜드 이미지 강화 / 실구매 흐름은 Cafe24 활용으로 운영 부담 분산</dd>
+          <dt>벤치마크</dt><dd>Byredo (레이아웃·무드) · Nonfiction (제품 그리드) · Portrait Report (에디토리얼)</dd>
+          <dt>핵심 분기</dt><dd>홈 / 스토리 / 제품 컬렉션 / 푸터 (구매 클릭 시 Cafe24로 이동)</dd>
+          <dt>분석 도구</dt><dd>Google Analytics 4 + Microsoft Clarity (사용자 행동 측정)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🎯</span> 역할 분담</h3>
+        <ul class="bulleted">
+          <li><strong>이 사이트가 하는 일</strong>: 홈 / 브랜드 스토리 / 제품 진열 / 메뉴·푸터 / Cafe24로 가는 링크</li>
+          <li><strong>Cafe24가 하는 일</strong>: 실제 제품 상세·장바구니·결제·마이페이지·주문/배송/교환/AS</li>
+          <li><strong>외부 이동 시</strong>: 새 탭 X (같은 탭) + 클릭 추적 정보 부착</li>
+          <li><strong>메뉴 구성</strong>: ITEM · NEW · BEST · JEWELRY · ABOUT · NEWS · LANG · WISHLIST · MYPAGE</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>의사결정·개발 흐름</h2>
+      <div class="desc">4월 20일 착수 → 4월 29일 베타 오픈 → 5월 7일 보완안</div>
+    </div>
+    <div class="timeline" id="tl-ophe"></div>
+  </div>
+
+  <div id="discussion-ophe" data-discussion="ophe"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 6: AI 디자인 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="ai-design">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">AI 디자인 에이전트 · 임원 요약</div>
+      <h2>내부 디자인팀 전용 브랜드 아이덴티티 생성 도구 — 통합 테스트 단계, 마감 초과</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> 내부 디자인팀만 사용하는 AI 기반 브랜드 아이덴티티(로고·컬러·타이포 등) 자동 생성 도구.
+        <strong>왜 중요?</strong> 새 브랜드 출시·리뉴얼 시 초안 디자인 시간 단축. 디자이너의 반복 작업을 AI가 대신.
+        <strong>지금 상황?</strong> 4월 30일 마감 초과. 통합 테스트 단계. HR 핵심 안정화 후 재개하기로 한 P2 분류 항목.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">진행 43% · 중</span>
+        <span class="h-tag">마감 4월 30일 (초과)</span>
+        <span class="h-tag">현재: 통합 테스트</span>
+        <span class="h-tag">우선순위: HR 안정화 후</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi k-yellow"><div class="label">진행률</div><div class="value">43%</div><div class="sub">통합 테스트 단계</div></div>
+      <div class="kpi k-red"><div class="label">마감 상태</div><div class="value">초과</div><div class="sub">4/30 마감 미달성</div></div>
+      <div class="kpi"><div class="label">AI 제공사</div><div class="value">4</div><div class="sub">Claude · OpenAI · Gemini · OpenRouter</div></div>
+      <div class="kpi k-purple"><div class="label">접근</div><div class="value" style="font-size:16px;">내부 전용</div><div class="sub">사전 등록 사용자만</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
+    </div>
+    <div class="grid-2">
+      <div class="card danger-card">
+        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
+        <ul class="bulleted">
+          <li><strong>P2 재개 여부</strong> — HR 핵심 안정화 전 착수 금지 분류. HR이 80~90%에 도달하면 재개할지 결정</li>
+          <li><strong>예산 합의</strong> — AI 이미지 생성(DALL-E 3) + 멀티 프로바이더 운영 비용. 월 예산 한도 사전 합의</li>
+          <li><strong>실제 사용 ROI</strong> — 디자인팀 실제 사용 빈도 측정 후 ROI 판단 필요. 시범 사용자 지정</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
+        <ul class="bulleted">
+          <li>통합 테스트 완료 → 4/30 마감 정산</li>
+          <li>멀티 프로바이더 API 비용 모니터링 대시보드</li>
+          <li>이미지 생성 사용량 추적 (DALL-E 3 / Gemini)</li>
+          <li>디자인팀 시범 사용 + 피드백 수집</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>디자인팀이 AI에게 브랜드 키워드를 주면 로고·컬러·타이포 초안을 자동 생성</dd>
+          <dt>대상 사용자</dt><dd>내부 디자인팀만 (공개 회원가입 없음)</dd>
+          <dt>도입 효과</dt><dd>초안 디자인 시간 단축 / 멀티 AI로 비교 출력 가능 / 반복 디자인 자동화</dd>
+          <dt>접속</dt><dd><code>ai-design-agent-rosy.vercel.app</code></dd>
+          <dt>현재 단계</dt><dd>통합 테스트 및 품질 검증</dd>
+          <dt>대기 사유</dt><dd>HR 핵심 안정화 후 본격 운영 (P2 분류, 5/12 0512 보완계획)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🤖</span> AI 4사 활용</h3>
+        <ul class="bulleted">
+          <li><strong>Anthropic Claude</strong> — 카피라이팅·브랜드 설명 자동 작성</li>
+          <li><strong>OpenAI</strong> — DALL-E 3 이미지 생성 (로고·일러스트)</li>
+          <li><strong>Google Gemini</strong> — 텍스트 보조</li>
+          <li><strong>OpenRouter</strong> — 가격·성능 비교 단일 진입점 (어떤 AI가 더 좋은지 자동 비교)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>의사결정 흐름</h2>
+      <div class="desc">3월 20일 착수 → 3월 23일 기능 명세 v1 완성</div>
+    </div>
+    <div class="timeline" id="tl-ai-design"></div>
+  </div>
+
+  <div id="discussion-ai-design" data-discussion="ai-design"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 7: 붐앤잽 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="boomzap">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">붐앤잽 · 임원 요약</div>
+      <h2>인터오리진 신규 브랜드 "붐앤잽" 공식 웹사이트 — 4월 17일 정식 오픈 완료</h2>
+      <div class="h-summary">
+        <strong>무엇?</strong> 인터오리진의 신규 브랜드 붐앤잽 공식 사이트와 어드민(콘텐츠 관리자).
+        <strong>왜 중요?</strong> 신규 브랜드 첫 디지털 진입점. AI 기반 어드민 CMS로 콘텐츠를 직접 편집 가능.
+        <strong>지금 상황?</strong> 4월 17일 정식 오픈 완료. 멀티 AI 통합(Claude·Gemini·OpenAI)과 토큰/비용 실시간 표시 기능 적용.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">완료 100%</span>
+        <span class="h-tag">정식 오픈 4월 17일 ✓</span>
+        <span class="h-tag">신규 브랜드</span>
+        <span class="h-tag">멀티 AI + 비용 실시간 표시</span>
+      </div>
+    </div>
+
+    <div class="kpi-row k4">
+      <div class="kpi k-green"><div class="label">상태</div><div class="value" style="font-size:20px;">완료</div><div class="sub">100% / 운영 중</div></div>
+      <div class="kpi k-pink"><div class="label">정식 오픈</div><div class="value" style="font-size:20px;">4/17</div><div class="sub">완료 ✓</div></div>
+      <div class="kpi k-purple"><div class="label">AI 제공사</div><div class="value">3</div><div class="sub">Claude · Gemini · OpenAI</div></div>
+      <div class="kpi k-orange"><div class="label">월 운영비</div><div class="value">$0</div><div class="sub">기본 Gemini 무료 라우터</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>대표·이사 확인 요청 (미리 기재)</h2>
+      <div class="desc">운영 단계에서 결정이 필요한 사항</div>
+    </div>
+    <div class="grid-2">
+      <div class="card warn-card">
+        <h3><span class="emoji">📋</span> 운영 모니터링 KPI 정의</h3>
+        <ul class="bulleted">
+          <li><strong>방문자 추이</strong> — 월간 방문자 / 페이지뷰 목표 합의 필요</li>
+          <li><strong>AI 사용 모니터링</strong> — 토큰 사용량 + 비용 (현재 무료 라우터지만 초과 시 알림 기준 필요)</li>
+          <li><strong>콘텐츠 업데이트 주기</strong> — 신규 콘텐츠 등록 주기와 담당자</li>
+          <li><strong>유료 모델 전환 시점</strong> — Cloudflare Workers 한도 도달 시</li>
+        </ul>
+      </div>
+      <div class="card success-card">
+        <h3><span class="emoji">✅</span> 완료 사항 요약</h3>
+        <ul class="bulleted">
+          <li>3월 28일: 클라우드 인프라 구축 + 자동 배포</li>
+          <li>4월 2일: 실무 미팅으로 콘텐츠 방향성 확정</li>
+          <li>4월 17일: 멀티 AI + 어드민 CMS 완성 후 정식 오픈</li>
+          <li>5월 12일: 상세 페이지 영상 자산 보강</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
+        <dl class="kv">
+          <dt>한 줄</dt><dd>붐앤잽 공식 사이트 + 콘텐츠 직접 편집 가능한 어드민</dd>
+          <dt>대상 사용자</dt><dd>최종 소비자 (외부) · 브랜드 운영자 (어드민)</dd>
+          <dt>도입 효과</dt><dd>브랜드 디지털 진입점 확보 / 콘텐츠 수정 시 개발자 불필요 / AI로 카피라이팅 보조</dd>
+          <dt>웹사이트 URL</dt><dd><code>boomnzap.interohrigin-dev.workers.dev</code></dd>
+          <dt>레퍼런스</dt><dd>goflaus.com (고대비 디자인 / Apple 스타일 헤더)</dd>
+          <dt>운영비</dt><dd><strong>월 $0</strong> (Cloudflare 무료 한도 내 + AI는 기본 무료 모델)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🤖</span> 멀티 AI + 비용 실시간 표시</h3>
+        <ul class="bulleted">
+          <li><strong>Gemini 2.5 Flash Lite</strong> — 무료 (기본 라우터)</li>
+          <li><strong>Gemini 2.5 Flash</strong> — $0.15/MTok (선택 가능)</li>
+          <li><strong>Gemini 2.5 Pro</strong> — $1.25/MTok (선택 가능)</li>
+          <li><strong>Claude 4 (Haiku/Sonnet/Opus)</strong> — 결제 추가 시 활성화</li>
+          <li><strong>운영자가 AI 사용 시</strong> — 어드민에 토큰 사용량 + 누적 비용이 실시간 표시 (사내 시스템 중 유일)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>의사결정·개발 흐름</h2>
+      <div class="desc">3월 28일 인프라 구축 → 4월 17일 정식 오픈</div>
+    </div>
+    <div class="timeline" id="tl-boomzap"></div>
+  </div>
+
+  <div id="discussion-boomzap" data-discussion="boomzap"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 8: 완료 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="completed">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">완료 프로젝트 · 임원 요약</div>
+      <h2>인터오리진 본사 사이트 리뉴얼 · 사내 복지몰 · Exhiboot 박람회 시스템 — 모두 완료 운영 중</h2>
+      <div class="h-summary">
+        <strong>3건 모두 완료 단계</strong>로 이미 운영 중. 신규 개발이 아닌 안정 운영과 후속 보강(어드민 개편 등)이 진행됩니다.
+        붐앤잽은 별도 탭에 정리되어 있습니다.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">완료 3건</span>
+        <span class="h-tag">I&amp;C 리뉴얼 3/31</span>
+        <span class="h-tag">복지몰 4/24</span>
+        <span class="h-tag">Exhiboot 3/23</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card" style="margin-bottom:16px;">
+      <h3><span class="emoji">🏢</span> 인터오리진 I&amp;C 홈페이지 리뉴얼 — <span class="badge b-completed">완료 100%</span> · 3월 31일 · 긴급</h3>
+      <dl class="kv">
+        <dt>한 줄</dt><dd>인터오리진 본사 공식 사이트 리뉴얼 (디자인·정보 구조 전면 개편)</dd>
+        <dt>완료일</dt><dd>2026-03-31 (5단계 모두 완료)</dd>
+        <dt>5단계</dt><dd>요구사항 분석 → UI/UX 설계 → 개발/구현 → 품질보증 테스트 → 콘텐츠 확인</dd>
+        <dt>도메인</dt><dd>interohrigin.com (운영 중)</dd>
+        <dt>후속 작업</dt><dd><strong>어드민 패널 개편</strong> 진행 중 — 콘텐츠 직접 수정 + AI 카피라이팅 보조 (별개 트랙)</dd>
+        <dt>임원 확인 필요</dt><dd>어드민 개편 완료 시점 합의 / 콘텐츠 관리 책임자 지정</dd>
+      </dl>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3><span class="emoji">🛍️</span> 인터오리진 복지몰 — <span class="badge b-completed">완료 100%</span> · 4월 24일 · 중</h3>
+      <dl class="kv">
+        <dt>한 줄</dt><dd>직원 포인트로 사내 복지품을 구매할 수 있는 사내 쇼핑몰</dd>
+        <dt>완료일</dt><dd>2026-04-24</dd>
+        <dt>특징</dt><dd>HR 시스템과 동일한 로그인 + 직원 마스터 자동 연동 (별도 회원가입 불필요)</dd>
+        <dt>운영 정책</dt><dd>경영지원팀 선행 → 키맨 → 전사 (4/16, 4/30 회의 합의)</dd>
+        <dt>관련 회의</dt><dd>4/16 HR + 복지몰 통합 점검 · 4/30 재무회계 + 복지몰 개발 미팅</dd>
+        <dt>임원 확인 필요</dt><dd>전사 확산 일정 / 복지품 카테고리 추가 정책</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h3><span class="emoji">💄</span> Exhiboot — <span class="badge b-completed">완료 100%</span> · 3월 23일 · 하</h3>
+      <dl class="kv">
+        <dt>한 줄</dt><dd>해외 뷰티 박람회 현장 운영 시스템 (QR 리드 수집 + 바이어 응대 + 주문 결제)</dd>
+        <dt>완료일</dt><dd>2026-03-23</dd>
+        <dt>차별점</dt><dd>박람회 부스에 태블릿 키오스크 — 방문자 4~5단계 Q&amp;A → AI 맞춤 추천 + 뷰티 분석 리포트 즉시 발송</dd>
+        <dt>결제 수단</dt><dd>PayPal (해외 결제) · EMS 배송비 통합 결제</dd>
+        <dt>SNS 연결</dt><dd>WhatsApp · LINE · 카카오톡 · Instagram</dd>
+        <dt>최근 활동</dt><dd>5/25 Drive 폴더 수정 감지 — 운영 후속 작업으로 추정</dd>
+        <dt>임원 확인 필요</dt><dd>다음 박람회 일정 / 운영 인력 배정 / 시즌별 콘텐츠 업데이트</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>완료 프로젝트 통합 타임라인</h2>
+      <div class="desc">붐앤잽 포함 4개 완료 프로젝트의 핵심 마일스톤</div>
+    </div>
+    <div class="timeline" id="tl-completed"></div>
+  </div>
+
+  <div id="discussion-completed" data-discussion="completed"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 9: 과금 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="cost">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">과금 구조 · 임원 요약</div>
+      <h2>5월 확정 비용 약 $155 + 사용량 기반 변동분 — 토큰 단위 추적은 일부만 가능</h2>
+      <div class="h-summary">
+        비용은 3개 카테고리로 구분: <strong>① 개발자 도구</strong> (월 $130, 차주용 본인 도구) · <strong>② 시스템 운영 AI 호출</strong> (각 콘솔 청구서 기준) · <strong>③ 인프라</strong> (Supabase Pro $25 + Cloudflare 무료 한도).
+        토큰 단위 정확한 비용 추적은 Anthropic·Google·OpenAI 콘솔 청구서를 직접 확인해야 합니다.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">5월 확정 $155 + α</span>
+        <span class="h-tag">6개월 누계 $940 + α</span>
+        <span class="h-tag">단일 Supabase Pro 공유 ($25)</span>
+        <span class="h-tag">붐앤잽만 토큰 실시간 표시</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <table class="t">
+      <thead>
+        <tr>
+          <th style="width:22%;">서비스</th>
+          <th style="width:22%;">플랜/항목</th>
+          <th class="right" style="width:11%;">단가</th>
+          <th class="right" style="width:9%;">2026-04</th>
+          <th class="right" style="width:9%;">2026-05</th>
+          <th class="right" style="width:11%;">6개월 누계</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody id="cost-table"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="notice">
+      <strong>토큰 단위 추적 한계.</strong>
+      HR DB에 AI 설정·리포트 테이블은 있으나 호출별 토큰 카운트 저장은 미구현.
+      붐앤잽만 자체적으로 토큰/비용 실시간 표시 (세션 누적). 정확한 5월 합산은 각 콘솔 (Anthropic · Google Cloud · OpenAI) 청구서 기준 수동 입력이 필요합니다.
+    </div>
+  </div>
+
+  <div id="discussion-cost" data-discussion="cost"></div>
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널 10: 향후 -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="future">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">향후 계획 · 임원 요약</div>
+      <h2>다음 6주 핵심 일정 — 6/9 자금계획 베타가 가장 임박, 미결 의사결정 12건</h2>
+      <div class="h-summary">
+        2주 안에 (P0): <strong>자금계획 v1 베타 (6/9)</strong> · <strong>CS 배포 + 교육 완료</strong> · <strong>HR 마감 지연 해소</strong>.
+        4주 안에 (P1): HR AI 보조 면접 · OPHE 정식 운영 · AI 디자인 통합 테스트 완료.
+        보류 (P2): HR Phase 3 디자인 플랫폼, 모듈 분리, SMS PoC, 보안 강화.
+      </div>
+      <div class="h-tags">
+        <span class="h-tag">P0 (2주): 3건</span>
+        <span class="h-tag">P1 (4주): 5건</span>
+        <span class="h-tag">P2 (비용 합의 후): 5건</span>
+        <span class="h-tag">미결 결정: 12건</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="grid-3">
+      <div class="card danger-card">
+        <h3><span class="emoji">🔥</span> P0 — 5/27 ~ 6/9 (2주)</h3>
+        <ul class="bulleted">
+          <li><strong>재무관리 자금계획 v1 베타</strong> (6/9) — 직원-브랜드 매핑 + 고정비 자동채움 + 편집/감사로그</li>
+          <li><strong>CS 플랫폼 배포 + 교육</strong> — 4/30 마감 초과분 해소</li>
+          <li><strong>HR 4/13 마감 지연 해소</strong> + 잔여 보완 작업 15건</li>
+        </ul>
+      </div>
+      <div class="card warn-card">
+        <h3><span class="emoji">📈</span> P1 — 6/10 ~ 7/7 (4주)</h3>
+        <ul class="bulleted">
+          <li>HR — AI 보조 면접 콘솔 본격화 + 보직 추천 AI 기본값 적용</li>
+          <li>OPHE — 정식 운영(6/30) + NEWS/FAQ 강화 + 콘텐츠 CMS 도입 검토</li>
+          <li>재무관리 — 베타 후 손익분석 모듈 자동 연계</li>
+          <li>I&amp;C 어드민 — Tiptap/Lexical 리치 에디터 + Claude 카피라이팅</li>
+          <li>AI 디자인 — 마감 통합 테스트 완료 후 P2 재개 여부 결정</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">⏸️</span> P2 — 비용·합의 후</h3>
+        <ul class="bulleted">
+          <li>HR Phase 3 (AI 디자인 플랫폼) — 비용 영향 큼</li>
+          <li>HR Phase 2 (P-32~41) — 시스템·업무 연동, 모듈 분리</li>
+          <li>SMS PoC + 컬럼 단위 암호화</li>
+          <li>CS 본격 운영 (배포 후)</li>
+          <li>붐앤잽 운영 안정화 + AI 사용량 모니터링</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>미결 의사결정 (대표·이사 검토 12건)</h2>
+      <div class="desc">인프라 · 운영 · 정책 · 기술 — 아래 토론 영역에서 회신 부탁드립니다</div>
+    </div>
+    <div class="card">
+      <ul class="bulleted">
+        <li>📌 <strong>fn.interohrigin.com 서브도메인 확정</strong></li>
+        <li>📌 <strong>카카오워크 30명 무료 한도 초과 후 유료 전환</strong> 시기</li>
+        <li>📌 <strong>HR AI 디자인 플랫폼 (Phase 3) 비용 합의</strong></li>
+        <li>📌 <strong>채용 면접 통합 페이지 우선순위</strong> (대표 단일 링크)</li>
+        <li>📌 <strong>디자인 레퍼런스 아카이브 위치</strong> (강 이사 검토)</li>
+        <li>📌 <strong>Vercel Hobby → Pro 전환</strong> (AI 디자인)</li>
+        <li>📌 <strong>Supabase Free → Pro 전환</strong> (트래픽 한도)</li>
+        <li>📌 <strong>Cloudflare Workers 유료 한도</strong> (붐앤잽 운영 안정화 후)</li>
+        <li>📌 <strong>SMS PoC 도입 여부</strong> (개인정보 보안 비용)</li>
+        <li>📌 <strong>CS 본격 운영 → 키맨 확산 시점</strong></li>
+        <li>📌 <strong>1분기 인사 평가 정식 실행</strong> (현재 민지 + JY 2인 선행 중)</li>
+        <li>📌 <strong>AI 컬럼 단위 암호화 도입</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="notice info">
+      <strong>다음 보고 권고.</strong>
+      (1) 6/9 자금계획 베타 결과 · (2) HR Gap 100% 달성 + 4/13 지연 해소 · (3) CS 배포·교육 완료 · (4) 정확한 5월 API 비용 (각 콘솔 청구서 마감 후).
+    </div>
+  </div>
+
+  <div id="discussion-future" data-discussion="future"></div>
+</section>
+
+</main>
+
+<footer>
+  생성: <span id="gen-time"></span> · 파일: <code>~/Desktop/jy_executive_dashboard.html</code> ·
+  의견은 브라우저 localStorage에 저장 · 슬랙·이메일·JSON 연동 지원
+  · <a href="#" onclick="window.print();return false;">PDF 저장</a>
+  · <a href="#" onclick="openSettingsModal();return false;">설정</a>
+</footer>
+
+<!-- ===== 설정/외부 연동 모달 ===== -->
+<div class="modal-backdrop" id="settings-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>⚙️ 설정 / 외부 연동</h3>
+      <button class="modal-close" onclick="closeSettingsModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div style="background:var(--green-soft);border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#166534;">
+        💡 <strong>외부 연동 안내.</strong> 토론에 의견을 작성하면 슬랙 채널로 자동 전송되거나, 슬랙에서 받은 메시지를 여기로 끌어올 수 있습니다.
+        설정은 이 브라우저에만 저장됩니다 (다른 사람에게 노출되지 않음).
+      </div>
+
+      <label>🔌 백엔드 (Cloudflare Worker) URL <span style="color:var(--red);font-weight:400;text-transform:none;">필수 (실시간 동기화)</span></label>
+      <input type="text" id="setting-backend" placeholder="예: https://executive-dashboard.YOUR-SUBDOMAIN.workers.dev">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:-8px;margin-bottom:8px;">
+        Worker가 같은 도메인에 배포된 경우 비워두세요. 별도 호스팅이면 URL 입력.
+      </div>
+
+      <label>🔑 Dashboard Key <span style="color:var(--red);font-weight:400;text-transform:none;">필수</span></label>
+      <input type="text" id="setting-key" placeholder="PM에게 받은 공유 키">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:-8px;margin-bottom:8px;">
+        Worker 환경변수 DASHBOARD_KEY와 동일한 값. PM이 임원에게 공유.
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+
+      <label>① 작성자 기본값 (한 번 입력하면 다음부터 자동 채워짐)</label>
+      <input type="text" id="setting-author" placeholder="예: 차주용 / 차대표 / 강 이사">
+
+      <label>② 슬랙 Incoming Webhook URL <span style="color:var(--text-mute);font-weight:400;text-transform:none;">(선택 — 대시보드에서 슬랙으로 미러링용)</span></label>
+      <input type="text" id="setting-slack-webhook" placeholder="https://hooks.slack.com/services/...">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:-8px;margin-bottom:8px;">
+        설정 시 토론 의견이 작성될 때마다 해당 슬랙 채널로 자동 발송됩니다.
+        <a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener">Webhook 만드는 법 (Slack 공식 문서)</a>
+      </div>
+
+      <label>③ 이메일 수신자 <span style="color:var(--text-mute);font-weight:400;text-transform:none;">(선택)</span></label>
+      <input type="text" id="setting-email" placeholder="예: ceo@interohrigin.com, jooyong@interohrigin.com">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:-8px;margin-bottom:8px;">
+        "이메일로 보내기" 버튼 사용 시 기본 수신자로 채워집니다 (쉼표로 여러 명 가능).
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">
+
+      <label>📥 슬랙 메시지 가져오기 (붙여넣어 토론에 추가)</label>
+      <textarea id="setting-slack-paste" placeholder="슬랙에서 메시지를 복사해서 여기에 붙여넣으세요. 작성자/시간이 자동 인식됩니다.
+예시:
+차대표  오후 3:45
+자금계획 6/9 베타 임원 보고는 6/10 오후로 잡아주세요."></textarea>
+      <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+        <select id="setting-slack-paste-panel" style="width:auto;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;">
+          <option value="overview">📌 종합</option>
+          <option value="hr">👥 HR 플랫폼</option>
+          <option value="cs">🎧 CS 플랫폼</option>
+          <option value="finance">💰 재무관리</option>
+          <option value="ophe">🌿 OPHE</option>
+          <option value="ai-design">🎨 AI 디자인</option>
+          <option value="boomzap">💧 붐앤잽</option>
+          <option value="completed">✅ 완료</option>
+          <option value="cost">💵 과금</option>
+          <option value="future">🚀 향후</option>
+        </select>
+        <select id="setting-slack-paste-cat" style="width:auto;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;">
+          <option value="question">❓ 질문</option>
+          <option value="request">📋 요청</option>
+          <option value="decision">⚠️ 결정필요</option>
+          <option value="feedback">👍 피드백</option>
+        </select>
+        <button onclick="importSlackMessage()" style="padding:6px 14px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">슬랙 메시지 토론에 추가</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">
+
+      <label>📤 전체 의견 백업·복원</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="exportAllJSON()" style="padding:8px 14px;background:var(--green);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">JSON 내보내기</button>
+        <button onclick="document.getElementById('json-import').click()" style="padding:8px 14px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">JSON 가져오기</button>
+        <input type="file" id="json-import" accept=".json" style="display:none" onchange="importJSON(event)">
+        <button onclick="exportAllText()" style="padding:8px 14px;background:var(--purple);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">텍스트로 내보내기</button>
+        <button onclick="mailAllOpinions()" style="padding:8px 14px;background:var(--orange);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">이메일로 보내기</button>
+        <button onclick="clearAllDiscussions()" style="padding:8px 14px;background:white;color:var(--red);border:1px solid var(--red);border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">전체 삭제</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button onclick="closeSettingsModal()">닫기</button>
+      <button class="primary" onclick="saveSettings()">설정 저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================================================
+// 데이터
+// ======================================================
+const ACTIVE_PROJECTS = [
+  { id: "cs",         name: "고객관리 CS 플랫폼 개발", tasks: 1,  progress: 75, priority: "urgent", priorityLabel: "긴급", due: "4월 30일", stage: "배포 준비 및 교육", panel: "cs" },
+  { id: "finance",    name: "재무관리 시스템 개발",       tasks: 0,  progress: 63, priority: "high",   priorityLabel: "상",   due: "6월 30일", stage: "보안 및 성능 최적화", panel: "finance" },
+  { id: "ophe",       name: "ophe 브랜드 런칭",            tasks: 0,  progress: 63, priority: "high",   priorityLabel: "상",   due: "6월 30일", stage: "콘텐츠 업로드 및 운영", panel: "ophe" },
+  { id: "hr",         name: "HR 플랫폼 개발",                tasks: 15, progress: 73, priority: "high",   priorityLabel: "상",   due: "4월 13일", stage: "메뉴별 테스트 및 보완", panel: "hr" },
+  { id: "ai-design",  name: "AI 디자인 에이전트",            tasks: 0,  progress: 43, priority: "med",    priorityLabel: "중",   due: "4월 30일", stage: "통합 테스트 및 품질", panel: "ai-design" }
+];
+
+const DONE_PROJECTS = [
+  { id: "boomzap",  name: "신규브랜드(붐앤잽) 웹사이트 구축",   tasks: 1, progress: 100, priority: "high",   priorityLabel: "상",   due: "4월 17일", stage: "—", panel: "boomzap" },
+  { id: "irc",      name: "인터오리진 I&C 홈페이지 리뉴얼",      tasks: 3, progress: 100, priority: "urgent", priorityLabel: "긴급", due: "3월 31일", stage: "—", panel: "completed" },
+  { id: "mall",     name: "인터오리진 복지몰 개발",                  tasks: 0, progress: 100, priority: "med",    priorityLabel: "중",   due: "4월 24일", stage: "—", panel: "completed" },
+  { id: "exhiboot", name: "Exhiboot 개발",                                 tasks: 4, progress: 100, priority: "low",    priorityLabel: "하",   due: "3월 23일", stage: "—", panel: "completed" }
+];
+
+const TIMELINE = {
+  "hr": [
+    { date: "2026-03-19", milestone: true, title: "프로젝트 착수 — 차주용 입사 첫 주", content: "DB 마이그레이션 진행 / 페이팔 결제 라이브 / 이메일 도메인 인증 / 인사노무 기능 착수. Phase 1 범위 P-01~P-21 채용관리·인사평가 통합 정의.", source: "scripts/data_migration_part2.sql" },
+    { date: "2026-03-24", milestone: true, title: "Phase 1 완료 — 핵심 모듈 1차 가동", content: "Supabase Pro 전환·백업 / Monday.com 스타일 대시보드 UI / 채용관리 Phase 1 (P-01~P-21) / CEO 긴급 대시보드 (P-22) / 인사평가 간소화 (P-23) / 연차 관리 (P-26) / 전자결재 (P-28).", source: "docs/ROADMAP.md" },
+    { date: "2026-04-16", title: "HR플랫폼 + 복지몰 개발 점검 회의", content: "• 전사 일괄 오픈 X → 경영지원팀 선행 테스트 → 단계별 확산\n• 키맨 중심 운영\n• CEO 리포트 한 방에 회사 전반 파악\n• 알림 = 이메일 (슬랙/푸시는 미로그인 시 수신 불가)", source: "IO_HR_개발_업데이트.md" },
+    { date: "2026-04-21", title: "운영 피드백 정리 — 31건", content: "정규직 인사 평가 / OJT 멘토링 / 프로젝트 일일보고 / 연차 전자결재 4개 영역 31건. 별도 문서로 분리.", source: "docs/ref/차대표님_확인요청_정리_20260421.md" },
+    { date: "2026-04-24", title: "CS 플랫폼 + 경영 전반 업무 점검", content: "• KPI 수치화 — 매출 목표 미입력 시 결재 잠금\n• 전자결재 AI 자동작성 (Claude API) — 직원 입력 0분 목표\n• 채용 면접 통합 페이지 — 대표용 단일 링크\n• 메신저: 카카오워크 (30명 무료) 채택\n• 미결: 면접 페이지 우선순위, 디자인 레퍼런스", source: "HR플랫폼_미팅노트_0424.md" },
+    { date: "2026-04-30", title: "HR + 복지몰 기능 업데이트 회의", content: "기능 업데이트 보완 계획. 6주 스프린트 재산정 (Sprint 0~3, 4/17~5/15). 1분기 평가 테스트는 민지+JY 2인 선행.", source: "docs/HR플랫폼_기능업데이트_개발계획_0430.md" },
+    { date: "2026-05-01", title: "실행 프롬프트 7종 패키지화", content: "공통 베이스 / 업무보고↔결재 연동 / 결재선 관리자 / 연차·촉진 / 증명서 인감 자동 날인 / 근태 메뉴 숨김 / 테스트·리포트 출력 형식.", source: "docs/HR플랫폼_기능업데이트_실행프롬프트_0501.md" },
+    { date: "2026-05-07", milestone: true, title: "Gap Analysis — 현재 80%, FR별 갭 매트릭스", content: "HR AI 플랫폼 고도화 요구서 v1.0 모든 FR 대조 분석:\n• Phase 1 사전 질의서 UI/UX\n• Phase 2 채용 프로세스 자동화\n• Phase 3 AI 디자인 플랫폼\n80% → 100% 단계별 실행 계획 확정.", source: "docs/HR플랫폼_기능업데이트_개발계획_0507.md" },
+    { date: "2026-05-12", title: "0507 계획 보완 — 비용·보안·우선순위 재정렬", content: "P0 채용 전환율 / P1 면접 품질 / P2 비용 합의 후. Phase 3 디자인 플랫폼은 HR 핵심 안정화 전 착수 금지.", source: "docs/HR플랫폼_기능업데이트_보완개발계획_0512.md" }
+  ],
+  "finance": [
+    { date: "2026-05-15", title: "재무관리 자동 배포 준비 — Cloudflare Pages", content: "main 브랜치에 코드 올리면 자동 빌드. 서브도메인 fn.interohrigin.com 예정 (README finance.* 표기는 outdated).", source: "auto-memory · io_finance_deploy.md" },
+    { date: "2026-05-21", milestone: true, title: "자금계획 v1 — 3개 핵심 결정", content: "① 입력: 부서 단위 → 직원 단위 + 직원-브랜드 매핑\n② 자동 채움: 고정비 18개 카테고리 단위로 자동 합산. 변동비는 향후 Stage 3\n③ 편집·감사: 임원 보고 후 편집 모드 + 모든 변경 자동 기록\n\n베타 일정: 6/4 → 6/8 → 6/9 보정", source: "auto-memory · cash_plan_*.md" }
+  ],
+  "ophe": [
+    { date: "2026-04-20", milestone: true, title: "프로젝트 착수 — 요구사항 정렬", content: "OPHE 자사몰 (랜딩 + Cafe24 핸드오프).\n베타 목표: 4/29.\n벤치마크: Byredo / Nonfiction / Portrait Report.\n역할 분담: Next.js (브랜드 사이트) + Cafe24 (실제 결제)", source: "ophe/DEVELOPMENT_PLAN.md" },
+    { date: "2026-04-21", title: "Step 1 셋업", content: "Next.js 14 + Tailwind + GSAP/Lenis + Cafe24 URL 빌더 구축. 기본 디렉토리 + 디자인 기준 정의.", source: "ophe/DEVELOPMENT_PLAN.md Step 1" },
+    { date: "2026-04-22 ~ 25", title: "Step 2~4 레이아웃·히어로·제품진열", content: "Step 2: 헤더/메뉴/모바일메뉴/푸터\nStep 3: 홈 히어로 + 챕터 스토리텔링\nStep 4: 컬렉션 페이지, 제품 카드, 필터, 클릭 추적\n\n분석: GA4 + Microsoft Clarity + cafe24_redirect 이벤트.", source: "ophe/DEVELOPMENT_PLAN.md Step 2~4" },
+    { date: "2026-04-29", milestone: true, title: "🚀 베타 오픈", content: "Step 8 배포 리허설 + Beta Open. Cloudflare Pages 도메인 + 분석 점검 완료. 운영 체크 + 이슈 대응 단계 진입.", source: "ophe/DEVELOPMENT_PLAN.md Beta Open" },
+    { date: "2026-05-07", title: "수정안 — 베타 후 피드백 반영", content: "TalkFile 수정안 기반 베타 후 2차 보완. NEWS/FAQ 진입 강화 + 다국어 검토.", source: "ophe/TalkFile_오프_자사몰_수정안_260507.pdf" }
+  ],
+  "ai-design": [
+    { date: "2026-03-20", milestone: true, title: "프로젝트 시작 — 멀티 AI 셋업", content: "내부 디자인팀 전용 BI(브랜드 아이덴티티) Generator. 공개 회원가입 없음 — 사전 등록만.\n\n역할 (Supabase RLS):\n• admin: 전체 + 팀 관리 + 프롬프트\n• manager: 프로젝트 + 프롬프트\n• member: 프로젝트 조회 + BI 생성", source: "AI Design Agent/docs/기능명세서.md" },
+    { date: "2026-03-23", title: "기능명세서 v1 완성", content: "배포 URL: ai-design-agent-rosy.vercel.app\n\nHR 0512 보완계획에서 'P2. 비용/운영 합의 후 진행' 분류 — HR 핵심 퍼널 안정화 전 착수 금지.\n현재 통합 테스트 단계 (대시보드 43% / 마감 4/30).", source: "AI Design Agent/docs/기능명세서.md" }
+  ],
+  "boomzap": [
+    { date: "2026-03-28", title: "Cloudflare 인프라 구축 + 작업 일지 v1", content: "Cloudflare Pages → Workers 전환 (Pages가 @opennextjs/cloudflare 미지원).\n• D1 데이터베이스 — 13개 테이블 + 시드\n• KV — AI API 키\n• AUTH_SECRET 시크릿\n• CI/CD: GitHub 자동 배포\n\n공개: boomnzap.interohrigin-dev.workers.dev", source: "Boom&Zap/website/docs/work-log-2026-03-28.md" },
+    { date: "2026-04-02", title: "붐앤잽 사이트 실무 미팅", content: "오프라인 미팅 — 사이트 구조·콘텐츠 방향성 협의. 메인 7섹션 / 브랜드 7섹션 / 4컷만화 / 캐릭터 등 콘텐츠 확정.", source: "Boom&Zap/붐앤잽 사이트 실무 미팅_0402" },
+    { date: "2026-04-17", milestone: true, title: "🚀 정식 오픈 — 멀티 AI + 토큰/비용 실시간 표시", content: "디자인 (goflaus.com 레퍼런스): 검정 + 핫핑크 공지바 + Apple 헤더\n홈 7섹션 / 브랜드 7섹션 / 4컷만화 / 캐릭터\n\n어드민 CMS:\n• NextAuth credentials (Cloudflare 호환)\n• 페이지 관리 탭 + 아코디언\n• 이미지 드래그앤드롭 업로드\n\n멀티 AI:\n• Claude + Gemini + OpenAI (자동 라우터 = Gemini 무료)\n• AI 버튼: 그라데이션 pill + 팝오버\n• 토큰 + 비용 실시간 표시 (세션 누적)", source: "Boom&Zap/website/docs/work-log-2026-03-28.md" },
+    { date: "2026-05-12", title: "상페 영상 자산 보강", content: "상세페이지 모바일/PC 버전 영상 작업 (mp4). 시각화 자산 보강.", source: "Boom&Zap/0512_상페 mobile ver.mp4" }
+  ],
+  "completed": [
+    { date: "2026-03-16", milestone: true, title: "Exhiboot — 클라이언트 미팅 v6.0 확정", content: "참석: 오 대표 / 김 리더·보리 / 이사님. 링크트리 랜딩 + 공급가+MOQ + FAQ + SNS + AI 부스 인터랙티브.", source: "exhiboot/docs/DEVELOPMENT_PLAN.md" },
+    { date: "2026-03-23", milestone: true, title: "🏁 인터오리진 I&C v1 / Exhiboot 완료", content: "I&C v1 — 5단계 모두 완료 (요구사항 → UI/UX → 개발 → QA → 콘텐츠).\nExhiboot — 개발 완료 단계 진입.", source: "scripts/data_migration_part2.sql" },
+    { date: "2026-03-31", milestone: true, title: "🏁 인터오리진 I&C 홈페이지 리뉴얼 — 완료 100%", content: "사내 대시보드 기준 완료일 3/31. 작업 3건 마감. 이후 어드민 패널 개편(별개 트랙) 진행 중.", source: "사내 대시보드" },
+    { date: "2026-04-17", milestone: true, title: "🚀 붐앤잽 정식 오픈 (완료)", content: "Cloudflare Workers + D1 + KV / 멀티 AI 통합 / 어드민 CMS / 영상 자산. 작업 1건 누적.", source: "Boom&Zap/website/docs/work-log-2026-03-28.md" },
+    { date: "2026-04-24", milestone: true, title: "🏁 인터오리진 복지몰 완료 100%", content: "HR 통합 DB (mall_* 테이블) · SSO · 직원 마스터/포인트 연결. 단계별 오픈 정책 (경영지원팀 선행 → 키맨 → 전사).", source: "사내 대시보드 · 4/16 4/30 회의록" }
+  ]
+};
+
+const COSTS = [
+  { group: "1. 개발자 직접 사용 (차주용 본인 도구)" },
+  { service: "Anthropic Claude", plan: "Max Plan 5x", unit: "$100/월", apr: "100", may: "100", total6m: "600", note: "6개월 약정 가정" },
+  { service: "OpenAI Codex", plan: "API 종량제", unit: "사용량 기반", apr: "—", may: "—", total6m: "—", note: "콘솔 청구서 필요" },
+  { service: "GitHub Copilot", plan: "Pro", unit: "$10/월", apr: "10", may: "10", total6m: "60", note: "기재 추정" },
+  { service: "Cursor / Antigravity", plan: "Pro", unit: "$20/월", apr: "20", may: "20", total6m: "120", note: "기재 추정" },
+  { subtotal: "1. 개발자 도구 소계", apr: "130", may: "130", total6m: "780" },
+
+  { group: "2. 시스템 운영 사용 (프로덕션 API 호출)" },
+  { service: "HR — Claude API", plan: "Sonnet · CEO 리포트·결재 자동작성", unit: "토큰당", apr: "—", may: "—", total6m: "—", note: "4/16 회의: 한도 소진 이슈" },
+  { service: "HR — Gemini API", plan: "2.5 Flash · 이력서/면접/평가/수습/인수인계 분석", unit: "토큰당", apr: "0", may: "0", total6m: "0", note: "무료 플랜 (분당 15건)" },
+  { service: "HR — Deepgram", plan: "Nova-3 · 회의록 받아쓰기 한국어", unit: "$0.0043/분", apr: "—", may: "—", total6m: "—", note: "정확도 27% 개선" },
+  { service: "HR — OpenAI Whisper", plan: "받아쓰기 fallback", unit: "$0.006/분", apr: "—", may: "—", total6m: "—", note: "25MB 파일 제한" },
+  { service: "Exhiboot — Claude API", plan: "다국어 번역·제품 추천", unit: "토큰당", apr: "—", may: "—", total6m: "—", note: "콘솔 청구서 필요" },
+  { service: "Exhiboot — Resend", plan: "메일링 자동발송", unit: "1만건 $20", apr: "—", may: "—", total6m: "—", note: "발송량 기반" },
+  { service: "Exhiboot — PayPal", plan: "결제 수수료", unit: "건당 ~3.5%", apr: "—", may: "—", total6m: "—", note: "거래액 기반" },
+  { service: "OPHE — Cafe24", plan: "쇼핑몰 호스팅", unit: "월 정액", apr: "—", may: "—", total6m: "—", note: "Cafe24 측 청구" },
+  { service: "OPHE — GA4 + Clarity", plan: "분석 (무료)", unit: "$0", apr: "0", may: "0", total6m: "0", note: "" },
+  { service: "붐앤잽 — Gemini 2.5", plan: "Flash Lite (무료) · Flash $0.15/MTok", unit: "토큰당", apr: "0", may: "0", total6m: "0", note: "기본 무료 + 세션 누적 표시" },
+  { service: "재무관리 — Supabase RPC", plan: "자금계획·고정비·감사로그", unit: "$0", apr: "0", may: "0", total6m: "0", note: "HR DB 통합" },
+  { service: "AI 디자인 — 멀티 프로바이더", plan: "Anthropic + OpenAI + Google + OpenRouter", unit: "혼합", apr: "—", may: "—", total6m: "—", note: "통합 테스트 단계" },
+  { subtotal: "2. 시스템 API 소계", apr: "0", may: "0", total6m: "0" },
+
+  { group: "3. 인프라" },
+  { service: "Supabase PRO (HR · CS · 복지몰 · 재무관리)", plan: "Pro Plan (단일 인스턴스)", unit: "$25/월", apr: "25", may: "25", total6m: "150", note: "4 모듈 공유" },
+  { service: "Supabase Free (Exhiboot)", plan: "Free Tier", unit: "$0", apr: "0", may: "0", total6m: "0", note: "트래픽 한도 도달 시 PRO 전환" },
+  { service: "Supabase Free (OPHE · AI Design)", plan: "Free Tier", unit: "$0", apr: "0", may: "0", total6m: "0", note: "" },
+  { service: "Firebase (I&C 리뉴얼)", plan: "Spark/Blaze", unit: "사용량 기반", apr: "—", may: "—", total6m: "—", note: "Storage 비용 발생 가능" },
+  { service: "Cloudflare D1 + Workers (붐앤잽)", plan: "Free Tier 현재", unit: "$0", apr: "0", may: "0", total6m: "0", note: "유료 한도 도달 시 ~$5/월" },
+  { service: "Cloudflare Pages (HR · IR · 재무 · OPHE)", plan: "Free", unit: "$0", apr: "0", may: "0", total6m: "0", note: "현재 무료 한도 내" },
+  { service: "Vercel (AI Design)", plan: "Hobby (Pro 검토 중)", unit: "Pro $20/월", apr: "—", may: "—", total6m: "—", note: "Pro 전환 여부 결정 필요" },
+  { service: "도메인 (interohrigin.com 외)", plan: "연간", unit: "~$20/년", apr: "—", may: "—", total6m: "10", note: "" },
+  { service: "Google Workspace", plan: "Business Starter", unit: "$6/유저/월", apr: "—", may: "—", total6m: "—", note: "유저 수 × 단가" },
+  { subtotal: "3. 인프라 소계", apr: "25", may: "25", total6m: "160" },
+
+  { total: "총계 (확정 + 미입력 α)", apr: "$155 + α", may: "$155 + α", total6m: "$940 + α" }
+];
+
+const PROGRESS_DATA = [
+  { name: "고객관리 CS 플랫폼",      pct: 75, color: "var(--red)" },
+  { name: "재무관리 시스템",            pct: 63, color: "var(--accent)" },
+  { name: "ophe 브랜드 런칭",            pct: 63, color: "var(--accent)" },
+  { name: "HR 플랫폼",                       pct: 73, color: "var(--purple)" },
+  { name: "AI 디자인 에이전트",         pct: 43, color: "var(--yellow)" },
+  { name: "붐앤잽 (완료)",                  pct: 100, color: "var(--green)" },
+  { name: "I&C 홈페이지 리뉴얼 (완료)", pct: 100, color: "var(--green)" },
+  { name: "복지몰 (완료)",                   pct: 100, color: "var(--green)" },
+  { name: "Exhiboot (완료)",                pct: 100, color: "var(--green)" }
+];
+
+const ACTIVITY_DATA = [
+  { m: "2026-03", count: 9 },
+  { m: "2026-04", count: 8 },
+  { m: "2026-05", count: 7 }
+];
+
+const PRI_CLASS = { urgent: "pri-urgent", high: "pri-high", med: "pri-med", low: "pri-low" };
+
+// 탭 정의
+const TABS = [
+  { key: "overview",  emoji: "🏠", label: "종합 현황" },
+  { key: "hr",        emoji: "👥", label: "HR 플랫폼" },
+  { key: "cs",        emoji: "🎧", label: "CS 플랫폼" },
+  { key: "finance",   emoji: "💰", label: "재무관리" },
+  { key: "ophe",      emoji: "🌿", label: "OPHE" },
+  { key: "ai-design", emoji: "🎨", label: "AI 디자인" },
+  { key: "boomzap",   emoji: "💧", label: "붐앤잽" },
+  { key: "completed", emoji: "✅", label: "완료 프로젝트" },
+  { key: "cost",      emoji: "💵", label: "과금 구조" },
+  { key: "future",    emoji: "🚀", label: "향후 계획" }
+];
+
+const CATS = {
+  question: { emoji: "❓", label: "질문",       color: "var(--accent)" },
+  request:  { emoji: "📋", label: "요청",       color: "var(--purple)" },
+  decision: { emoji: "⚠️", label: "결정필요", color: "var(--orange)" },
+  feedback: { emoji: "👍", label: "피드백",    color: "var(--green)"  }
+};
+
+// ======================================================
+// 백엔드 연결 (Cloudflare Worker)
+// ======================================================
+// 같은 도메인에 배포되었을 경우 BACKEND_URL = "" (상대 경로)
+// 다른 도메인 또는 file:// 일 경우 설정 모달에서 입력
+const LOCAL_KEY = "jy_dashboard_local_v3";
+
+function loadLocal() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}");
+    if (!s.settings) s.settings = {};
+    if (!s.viewedAt) s.viewedAt = {};
+    return s;
+  } catch { return { settings: {}, viewedAt: {} }; }
+}
+function saveLocal(s) { localStorage.setItem(LOCAL_KEY, JSON.stringify(s)); }
+
+let STATE = {
+  ...loadLocal(),
+  discussions: {},     // 서버 fetch 결과 (panel별 배열)
+  selected: new Set(), // PM Inbox 선택용
+};
+
+// 백엔드 URL 결정: 같은 origin이면 상대 경로, file:// 등이면 settings에서
+function backendBase() {
+  if (STATE.settings.backendUrl) return STATE.settings.backendUrl.replace(/\/$/, "");
+  // 같은 도메인에 worker 가 배포된 경우
+  if (location.protocol === "http:" || location.protocol === "https:") return "";
+  return ""; // file:// 인 경우 — 데모 모드 (서버 호출 실패하면 로컬 폴백)
+}
+function dashboardKey() { return STATE.settings.dashboardKey || ""; }
+function backendConfigured() { return !!dashboardKey() && (backendBase() !== "" || location.protocol.startsWith("http")); }
+
+async function api(path, options = {}) {
+  const base = backendBase();
+  const key = dashboardKey();
+  const headers = { "Content-Type": "application/json", "X-Dashboard-Key": key, ...(options.headers || {}) };
+  const res = await fetch(base + path, { ...options, headers });
+  if (!res.ok) throw new Error(`API ${path}: ${res.status} ${await res.text()}`);
+  const ct = res.headers.get("Content-Type") || "";
+  return ct.includes("json") ? res.json() : res.text();
+}
+
+// ======================================================
+// 서버 동기화 (없으면 로컬 폴백)
+// ======================================================
+async function fetchPanel(panel) {
+  if (!backendConfigured()) {
+    // 폴백 — localStorage 로컬 데모
+    const local = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    STATE.discussions[panel] = local;
+    return local;
+  }
+  try {
+    const data = await api(`/api/messages?panel=${encodeURIComponent(panel)}`);
+    STATE.discussions[panel] = data.messages || [];
+    return STATE.discussions[panel];
+  } catch (e) {
+    console.warn("fetchPanel fallback:", e);
+    STATE.discussions[panel] = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    return STATE.discussions[panel];
+  }
+}
+
+async function refreshAllPanels() {
+  await Promise.all(TABS.map(t => fetchPanel(t.key)));
+  TABS.forEach(t => renderDiscussionThread(t.key));
+  document.getElementById("hd-fb-count").textContent = totalDiscussionCount() + "건";
+  updateUnread();
+}
+
+// 5초마다 현재 패널 폴링 (실시간 흐름)
+let pollTimer = null;
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    const cur = getCurrentPanel();
+    await fetchPanel(cur);
+    renderDiscussionThread(cur);
+  }, 5000);
+}
+
+// ======================================================
+// 토론 영역 동작
+// ======================================================
+function escapeHTML(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function totalDiscussionCount() {
+  let n = 0; for (const k in STATE.discussions) n += (STATE.discussions[k] || []).length; return n;
+}
+function getCurrentPanel() {
+  const a = document.querySelector(".tab.active");
+  return a ? a.dataset.panel : "overview";
+}
+
+function buildDiscussion(panel) {
+  const root = document.getElementById("discussion-" + panel);
+  if (!root) return;
+  root.className = "discussion";
+  const slackConnected = !!STATE.settings.slackWebhook;
+  const beConn = backendConfigured();
+  root.innerHTML = `
+    <div class="d-head">
+      <div class="d-title">💬 이 프로젝트에 대한 의견·요청 <span class="d-count" id="dc-${panel}">0</span>
+        ${beConn ? '<span class="badge b-active" style="margin-left:8px;">실시간 동기화 ON</span>' : '<span class="badge b-paused" style="margin-left:8px;">로컬 데모 (서버 미연결)</span>'}
+      </div>
+      <div class="d-actions">
+        <button class="d-btn" onclick="refreshAllPanels()">🔄 새로고침</button>
+        <button class="d-btn" onclick="exportDiscussionAsText('${panel}')">📄 텍스트 복사</button>
+        <button class="d-btn" onclick="emailDiscussion('${panel}')">📧 이메일</button>
+        <button class="d-btn primary" onclick="createInbox('${panel}')">🤖 Claude Code Inbox 생성</button>
+      </div>
+    </div>
+
+    <div class="d-compose">
+      <div class="d-cat-row" data-panel="${panel}">
+        <button class="d-cat-chip cat-question active" data-cat="question">❓ 질문</button>
+        <button class="d-cat-chip cat-request" data-cat="request">📋 요청</button>
+        <button class="d-cat-chip cat-decision" data-cat="decision">⚠️ 결정필요</button>
+        <button class="d-cat-chip cat-feedback" data-cat="feedback">👍 피드백</button>
+      </div>
+      <div class="d-author-row">
+        <input class="d-input" id="d-author-${panel}" placeholder="작성자 (예: 차대표 / 강 이사 / 차주용)">
+        <input class="d-input" id="d-title-${panel}" placeholder="제목 (선택, 한 줄 요약)">
+      </div>
+      <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 입력하세요. 슬랙에서 작성하면 이미지까지 자동으로 여기로 들어옵니다."></textarea>
+      <div class="d-row-btn">
+        <div class="d-meta">
+          ${beConn ? "💡 슬랙 채널에 작성하면 자동으로 여기 표시됩니다." : "⚠️ 서버 미연결 — 우상단 설정에서 백엔드 URL + Dashboard Key 입력 필요"}
+        </div>
+        <div>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);margin-right:10px;font-weight:600;">
+            <input type="checkbox" id="d-slack-${panel}" ${slackConnected ? "checked" : "disabled"}> 슬랙에도 전송
+          </label>
+          <button class="d-btn primary" onclick="addDiscussion('${panel}')">의견 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-thread" id="d-thread-${panel}"></div>
+  `;
+  root.querySelectorAll(".d-cat-chip").forEach(c => {
+    c.addEventListener("click", () => {
+      root.querySelectorAll(".d-cat-chip").forEach(x => x.classList.remove("active"));
+      c.classList.add("active");
+    });
+  });
+  if (STATE.settings.author) {
+    const ai = document.getElementById("d-author-" + panel);
+    if (ai) ai.value = STATE.settings.author;
+  }
+  renderDiscussionThread(panel);
+}
+
+function renderDiscussionThread(panel) {
+  const list = STATE.discussions[panel] || [];
+  const c = document.getElementById("d-thread-" + panel);
+  const cnt = document.getElementById("dc-" + panel);
+  if (cnt) cnt.textContent = list.length;
+  if (!c) return;
+  if (list.length === 0) {
+    c.innerHTML = '<div class="empty-thread">아직 의견이 없습니다. 슬랙 채널에 글을 올리거나 위 폼에서 작성하면 표시됩니다.</div>';
+  } else {
+    c.innerHTML = list.slice().reverse().map((it) => {
+      const cat = CATS[it.category] || CATS.question;
+      const replies = it.replies || [];
+      const imgs = (it.images || []).filter(Boolean);
+      const beBase = backendBase();
+      return `
+        <div class="d-item cat-${it.category} ${it.resolved ? "resolved" : ""}">
+          <div class="d-item-head">
+            <div class="d-item-info">
+              <input type="checkbox" class="inbox-pick" data-id="${it.id}" data-panel="${panel}" ${STATE.selected.has(panel+"|"+it.id) ? "checked" : ""} style="margin-right:4px;">
+              <span class="d-cat-badge cat-${it.category}">${cat.emoji} ${cat.label}</span>
+              <span class="author">${escapeHTML(it.author || "익명")}</span>
+              <span class="at">· ${it.at}</span>
+              ${it.resolved ? '<span class="badge b-completed" style="margin-left:6px;">해결됨</span>' : ""}
+              ${it.fromSlack ? '<span class="badge b-progress" style="margin-left:6px;">슬랙</span>' : ""}
+              ${it.edited ? '<span class="badge b-warn" style="margin-left:6px;">수정됨</span>' : ""}
+            </div>
+          </div>
+          ${it.title ? `<div style="font-weight:700;margin-bottom:4px;">${escapeHTML(it.title)}</div>` : ""}
+          <div class="body">${escapeHTML(it.content)}</div>
+          ${imgs.length ? `<div class="d-images" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${imgs.map(u => `<a href="${beBase + u}" target="_blank" rel="noopener"><img src="${beBase + u}" style="max-width:200px;max-height:160px;border-radius:6px;border:1px solid var(--border);" loading="lazy"></a>`).join("")}</div>` : ""}
+          ${replies.length ? `<div class="replies">${replies.map(r => `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div></div>`).join("")}</div>` : ""}
+          <div class="item-actions">
+            <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">↳ 답글</button>
+            <button class="d-btn" onclick="toggleResolved('${panel}', '${it.id}')">${it.resolved ? "다시 열기" : "해결됨"}</button>
+            <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">삭제</button>
+          </div>
+          <div class="reply-compose" id="reply-compose-${panel}-${it.id}">
+            <textarea id="reply-content-${panel}-${it.id}" placeholder="답글 내용"></textarea>
+            <div style="margin-top:6px;text-align:right;">
+              <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">취소</button>
+              <button class="d-btn primary" onclick="addReply('${panel}', '${it.id}')">답글 등록</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+    // Inbox 체크박스 핸들러
+    c.querySelectorAll(".inbox-pick").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const k = cb.dataset.panel + "|" + cb.dataset.id;
+        if (cb.checked) STATE.selected.add(k); else STATE.selected.delete(k);
+      });
+    });
+  }
+  updateUnread();
+  const hd = document.getElementById("hd-fb-count");
+  if (hd) hd.textContent = totalDiscussionCount() + "건";
+}
+
+function updateUnread() {
+  TABS.forEach(t => {
+    const list = STATE.discussions[t.key] || [];
+    const viewedAt = STATE.viewedAt[t.key] || 0;
+    const hasUnread = list.some(it => (it._ts || 0) > viewedAt);
+    const tab = document.querySelector(`.tab[data-panel="${t.key}"]`);
+    if (tab) tab.classList.toggle("has-unread", hasUnread && tab.dataset.panel !== getCurrentPanel());
+  });
+}
+
+async function addDiscussion(panel) {
+  const catBtn = document.querySelector(`.d-cat-row[data-panel="${panel}"] .d-cat-chip.active`);
+  const category = catBtn ? catBtn.dataset.cat : "question";
+  const author = document.getElementById("d-author-" + panel).value.trim() || "익명";
+  const title = document.getElementById("d-title-" + panel).value.trim();
+  const content = document.getElementById("d-content-" + panel).value.trim();
+  if (!content) { alert("내용을 입력해주세요."); return; }
+
+  if (!STATE.settings.author && author !== "익명") {
+    STATE.settings.author = author;
+    saveLocal(STATE);
+  }
+
+  if (backendConfigured()) {
+    try {
+      await api("/api/messages", {
+        method: "POST",
+        body: JSON.stringify({ panel, category, author, title, content }),
+      });
+    } catch (e) {
+      alert("서버 저장 실패: " + e.message + "\n로컬에만 저장됩니다.");
+    }
+  } else {
+    // 로컬 폴백
+    const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    list.push({
+      id: "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+      category, author, title, content,
+      at: new Date().toLocaleString("ko-KR"),
+      _ts: Date.now(), replies: [], resolved: false, images: [],
+    });
+    localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
+  }
+
+  // 슬랙 직접 발송 (선택)
+  const sendSlack = document.getElementById("d-slack-" + panel).checked && STATE.settings.slackWebhook;
+  if (sendSlack) {
+    try {
+      const tab = TABS.find(t => t.key === panel);
+      const cat = CATS[category];
+      const text = `${cat.emoji} *[${tab.emoji} ${tab.label}] ${cat.label}* — ${author}\n${title ? "*" + title + "*\n" : ""}${content}\n_경영진 대시보드에서 작성_`;
+      await fetch(STATE.settings.slackWebhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ text }) });
+    } catch {}
+  }
+
+  document.getElementById("d-content-" + panel).value = "";
+  document.getElementById("d-title-" + panel).value = "";
+  await fetchPanel(panel);
+  renderDiscussionThread(panel);
+}
+
+function toggleReply(panel, id) {
+  const c = document.getElementById(`reply-compose-${panel}-${id}`);
+  if (c) c.classList.toggle("open");
+}
+async function addReply(panel, id) {
+  const content = document.getElementById(`reply-content-${panel}-${id}`).value.trim();
+  if (!content) return;
+  const author = STATE.settings.author || prompt("답글 작성자 이름") || "익명";
+  if (backendConfigured()) {
+    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, {
+      method: "PATCH",
+      body: JSON.stringify({ reply: { author, content } }),
+    });
+  } else {
+    const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    const it = list.find(x => x.id === id);
+    if (it) { it.replies = it.replies || []; it.replies.push({ author, content, at: new Date().toLocaleString("ko-KR") }); }
+    localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
+  }
+  await fetchPanel(panel);
+  renderDiscussionThread(panel);
+}
+async function toggleResolved(panel, id) {
+  const cur = (STATE.discussions[panel] || []).find(x => x.id === id);
+  const next = !cur?.resolved;
+  if (backendConfigured()) {
+    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, {
+      method: "PATCH",
+      body: JSON.stringify({ resolved: next }),
+    });
+  } else {
+    const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    const it = list.find(x => x.id === id);
+    if (it) it.resolved = next;
+    localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
+  }
+  await fetchPanel(panel);
+  renderDiscussionThread(panel);
+}
+async function deleteDiscussion(panel, id) {
+  if (!confirm("이 의견을 삭제할까요?")) return;
+  if (backendConfigured()) {
+    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, { method: "DELETE" });
+  } else {
+    const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    localStorage.setItem("jy_demo_" + panel, JSON.stringify(list.filter(x => x.id !== id)));
+  }
+  await fetchPanel(panel);
+  renderDiscussionThread(panel);
+}
+
+// ======================================================
+// Claude Code Inbox 생성
+// ======================================================
+async function createInbox(panel) {
+  // 1) 선택된 것이 있으면 그 항목들로, 없으면 현재 패널의 미해결 항목 전체
+  let ids = [], panels = [];
+  if (STATE.selected.size > 0) {
+    STATE.selected.forEach(k => {
+      const [p, i] = k.split("|");
+      panels.push(p); ids.push(i);
+    });
+  } else {
+    const list = STATE.discussions[panel] || [];
+    const unresolved = list.filter(x => !x.resolved);
+    if (unresolved.length === 0) { alert("해결되지 않은 의견이 없습니다."); return; }
+    if (!confirm(`선택된 항목이 없습니다. "${TABS.find(t=>t.key===panel).label}" 탭의 미해결 의견 ${unresolved.length}건으로 Inbox 생성할까요?`)) return;
+    unresolved.forEach(x => { panels.push(panel); ids.push(x.id); });
+  }
+
+  if (backendConfigured()) {
+    try {
+      const res = await fetch(backendBase() + "/api/inbox", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Dashboard-Key": dashboardKey() },
+        body: JSON.stringify({ panels, ids }),
+      });
+      if (!res.ok) throw new Error("inbox failed: " + res.status);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `inbox-${new Date().toISOString().slice(0,10)}.md`; a.click();
+      URL.revokeObjectURL(url);
+      alert(`Claude Code Inbox 파일이 다운로드되었습니다 (${ids.length}건).\nClaude Code 디렉토리에 두고:\n\nclaude code -p "@inbox-${new Date().toISOString().slice(0,10)}.md 처리해줘"`);
+    } catch (e) {
+      alert("Inbox 생성 실패: " + e.message);
+    }
+  } else {
+    // 로컬에서 동일하게 생성
+    const items = [];
+    for (let i = 0; i < ids.length; i++) {
+      const list = STATE.discussions[panels[i]] || [];
+      const m = list.find(x => x.id === ids[i]);
+      if (m) items.push({ ...m, panel: panels[i] });
+    }
+    const md = localBuildInbox(items);
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `inbox-${new Date().toISOString().slice(0,10)}.md`; a.click();
+    URL.revokeObjectURL(url);
+  }
+  STATE.selected.clear();
+  TABS.forEach(t => renderDiscussionThread(t.key));
+}
+
+function localBuildInbox(messages) {
+  // 서버와 동일 포맷 (로컬 폴백)
+  const now = new Date().toLocaleString("ko-KR");
+  const CAT = { question: "❓ 질문", request: "📋 요청", decision: "⚠️ 결정필요", feedback: "👍 피드백" };
+  const PNAME = { overview:"🏠 종합", hr:"👥 HR", cs:"🎧 CS", finance:"💰 재무", ophe:"🌿 OPHE", "ai-design":"🎨 AI 디자인", boomzap:"💧 붐앤잽", completed:"✅ 완료", cost:"💵 과금", future:"🚀 향후" };
+  let md = `# Claude Code Inbox\n\n> ${now} · ${messages.length}건\n\n`;
+  const order = ["decision","request","question","feedback"];
+  for (const cat of order) {
+    const g = messages.filter(m => m.category === cat);
+    if (!g.length) continue;
+    md += `## ${CAT[cat]}\n\n`;
+    g.forEach((m, i) => {
+      md += `### ${i+1}. ${PNAME[m.panel] || m.panel} — ${m.title || m.content.split("\n")[0].slice(0, 40)}\n\n`;
+      md += `- 작성자: ${m.author}\n- 시각: ${m.at}\n\n\`\`\`\n${m.content}\n\`\`\`\n\n`;
+      if (m.images && m.images.length) md += `첨부 이미지: ${m.images.length}건\n\n`;
+      md += `---\n\n`;
+    });
+  }
+  return md;
+}
+
+// ======================================================
+// 설정 모달
+// ======================================================
+function openSettingsModal() {
+  document.getElementById("setting-author").value = STATE.settings.author || "";
+  document.getElementById("setting-slack-webhook").value = STATE.settings.slackWebhook || "";
+  document.getElementById("setting-email").value = STATE.settings.email || "";
+  const beField = document.getElementById("setting-backend");
+  const keyField = document.getElementById("setting-key");
+  if (beField) beField.value = STATE.settings.backendUrl || "";
+  if (keyField) keyField.value = STATE.settings.dashboardKey || "";
+  document.getElementById("settings-modal").classList.add("open");
+}
+function closeSettingsModal() { document.getElementById("settings-modal").classList.remove("open"); }
+async function saveSettings() {
+  STATE.settings.author = document.getElementById("setting-author").value.trim();
+  STATE.settings.slackWebhook = document.getElementById("setting-slack-webhook").value.trim();
+  STATE.settings.email = document.getElementById("setting-email").value.trim();
+  const beField = document.getElementById("setting-backend");
+  const keyField = document.getElementById("setting-key");
+  if (beField) STATE.settings.backendUrl = beField.value.trim();
+  if (keyField) STATE.settings.dashboardKey = keyField.value.trim();
+  saveLocal(STATE);
+  closeSettingsModal();
+  TABS.forEach(t => buildDiscussion(t.key));
+  await refreshAllPanels();
+  startPolling();
+  alert("설정 저장 완료" + (backendConfigured() ? "\n실시간 동기화 시작됨" : "\n⚠️ 서버 미연결 — 로컬 데모 모드"));
+}
+
+function importSlackMessage() {
+  alert("ℹ️ 안내\n슬랙에 메시지를 작성하면 자동으로 여기 표시됩니다 (실시간).\n별도 붙여넣기 불필요.\n\n수동 가져오기가 필요하면 슬랙 메시지를 토론 영역에 직접 작성해주세요.");
+}
+
+// ======================================================
+// 탭
+// ======================================================
+function buildTabs() {
+  const c = document.getElementById("tab-nav-inner");
+  c.innerHTML = TABS.map(t => `<button class="tab ${t.key === "overview" ? "active" : ""}" data-panel="${t.key}"><span class="tab-emoji">${t.emoji}</span>${t.label}<span class="unread-dot"></span></button>`).join("");
+  c.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
+  });
+}
+async function activatePanel(key) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.dataset.panel === key));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.panel === key));
+  STATE.viewedAt[key] = Date.now();
+  saveLocal(STATE);
+  await fetchPanel(key);
+  renderDiscussionThread(key);
+  updateUnread();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  history.replaceState(null, "", "#" + key);
+}
+
+// ======================================================
+// 내보내기 / 가져오기
+// ======================================================
+function exportDiscussionAsText(panel) {
+  const list = STATE.discussions[panel] || [];
+  if (list.length === 0) { alert("저장된 의견이 없습니다."); return; }
+  const tab = TABS.find(t => t.key === panel);
+  const txt = `[${tab.emoji} ${tab.label}] 의견 정리 (${list.length}건)\n생성: ${new Date().toLocaleString("ko-KR")}\n\n` + list.map((f, i) => {
+    const cat = CATS[f.category];
+    return `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${f.at}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author} · ${r.at}: ${r.content}`).join("\n")}`;
+  }).join("\n\n---\n\n");
+  navigator.clipboard.writeText(txt).then(() => alert("의견을 클립보드에 복사했습니다."));
+}
+function emailDiscussion(panel) {
+  const list = STATE.discussions[panel] || [];
+  if (list.length === 0) { alert("저장된 의견이 없습니다."); return; }
+  const tab = TABS.find(t => t.key === panel);
+  const recipient = STATE.settings.email || "";
+  const subject = `[${tab.label}] 의견 정리 (${list.length}건)`;
+  const body = list.map((f, i) => {
+    const cat = CATS[f.category];
+    return `${i+1}. [${cat.label}] ${f.author} · ${f.at}\n${f.title ? f.title + "\n" : ""}${f.content}\n${(f.replies||[]).map(r => `   답변(${r.author}): ${r.content}`).join("\n")}`;
+  }).join("\n\n---\n\n");
+  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+function mailAllOpinions() {
+  const recipient = STATE.settings.email || "";
+  let body = "";
+  for (const k in STATE.discussions) {
+    const list = STATE.discussions[k];
+    if (!list || !list.length) continue;
+    const tab = TABS.find(t => t.key === k);
+    body += `\n=== ${tab.emoji} ${tab.label} (${list.length}건) ===\n` + list.map((f,i) => {
+      const cat = CATS[f.category];
+      return `${i+1}. [${cat.label}] ${f.author} · ${f.at}\n${f.title ? f.title + "\n" : ""}${f.content}`;
+    }).join("\n\n");
+  }
+  if (!body.trim()) { alert("저장된 의견이 없습니다."); return; }
+  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent("인터오리진 경영진 대시보드 - 전체 의견")}&body=${encodeURIComponent(body)}`;
+}
+function exportAllJSON() {
+  const data = JSON.stringify({ discussions: STATE.discussions, settings: STATE.settings }, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `dashboard_data_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+function exportAllText() {
+  let out = `인터오리진 경영진 대시보드 - 전체 의견\n생성: ${new Date().toLocaleString("ko-KR")}\n\n`;
+  for (const k in STATE.discussions) {
+    const list = STATE.discussions[k];
+    if (!list || !list.length) continue;
+    const tab = TABS.find(t => t.key === k);
+    out += `\n=== ${tab.emoji} ${tab.label} (${list.length}건) ===\n\n`;
+    list.forEach((f, i) => {
+      const cat = CATS[f.category];
+      out += `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${f.at}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author}: ${r.content}`).join("\n")}\n\n`;
+    });
+  }
+  const blob = new Blob([out], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `의견정리_${new Date().toISOString().slice(0,10)}.txt`; a.click();
+  URL.revokeObjectURL(url);
+}
+function importJSON(event) {
+  alert("ℹ️ Worker 연결 모드에서는 서버가 단일 진실 원천입니다.\n로컬 import는 데모 모드에서만 동작합니다.");
+}
+function clearAllDiscussions() {
+  alert("ℹ️ Worker 연결 모드에서는 서버 데이터를 직접 삭제하세요 (각 의견의 삭제 버튼 사용).");
+}
+
+// 초기화
+// ======================================================
+buildTabs();
+renderProjectTable(ACTIVE_PROJECTS, "ptable-active");
+renderProjectTable(DONE_PROJECTS, "ptable-done");
+renderTimeline("hr", "tl-hr");
+renderTimeline("finance", "tl-finance");
+renderTimeline("ophe", "tl-ophe");
+renderTimeline("ai-design", "tl-ai-design");
+renderTimeline("boomzap", "tl-boomzap");
+renderTimeline("completed", "tl-completed");
+renderBarChart("progress-chart", PROGRESS_DATA);
+renderBarChart("activity-chart", ACTIVITY_DATA, "var(--accent)");
+renderCosts();
+TABS.forEach(t => buildDiscussion(t.key));
+document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR");
+
+// 모달 외부 클릭 닫기
+document.getElementById("settings-modal").addEventListener("click", e => {
+  if (e.target.id === "settings-modal") closeSettingsModal();
+});
+
+// 초기 서버 로드 + 폴링 시작
+(async function init() {
+  await refreshAllPanels();
+  if (backendConfigured()) startPolling();
+  else {
+    // 백엔드 미설정 시 1회 안내 (각 PC 최초 1회)
+    if (!localStorage.getItem("jy_dash_seen_setup_v1")) {
+      setTimeout(() => {
+        if (confirm("실시간 동기화를 위해 설정에서 백엔드 URL + Dashboard Key를 입력해주세요.\n지금 설정을 열까요?")) {
+          openSettingsModal();
+        }
+        localStorage.setItem("jy_dash_seen_setup_v1", "1");
+      }, 600);
+    }
+  }
+})();
+
+// URL hash 진입
+const h = location.hash.replace("#", "");
+if (h && TABS.some(t => t.key === h)) activatePanel(h);
+</script>
+</body>
+</html>

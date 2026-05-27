@@ -1,0 +1,28 @@
+name = "executive-dashboard"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+
+# 정적 자산 (대시보드 HTML)
+[assets]
+directory = "../public"
+binding = "ASSETS"
+
+# 메시지 저장소 (KV)
+[[kv_namespaces]]
+binding = "MESSAGES"
+id = "REPLACE_WITH_KV_ID_AFTER_CREATE"
+
+# 이미지 저장소 (R2)
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "executive-dashboard-images"
+
+# Vars (공개 변수)
+[vars]
+ALLOWED_PANELS = "overview,hr,cs,finance,ophe,ai-design,boomzap,completed,cost,future"
+
+# Secrets는 wrangler secret put 으로 따로 설정:
+#   SLACK_SIGNING_SECRET — Slack App > Basic Information > Signing Secret
+#   SLACK_BOT_TOKEN      — Slack App > OAuth > Bot User OAuth Token (xoxb-)
+#   DASHBOARD_KEY        — 임원·PM 공유용 단순 토큰 (아무 랜덤 문자열)
+#   GITHUB_TOKEN         — (선택) GitHub Issues 자동 등록용

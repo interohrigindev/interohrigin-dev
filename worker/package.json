@@ -1,0 +1,16 @@
+{
+  "name": "executive-dashboard-worker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "secrets": "echo 'Run: wrangler secret put SLACK_SIGNING_SECRET / SLACK_BOT_TOKEN / DASHBOARD_KEY / GITHUB_TOKEN'"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240725.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.65.0"
+  }
+}
