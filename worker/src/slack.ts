@@ -7,7 +7,7 @@
  */
 
 import type { Env } from "./index";
-import { addMessage, updateMessage, deleteMessageByTs } from "./storage";
+import { addMessage, updateMessage, deleteMessageByTs, markResolvedAcrossPanels, updateCategoryAcrossPanels } from "./storage";
 
 // Slack의 reaction emoji → 카테고리 매핑
 const REACTION_CATEGORY: Record<string, string> = {
@@ -22,16 +22,41 @@ const REACTION_CATEGORY: Record<string, string> = {
   "+1": "feedback",
 };
 
-// 채널 이름 → 패널 매핑 (예: io-cs → cs, io-finance → finance)
-function panelFromChannel(channelName: string | undefined): string {
-  if (!channelName) return "overview";
-  const n = channelName.toLowerCase();
-  if (n.includes("hr"))           return "hr";
-  if (n.includes("cs"))           return "cs";
-  if (n.includes("finance") || n.includes("재무") || n.includes("자금")) return "finance";
-  if (n.includes("ophe"))         return "ophe";
-  if (n.includes("ai-design") || n.includes("design")) return "ai-design";
-  if (n.includes("boomzap") || n.includes("붐앤잽") || n.includes("boom"))  return "boomzap";
+// 완료 처리 이모지: PM이 슬랙에서 ✅ 반응 → resolved=true 자동
+const RESOLVED_REACTIONS = new Set([
+  "white_check_mark",  // ✅
+  "heavy_check_mark",  // ✔️
+  "ballot_box_with_check",
+  "white_tick", "done", "white_check",
+]);
+
+// 단일 채널 운영 — 메시지 첫 줄의 해시태그/키워드로 패널 자동 분류
+// 예: "#hr 채용 면접 페이지 디자인 검토" → HR 탭
+//     "#재무 6/9 베타 일정 확인" → 재무 탭
+//     해시태그 없으면 overview 탭으로 들어감
+function panelFromText(text: string | undefined): string {
+  if (!text) return "overview";
+  const t = text.toLowerCase();
+  // 우선 해시태그 명시
+  const tagMatch = t.match(/#([a-z가-힣-]+)/);
+  if (tagMatch) {
+    const tag = tagMatch[1];
+    if (/^hr|인사|채용|평가/.test(tag)) return "hr";
+    if (/^cs|고객|상담/.test(tag))     return "cs";
+    if (/^(finance|재무|자금|손익)/.test(tag)) return "finance";
+    if (/^ophe/.test(tag))             return "ophe";
+    if (/^(ai-?design|디자인)/.test(tag)) return "ai-design";
+    if (/^(boom|zap|붐앤잽)/.test(tag))  return "boomzap";
+    if (/^(cost|과금|비용)/.test(tag))    return "cost";
+    if (/^(future|향후|계획)/.test(tag))  return "future";
+  }
+  // 본문 키워드 추정 (해시태그 없으면)
+  if (/\bhr\b|인사평가|채용|면접|연차|결재/.test(t))  return "hr";
+  if (/\bcs\b|고객지원|상담|티켓/.test(t))             return "cs";
+  if (/재무|자금계획|손익|고정비/.test(t))             return "finance";
+  if (/\bophe\b|오프|cafe24/.test(t))                  return "ophe";
+  if (/ai.?design|디자인.?에이전트/.test(t))           return "ai-design";
+  if (/붐앤잽|boom.?n.?zap/.test(t))                   return "boomzap";
   return "overview";
 }
 
@@ -126,8 +151,15 @@ export async function handleSlackEvent(req: Request, env: Env): Promise<Response
     // 봇이 자기가 쓴 메시지를 다시 받지 않게
     if (event.bot_id || event.subtype === "bot_message") return new Response("ok");
 
-    const channelName = await getChannelName(event.channel, env);
-    const panel = panelFromChannel(channelName);
+    // 단일 채널 운영 — 지정된 채널 외에는 무시
+    const incomingChannel = event.channel || event.item?.channel;
+    if (env.SLACK_CHANNEL_ID && incomingChannel && incomingChannel !== env.SLACK_CHANNEL_ID) {
+      return new Response("ok"); // 다른 채널은 조용히 무시
+    }
+
+    // 패널은 메시지 본문에서 추정
+    const messageText = event.text || event.message?.text || event.previous_message?.text || "";
+    const panel = panelFromText(messageText);
 
     if (event.type === "message" && event.subtype === undefined && event.text !== undefined) {
       const author = event.user ? await getUserName(event.user, env) : "익명";
@@ -143,18 +175,32 @@ export async function handleSlackEvent(req: Request, env: Env): Promise<Response
         }
       }
 
-      await addMessage(env, {
-        panel,
-        category: "question",  // 기본값. reaction으로 변경됨.
-        author,
-        title: "",
-        content: event.text,
-        slackTs: event.ts,
-        slackChannel: event.channel,
-        slackUserId: event.user,
-        images: imageUrls,
-        fromSlack: true,
-      });
+      // 스레드 답글 처리: thread_ts !== ts → 부모 메시지의 reply로 등록
+      const isThreadReply = event.thread_ts && event.thread_ts !== event.ts;
+      if (isThreadReply) {
+        await updateMessage(env, panel, "ts:" + event.thread_ts, {
+          reply: {
+            author,
+            content: event.text + (imageUrls.length ? "\n📎 이미지 " + imageUrls.length + "건" : ""),
+            at: new Date().toLocaleString("ko-KR"),
+            images: imageUrls,
+            slackTs: event.ts,
+          } as any,
+        }, true);
+      } else {
+        await addMessage(env, {
+          panel,
+          category: "question",
+          author,
+          title: "",
+          content: event.text,
+          slackTs: event.ts,
+          slackChannel: event.channel,
+          slackUserId: event.user,
+          images: imageUrls,
+          fromSlack: true,
+        });
+      }
     }
 
     // 메시지 수정
@@ -174,15 +220,25 @@ export async function handleSlackEvent(req: Request, env: Env): Promise<Response
       if (ts) await deleteMessageByTs(env, panel, ts);
     }
 
-    // 이모지 반응 → 카테고리 변경
-    if (event.type === "reaction_added") {
-      const cat = REACTION_CATEGORY[event.reaction];
-      if (cat && event.item?.ts) {
-        const item_channel_name = await getChannelName(event.item.channel, env);
-        const item_panel = panelFromChannel(item_channel_name);
-        await updateMessage(env, item_panel, "ts:" + event.item.ts, {
-          category: cat,
-        }, true);
+    // 이모지 반응 처리
+    if (event.type === "reaction_added" && event.item?.ts) {
+      const targetTs = event.item.ts;
+      // 단일 채널이라 패널을 알 수 없음 — 전체 패널에서 찾아서 업데이트
+      const reaction = event.reaction;
+
+      // (1) 완료 이모지 — PM이 슬랙에서 ✅ 누르면 resolved=true
+      if (RESOLVED_REACTIONS.has(reaction)) {
+        await markResolvedAcrossPanels(env, targetTs, true);
+      }
+      // (2) 카테고리 변경 이모지
+      const cat = REACTION_CATEGORY[reaction];
+      if (cat) {
+        await updateCategoryAcrossPanels(env, targetTs, cat);
+      }
+    }
+    if (event.type === "reaction_removed" && event.item?.ts) {
+      if (RESOLVED_REACTIONS.has(event.reaction)) {
+        await markResolvedAcrossPanels(env, event.item.ts, false);
       }
     }
   } catch (e) {

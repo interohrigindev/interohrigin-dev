@@ -20,6 +20,9 @@ bucket_name = "executive-dashboard-images"
 # Vars (공개 변수)
 [vars]
 ALLOWED_PANELS = "overview,hr,cs,finance,ophe,ai-design,boomzap,completed,cost,future"
+SLACK_WORKSPACE = "interohriginichq"
+SLACK_CHANNEL_ID = "C0B6FK9BCE5"  # 임원 보고 단일 채널
+SLACK_CHANNEL_URL = "https://interohriginichq.slack.com/archives/C0B6FK9BCE5"
 
 # Secrets는 wrangler secret put 으로 따로 설정:
 #   SLACK_SIGNING_SECRET — Slack App > Basic Information > Signing Secret

@@ -1,77 +1,99 @@
-# 인터오리진 임원 대시보드 (Executive Dashboard)
+# 인터오리진 임원 대시보드
 
-> 차주용 PM 담당 9개 프로젝트의 종합 현황을 임원진과 공유하고, 슬랙 채널의 의견·이미지를 자동으로 끌어와 Claude Code 작업 지시서로 변환하는 시스템.
+> **단일 슬랙 채널 → 대시보드 자동 수집 → Claude Code 작업 지시**까지 한 줄로 잇는 PM 운영 시스템.
 
-## 핵심 아키텍처
-
-```
-[임원/PM] ─── 슬랙 채널에 글·이미지 첨부 ───┐
-                                              ▼
-                              Slack Events API (webhook)
-                                              │
-                      ┌───────────────────────┴───────────────────────┐
-                      │       Cloudflare Worker (무료 한도)            │
-                      │  - signing secret 검증                         │
-                      │  - 이미지 다운 → R2 업로드                     │
-                      │  - KV에 메시지/카테고리/답글 저장              │
-                      │  - 이모지 반응 ❓📋⚠️👍 → 카테고리 자동 분류  │
-                      └───────────────────────┬───────────────────────┘
-                                              │
-                  ┌───────────────────────────┴────────────────────────┐
-                  ▼                                                    ▼
-        [대시보드] (모두 같은 화면)                    [Claude Code Inbox]
-        - 5초 폴링으로 실시간 갱신                       - PM이 선택 → inbox.md 다운로드
-        - 슬랙 이미지 인라인 표시                        - `claude code -p "@inbox.md"` 한 줄
-        - 답글·해결 표시·카테고리 전환                   - Claude가 PR 자동 생성
-```
-
-## 디렉토리 구조
+## 운영 흐름 (간단)
 
 ```
-executive-dashboard/
-├── README.md           — 이 파일
+┌─────────────────────────────────────────────────────────────────┐
+│  슬랙 채널 #차주용-보고                                          │
+│  https://interohriginichq.slack.com/archives/C0B6FK9BCE5         │
+│                                                                  │
+│  임원·이사가 글 작성 (이미지 첨부 OK)                            │
+│   ↓                                                              │
+│  이모지 반응으로 분류:  ❓질문  📋요청  ⚠️결정필요  👍피드백       │
+│   ↓                                                              │
+│  thread 답글로 추가 의견 / 이미지                                │
+│   ↓                                                              │
+│  PM(차주용)이 처리 완료 후:  ✅ 이모지 → 자동 "해결됨"          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ Slack Events API
+                  ┌───────────────────────────┐
+                  │   Cloudflare Worker        │
+                  │ - signing 검증 + 채널 필터  │
+                  │ - 이미지 → R2 영구 보관    │
+                  │ - thread → 답글로 연결     │
+                  │ - 이모지 → 카테고리/완료    │
+                  └───────────┬───────────────┘
+                              │
+                  ┌───────────┴───────────────┐
+                  ▼                           ▼
+        ┌───────────────────┐    ┌───────────────────────┐
+        │  대시보드 (읽기)    │    │  Claude Code Inbox    │
+        │  - 모두 같은 화면   │    │  - PM이 선택 → .md    │
+        │  - 5초 자동 갱신    │    │  - `claude code -p`   │
+        │  - 슬랙 점프 버튼   │    │  - PR 자동 생성       │
+        └───────────────────┘    └───────────────────────┘
+```
+
+## 역할
+
+| 역할 | 동작 |
+|------|------|
+| **임원·이사** | 슬랙 채널에 글·이미지만 올림. 대시보드 접속 불필요 (선택). |
+| **PM (차주용)** | (1) 슬랙 알림으로 수신 → (2) 대시보드에서 의견 한눈에 정리 → (3) Inbox 다운받아 Claude Code에 던짐 → (4) PR 머지 → (5) 슬랙에 ✅ 이모지로 완료 보고 |
+| **다른 임원** | 대시보드 접속해서 모든 의견·상태를 같은 화면으로 확인 |
+
+## 슬랙 운영 규칙 (간단)
+
+```
+[새 의견] 슬랙 채널 #차주용-보고 에 자유 작성
+          (해시태그로 분류 보조: #hr / #cs / #재무 / #ophe / ...)
+
+[분류 변경] 메시지에 이모지 추가 → 카테고리 자동 변경
+          ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
+
+[답글·추가 의견] thread 답글로 작성 → 대시보드에 자동 표시
+
+[완료 처리] PM이 메시지에 ✅ 이모지 → 자동 "해결됨" 표시
+          (PM은 슬랙에서만 처리, 대시보드 별도 조작 불필요)
+```
+
+## 디렉토리
+
+```
+.
+├── README.md
 ├── docs/
-│   └── SETUP.md        — Slack App + Cloudflare 셋업 단계별 가이드
+│   ├── SETUP.md         — Slack App + Cloudflare 배포 단계별 가이드
+│   └── ARCHITECTURE.md  — 데이터 흐름 + 확장 계획
 ├── public/
-│   └── index.html      — 대시보드 (Cloudflare Workers Assets로 서빙)
+│   └── index.html       — 대시보드 (읽기 중심)
 └── worker/
-    ├── wrangler.toml   — Cloudflare 설정
+    ├── wrangler.toml    — Cloudflare 설정 (채널 ID 포함)
     ├── package.json
     ├── tsconfig.json
     └── src/
-        ├── index.ts    — 메인 엔트리 (라우팅)
-        ├── slack.ts    — Slack Events API 처리
-        ├── storage.ts  — KV 메시지 저장 레이어
-        └── claude.ts   — Claude Code Inbox 생성
+        ├── index.ts     — API 라우팅
+        ├── slack.ts     — 슬랙 이벤트 처리 (메시지/thread/이모지)
+        ├── storage.ts   — KV 메시지 저장 레이어
+        └── claude.ts    — Claude Code Inbox 생성기
 ```
 
 ## 빠른 시작
 
-자세한 셋업은 [docs/SETUP.md](docs/SETUP.md) 참조. 큰 흐름만:
+자세한 셋업은 [docs/SETUP.md](docs/SETUP.md) 참조. 큰 흐름:
 
-1. **Slack 워크스페이스에 App 생성** — Bot Token + Signing Secret 발급
-2. **Cloudflare 계정에서 Worker 배포** — `cd worker && npx wrangler deploy`
-3. **Secrets 설정** — `wrangler secret put SLACK_*`
-4. **Slack App의 Event Subscriptions URL** → `https://your-worker.workers.dev/slack/events`
-5. **임원에게 URL + Dashboard Key 공유** — 슬랙 채널에 글 올리면 자동으로 대시보드에 등장
-
-## 운영 흐름
-
-| 역할 | 동작 |
-|------|------|
-| **임원** | 슬랙 채널 `#차주용-보고`에 글 작성 (이미지 첨부 가능) → 이모지 반응으로 분류 (❓/📋/⚠️/👍) |
-| **PM (차주용)** | 대시보드에서 실시간 모니터링 → 처리할 의견 체크 → "🤖 Claude Code Inbox 생성" → `inbox-YYYY-MM-DD.md` 다운로드 → `claude code -p "@inbox.md"` |
-| **Claude Code** | Inbox 파일 받아서 우선순위 순으로 처리 → 결과 PR 생성 |
+1. Slack App 생성 → Bot Token + Signing Secret
+2. Cloudflare 무료 계정 → `npx wrangler deploy`
+3. Slack Event URL을 Worker URL로 설정
+4. 슬랙 채널 (이미 있음: `C0B6FK9BCE5`)에 봇 초대
+5. 임원에게 대시보드 URL + Dashboard Key 공유
 
 ## 비용
 
-| 서비스 | 사용량 | 비용 |
-|------|------|------|
-| Cloudflare Workers | 1000 req/일 (한도 10만) | $0 |
-| Cloudflare KV | 의견 100건/월 (한도 1천 write/일) | $0 |
-| Cloudflare R2 | 이미지 100MB (한도 10GB) | $0 |
-| Slack Free Plan | 메시지 무제한 | $0 |
-| **합계** | | **$0 / 월** |
+월 $0 (Cloudflare/Slack 모두 무료 한도 내).
 
 ## 라이선스
 

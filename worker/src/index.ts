@@ -18,6 +18,9 @@ export interface Env {
   DASHBOARD_KEY: string;
   GITHUB_TOKEN?: string;
   ALLOWED_PANELS: string;
+  SLACK_WORKSPACE: string;
+  SLACK_CHANNEL_ID: string;
+  SLACK_CHANNEL_URL: string;
 }
 
 const CORS = {
@@ -64,12 +67,20 @@ export default {
         return new Response(obj.body, { headers });
       }
 
-      // 3) API — 메시지 목록
+      // 3) API — 메시지 목록 (슬랙 permalink 포함)
       if (path === "/api/messages" && req.method === "GET") {
         if (!authorized(req, env)) return json({ error: "unauthorized" }, 401);
         const panel = url.searchParams.get("panel") || "overview";
         const messages = await listMessages(env, panel);
-        return json({ panel, messages });
+        // 슬랙 점프 URL 생성
+        const channel = env.SLACK_CHANNEL_ID;
+        const base = `https://${env.SLACK_WORKSPACE}.slack.com/archives/${channel}`;
+        const messagesWithLinks = messages.map(m => ({
+          ...m,
+          slackLink: m.slackTs ? `${base}/p${m.slackTs.replace(".", "")}` : null,
+          slackChannelUrl: env.SLACK_CHANNEL_URL,
+        }));
+        return json({ panel, messages: messagesWithLinks, channelUrl: env.SLACK_CHANNEL_URL });
       }
 
       // 4) API — 메시지 추가 (대시보드에서 작성)

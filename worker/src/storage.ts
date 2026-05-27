@@ -14,7 +14,7 @@ export interface Message {
   content: string;
   at: string;
   _ts: number;
-  replies: Array<{ author: string; content: string; at: string }>;
+  replies: Array<{ author: string; content: string; at: string; images?: string[]; slackTs?: string }>;
   resolved: boolean;
   slackTs?: string;
   slackChannel?: string;
@@ -120,4 +120,30 @@ export async function deleteMessage(env: Env, panel: string, id: string): Promis
 
 export async function deleteMessageByTs(env: Env, panel: string, ts: string): Promise<void> {
   await deleteMessage(env, panel, "ts:" + ts);
+}
+
+const ALL_PANELS = ["overview","hr","cs","finance","ophe","ai-design","boomzap","completed","cost","future"];
+
+export async function markResolvedAcrossPanels(env: Env, slackTs: string, resolved: boolean): Promise<void> {
+  for (const p of ALL_PANELS) {
+    const list = await listMessages(env, p);
+    const idx = list.findIndex(m => m.slackTs === slackTs);
+    if (idx !== -1) {
+      list[idx].resolved = resolved;
+      await env.MESSAGES.put(`panel:${p}`, JSON.stringify(list));
+      return;
+    }
+  }
+}
+
+export async function updateCategoryAcrossPanels(env: Env, slackTs: string, category: string): Promise<void> {
+  for (const p of ALL_PANELS) {
+    const list = await listMessages(env, p);
+    const idx = list.findIndex(m => m.slackTs === slackTs);
+    if (idx !== -1) {
+      list[idx].category = category;
+      await env.MESSAGES.put(`panel:${p}`, JSON.stringify(list));
+      return;
+    }
+  }
 }

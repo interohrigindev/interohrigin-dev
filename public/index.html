@@ -641,8 +641,9 @@
         <div>담당 <strong>차주용 (PM)</strong></div>
         <div>의견 <strong id="hd-fb-count">0건</strong> 누적</div>
       </div>
-      <button class="top-btn" onclick="openSettingsModal()">⚙️ 설정 / 외부 연동</button>
-      <button class="top-btn primary" onclick="window.print()">📄 PDF 저장</button>
+      <a href="https://interohriginichq.slack.com/archives/C0B6FK9BCE5" id="slack-channel-link" target="_blank" rel="noopener" class="top-btn primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">💬 슬랙 채널 열기</a>
+      <button class="top-btn" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="top-btn" onclick="window.print()">📄 PDF</button>
     </div>
   </div>
 </header>
@@ -1982,6 +1983,7 @@ async function fetchPanel(panel) {
   try {
     const data = await api(`/api/messages?panel=${encodeURIComponent(panel)}`);
     STATE.discussions[panel] = data.messages || [];
+    if (data.channelUrl) STATE.channelUrl = data.channelUrl;
     return STATE.discussions[panel];
   } catch (e) {
     console.warn("fetchPanel fallback:", e);
@@ -2024,58 +2026,31 @@ function buildDiscussion(panel) {
   const root = document.getElementById("discussion-" + panel);
   if (!root) return;
   root.className = "discussion";
-  const slackConnected = !!STATE.settings.slackWebhook;
   const beConn = backendConfigured();
+  const channelUrl = STATE.channelUrl || "https://interohriginichq.slack.com/archives/C0B6FK9BCE5";
   root.innerHTML = `
     <div class="d-head">
-      <div class="d-title">💬 이 프로젝트에 대한 의견·요청 <span class="d-count" id="dc-${panel}">0</span>
-        ${beConn ? '<span class="badge b-active" style="margin-left:8px;">실시간 동기화 ON</span>' : '<span class="badge b-paused" style="margin-left:8px;">로컬 데모 (서버 미연결)</span>'}
+      <div class="d-title">📥 임원 요구사항·의견 (슬랙에서 수신) <span class="d-count" id="dc-${panel}">0</span>
+        ${beConn ? '<span class="badge b-active" style="margin-left:8px;">실시간 동기화</span>' : '<span class="badge b-paused" style="margin-left:8px;">서버 미연결</span>'}
       </div>
       <div class="d-actions">
+        <a href="${channelUrl}" target="_blank" rel="noopener" class="d-btn primary" style="text-decoration:none;display:inline-block;">💬 슬랙 채널로 가기</a>
         <button class="d-btn" onclick="refreshAllPanels()">🔄 새로고침</button>
         <button class="d-btn" onclick="exportDiscussionAsText('${panel}')">📄 텍스트 복사</button>
-        <button class="d-btn" onclick="emailDiscussion('${panel}')">📧 이메일</button>
         <button class="d-btn primary" onclick="createInbox('${panel}')">🤖 Claude Code Inbox 생성</button>
       </div>
     </div>
 
-    <div class="d-compose">
-      <div class="d-cat-row" data-panel="${panel}">
-        <button class="d-cat-chip cat-question active" data-cat="question">❓ 질문</button>
-        <button class="d-cat-chip cat-request" data-cat="request">📋 요청</button>
-        <button class="d-cat-chip cat-decision" data-cat="decision">⚠️ 결정필요</button>
-        <button class="d-cat-chip cat-feedback" data-cat="feedback">👍 피드백</button>
-      </div>
-      <div class="d-author-row">
-        <input class="d-input" id="d-author-${panel}" placeholder="작성자 (예: 차대표 / 강 이사 / 차주용)">
-        <input class="d-input" id="d-title-${panel}" placeholder="제목 (선택, 한 줄 요약)">
-      </div>
-      <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 입력하세요. 슬랙에서 작성하면 이미지까지 자동으로 여기로 들어옵니다."></textarea>
-      <div class="d-row-btn">
-        <div class="d-meta">
-          ${beConn ? "💡 슬랙 채널에 작성하면 자동으로 여기 표시됩니다." : "⚠️ 서버 미연결 — 우상단 설정에서 백엔드 URL + Dashboard Key 입력 필요"}
-        </div>
-        <div>
-          <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);margin-right:10px;font-weight:600;">
-            <input type="checkbox" id="d-slack-${panel}" ${slackConnected ? "checked" : "disabled"}> 슬랙에도 전송
-          </label>
-          <button class="d-btn primary" onclick="addDiscussion('${panel}')">의견 저장</button>
-        </div>
-      </div>
+    <div style="background:var(--accent-soft);border:1px solid #93c5fd;border-radius:8px;padding:10px 14px;font-size:12px;color:#1e3a8a;margin-bottom:14px;line-height:1.7;">
+      💡 <strong>운영 안내</strong> — 임원·이사가 슬랙 채널에 글을 올리면 5초 안에 여기 표시됩니다.
+      PM(차주용)이 처리 완료 시:
+      <strong>슬랙 메시지에 ✅ 이모지 반응 → 자동 "해결됨" 처리</strong>
+      / 슬랙 thread에 답글 작성 → 자동으로 여기 답글에 표시.
+      <br>분류 이모지: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
     </div>
 
     <div class="d-thread" id="d-thread-${panel}"></div>
   `;
-  root.querySelectorAll(".d-cat-chip").forEach(c => {
-    c.addEventListener("click", () => {
-      root.querySelectorAll(".d-cat-chip").forEach(x => x.classList.remove("active"));
-      c.classList.add("active");
-    });
-  });
-  if (STATE.settings.author) {
-    const ai = document.getElementById("d-author-" + panel);
-    if (ai) ai.value = STATE.settings.author;
-  }
   renderDiscussionThread(panel);
 }
 
@@ -2086,13 +2061,14 @@ function renderDiscussionThread(panel) {
   if (cnt) cnt.textContent = list.length;
   if (!c) return;
   if (list.length === 0) {
-    c.innerHTML = '<div class="empty-thread">아직 의견이 없습니다. 슬랙 채널에 글을 올리거나 위 폼에서 작성하면 표시됩니다.</div>';
+    c.innerHTML = '<div class="empty-thread">아직 받은 의견이 없습니다.<br>슬랙 채널 <strong>#차주용-보고</strong>에 글이 올라오면 5초 안에 여기 표시됩니다.<br><br><a href="' + (STATE.channelUrl || "https://interohriginichq.slack.com/archives/C0B6FK9BCE5") + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;background:var(--accent);color:white;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:700;">💬 슬랙 채널 열기</a></div>';
   } else {
     c.innerHTML = list.slice().reverse().map((it) => {
       const cat = CATS[it.category] || CATS.question;
       const replies = it.replies || [];
       const imgs = (it.images || []).filter(Boolean);
       const beBase = backendBase();
+      const slackUrl = it.slackLink || it.slackChannelUrl || STATE.channelUrl;
       return `
         <div class="d-item cat-${it.category} ${it.resolved ? "resolved" : ""}">
           <div class="d-item-head">
@@ -2101,26 +2077,23 @@ function renderDiscussionThread(panel) {
               <span class="d-cat-badge cat-${it.category}">${cat.emoji} ${cat.label}</span>
               <span class="author">${escapeHTML(it.author || "익명")}</span>
               <span class="at">· ${it.at}</span>
-              ${it.resolved ? '<span class="badge b-completed" style="margin-left:6px;">해결됨</span>' : ""}
-              ${it.fromSlack ? '<span class="badge b-progress" style="margin-left:6px;">슬랙</span>' : ""}
+              ${it.resolved ? '<span class="badge b-completed" style="margin-left:6px;">✅ 해결됨</span>' : ""}
+              ${it.fromSlack ? '<span class="badge b-progress" style="margin-left:6px;">📥 슬랙</span>' : ""}
               ${it.edited ? '<span class="badge b-warn" style="margin-left:6px;">수정됨</span>' : ""}
             </div>
+            ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn" style="text-decoration:none;font-size:11px;">↗ 슬랙에서 보기</a>` : ""}
           </div>
           ${it.title ? `<div style="font-weight:700;margin-bottom:4px;">${escapeHTML(it.title)}</div>` : ""}
           <div class="body">${escapeHTML(it.content)}</div>
-          ${imgs.length ? `<div class="d-images" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${imgs.map(u => `<a href="${beBase + u}" target="_blank" rel="noopener"><img src="${beBase + u}" style="max-width:200px;max-height:160px;border-radius:6px;border:1px solid var(--border);" loading="lazy"></a>`).join("")}</div>` : ""}
-          ${replies.length ? `<div class="replies">${replies.map(r => `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div></div>`).join("")}</div>` : ""}
+          ${imgs.length ? `<div class="d-images" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${imgs.map(u => `<a href="${beBase + u}" target="_blank" rel="noopener"><img src="${beBase + u}" style="max-width:240px;max-height:180px;border-radius:6px;border:1px solid var(--border);" loading="lazy"></a>`).join("")}</div>` : ""}
+          ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">슬랙 thread 답글 ${replies.length}건</div>${replies.map(r => {
+            const rImgs = (r.images || []).filter(Boolean);
+            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgs.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${rImgs.map(u => `<a href="${beBase + u}" target="_blank"><img src="${beBase + u}" style="max-width:160px;max-height:120px;border-radius:4px;border:1px solid var(--border);"></a>`).join("")}</div>` : ""}</div>`;
+          }).join("")}</div>` : ""}
           <div class="item-actions">
-            <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">↳ 답글</button>
-            <button class="d-btn" onclick="toggleResolved('${panel}', '${it.id}')">${it.resolved ? "다시 열기" : "해결됨"}</button>
-            <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">삭제</button>
-          </div>
-          <div class="reply-compose" id="reply-compose-${panel}-${it.id}">
-            <textarea id="reply-content-${panel}-${it.id}" placeholder="답글 내용"></textarea>
-            <div style="margin-top:6px;text-align:right;">
-              <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">취소</button>
-              <button class="d-btn primary" onclick="addReply('${panel}', '${it.id}')">답글 등록</button>
-            </div>
+            ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn primary" style="text-decoration:none;">↳ 슬랙에서 답글 / ✅ 완료 처리</a>` : ""}
+            <button class="d-btn" onclick="toggleResolved('${panel}', '${it.id}')" title="대시보드에서 임시 표시 — 정식 완료는 슬랙 ✅ 이모지로">${it.resolved ? "다시 열기" : "임시 해결됨 표시"}</button>
+            <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">대시보드에서 숨기기</button>
           </div>
         </div>
       `;
