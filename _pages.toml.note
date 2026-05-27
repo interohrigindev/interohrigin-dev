@@ -1,0 +1,20 @@
+# Cloudflare Pages 설정 안내
+# (이 파일은 참고용 — 실제 설정은 Pages 대시보드 웹 UI에서 입력)
+
+[build]
+build_command = ""              # 빌드 불필요 (정적 HTML + Functions)
+build_output_directory = "public"
+root_directory = "."
+
+[environment_variables]
+SLACK_WORKSPACE = "interohriginichq"
+SLACK_CHANNEL_ID = "C0B6FK9BCE5"
+SLACK_CHANNEL_URL = "https://interohriginichq.slack.com/archives/C0B6FK9BCE5"
+
+[secrets]
+SLACK_SIGNING_SECRET = "(Pages 대시보드에서 입력)"
+SLACK_BOT_TOKEN = "(Pages 대시보드에서 입력)"
+DASHBOARD_KEY = "(Pages 대시보드에서 입력)"
+
+[kv_bindings]
+MESSAGES = "ba52d2bbb46e4cd9a328814656abdd6d"

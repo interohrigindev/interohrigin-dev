@@ -639,9 +639,10 @@
       <div class="header-meta">
         <div>보고일 <strong>2026-05-27 (목)</strong></div>
         <div>담당 <strong>차주용 (PM)</strong></div>
-        <div>의견 <strong id="hd-fb-count">0건</strong> 누적</div>
+        <div>의견 <strong id="hd-fb-count">0건</strong> 누적 · 갱신 <strong id="hd-updated">—</strong></div>
       </div>
-      <a href="https://interohriginichq.slack.com/archives/C0B6FK9BCE5" id="slack-channel-link" target="_blank" rel="noopener" class="top-btn primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">💬 슬랙 채널 열기</a>
+      <a href="https://interohriginichq.slack.com/archives/C0B6FK9BCE5" id="slack-channel-link" target="_blank" rel="noopener" class="top-btn primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">💬 슬랙 채널</a>
+      <button class="top-btn" onclick="hardReload()" title="브라우저 캐시까지 비우고 페이지를 새로 받아옴 (프로젝트 정보 최신화)">🔄 데이터 새로고침</button>
       <button class="top-btn" onclick="openSettingsModal()">⚙️ 설정</button>
       <button class="top-btn" onclick="window.print()">📄 PDF</button>
     </div>
@@ -1816,7 +1817,11 @@ const TIMELINE = {
     { date: "2026-04-30", title: "HR + 복지몰 기능 업데이트 회의", content: "기능 업데이트 보완 계획. 6주 스프린트 재산정 (Sprint 0~3, 4/17~5/15). 1분기 평가 테스트는 민지+JY 2인 선행.", source: "docs/HR플랫폼_기능업데이트_개발계획_0430.md" },
     { date: "2026-05-01", title: "실행 프롬프트 7종 패키지화", content: "공통 베이스 / 업무보고↔결재 연동 / 결재선 관리자 / 연차·촉진 / 증명서 인감 자동 날인 / 근태 메뉴 숨김 / 테스트·리포트 출력 형식.", source: "docs/HR플랫폼_기능업데이트_실행프롬프트_0501.md" },
     { date: "2026-05-07", milestone: true, title: "Gap Analysis — 현재 80%, FR별 갭 매트릭스", content: "HR AI 플랫폼 고도화 요구서 v1.0 모든 FR 대조 분석:\n• Phase 1 사전 질의서 UI/UX\n• Phase 2 채용 프로세스 자동화\n• Phase 3 AI 디자인 플랫폼\n80% → 100% 단계별 실행 계획 확정.", source: "docs/HR플랫폼_기능업데이트_개발계획_0507.md" },
-    { date: "2026-05-12", title: "0507 계획 보완 — 비용·보안·우선순위 재정렬", content: "P0 채용 전환율 / P1 면접 품질 / P2 비용 합의 후. Phase 3 디자인 플랫폼은 HR 핵심 안정화 전 착수 금지.", source: "docs/HR플랫폼_기능업데이트_보완개발계획_0512.md" }
+    { date: "2026-05-12", title: "0507 계획 보완 — 비용·보안·우선순위 재정렬", content: "P0 채용 전환율 / P1 면접 품질 / P2 비용 합의 후. Phase 3 디자인 플랫폼은 HR 핵심 안정화 전 착수 금지.", source: "docs/HR플랫폼_기능업데이트_보완개발계획_0512.md" },
+    { date: "2026-05-13~16", title: "사전질의서 v2.0 대규모 보강 (10+ commit)", content: "• 메타정보 수집 + 통합 해석 + 면접질문 + 생애주기 가이드 도입\n• Q6 자유입력 / Q8 장롱면허 표현 보완\n• 인트로에서 이메일·소속/직책 입력 제거 (간소화)\n• 결과 공개 공유 페이지 추가 (/survey-test-results)\n• 결과 페이지 기본정보 섹션 키/값 겹침 수정\n• ICI 카드에 해석 가이드 펼침 패널\n• ICI 계산식 보정 (양가적 응답 허용)\n• anon 역할 SELECT GRANT 부여\n• RLS silent rejection 해결 (저장 실패가 성공처럼 보이던 문제)\n\n0507 Gap Analysis FR-101~105 완료에 해당.", source: "git log 2026-05-13~16 commit 11건" },
+    { date: "2026-05-17~22", title: "채용 프로세스 보강 + 비밀번호 재설정 수정", content: "• 채용 사전질의서 별도 발송 시에도 미응답 카드 노출 (운영 피드백)\n• 채용 — 불합격/지원불참 처리 되돌리기 기능 (실수 복구)\n• 비밀번호 재설정 redirectTo 운영 URL 환경변수 분기 (배포 환경 호환)\n\nPhase 2 채용 자동화 영역 보강.", source: "git log feat/fix 2026-05-17~22" },
+    { date: "2026-05-23~25", title: "수습평가 5건 일괄 개선", content: "• 점수 아래 평가 인원/일자 표기 (가독성)\n• 할 일 카드 활성화\n• 도래일 표시 활성화\n• 리더 권한 분기 명확화\n• 통합 요약 추가\n• 역할 자동 선택\n\nPhase 1.8 수습평가 보강의 첫 결과물.", source: "git log feat 2026-05-23~25" },
+    { date: "2026-05-25~26", title: "전용 AI 에이전트 2종 도입 (.claude/agents/)", content: "• senior-dev — 시니어 개발자 서브 에이전트 (코드 리뷰·아키텍처 자문)\n• hr-debugger — HR 플랫폼 전용 디버깅 에이전트 (Supabase RLS·인증·도메인 이슈)\n\nClaude Code 작업 시 자동 호출 — 유지보수 효율 개선.", source: ".claude/agents/senior-dev.md · hr-debugger.md" }
   ],
   "finance": [
     { date: "2026-05-15", title: "재무관리 자동 배포 준비 — Cloudflare Pages", content: "main 브랜치에 코드 올리면 자동 빌드. 서브도메인 fn.interohrigin.com 예정 (README finance.* 표기는 outdated).", source: "auto-memory · io_finance_deploy.md" },
@@ -1996,7 +2001,17 @@ async function refreshAllPanels() {
   await Promise.all(TABS.map(t => fetchPanel(t.key)));
   TABS.forEach(t => renderDiscussionThread(t.key));
   document.getElementById("hd-fb-count").textContent = totalDiscussionCount() + "건";
+  const t = document.getElementById("hd-updated");
+  if (t) t.textContent = new Date().toLocaleTimeString("ko-KR");
   updateUnread();
+}
+
+// 페이지 자체를 캐시 무시하고 다시 받아옴 — 프로젝트 정보(코드)까지 최신화
+function hardReload() {
+  // localStorage의 의견 캐시는 유지 (서버 데이터가 진실)
+  const url = new URL(location.href);
+  url.searchParams.set("_t", Date.now().toString());
+  location.replace(url.toString());
 }
 
 // 5초마다 현재 패널 폴링 (실시간 흐름)
@@ -2066,7 +2081,7 @@ function renderDiscussionThread(panel) {
     c.innerHTML = list.slice().reverse().map((it) => {
       const cat = CATS[it.category] || CATS.question;
       const replies = it.replies || [];
-      const imgs = (it.images || []).filter(Boolean);
+      const imgRefs = (it.imageRefs || it.images || []).filter(Boolean);
       const beBase = backendBase();
       const slackUrl = it.slackLink || it.slackChannelUrl || STATE.channelUrl;
       return `
@@ -2085,10 +2100,10 @@ function renderDiscussionThread(panel) {
           </div>
           ${it.title ? `<div style="font-weight:700;margin-bottom:4px;">${escapeHTML(it.title)}</div>` : ""}
           <div class="body">${escapeHTML(it.content)}</div>
-          ${imgs.length ? `<div class="d-images" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${imgs.map(u => `<a href="${beBase + u}" target="_blank" rel="noopener"><img src="${beBase + u}" style="max-width:240px;max-height:180px;border-radius:6px;border:1px solid var(--border);" loading="lazy"></a>`).join("")}</div>` : ""}
+          ${imgRefs.length ? `<div style="margin-top:10px;padding:8px 12px;background:var(--accent-soft);border:1px solid #93c5fd;border-radius:6px;font-size:12px;">📎 첨부 이미지 ${imgRefs.length}건 — ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">슬랙에서 보기 →</a>` : "(슬랙 메시지에서 확인)"}</div>` : ""}
           ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">슬랙 thread 답글 ${replies.length}건</div>${replies.map(r => {
-            const rImgs = (r.images || []).filter(Boolean);
-            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgs.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${rImgs.map(u => `<a href="${beBase + u}" target="_blank"><img src="${beBase + u}" style="max-width:160px;max-height:120px;border-radius:4px;border:1px solid var(--border);"></a>`).join("")}</div>` : ""}</div>`;
+            const rImgRefs = (r.imageRefs || r.images || []).filter(Boolean);
+            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgRefs.length ? `<div style="margin-top:4px;font-size:11px;color:var(--accent);">📎 이미지 ${rImgRefs.length}건 (슬랙 thread에서 확인)</div>` : ""}</div>`;
           }).join("")}</div>` : ""}
           <div class="item-actions">
             ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn primary" style="text-decoration:none;">↳ 슬랙에서 답글 / ✅ 완료 처리</a>` : ""}

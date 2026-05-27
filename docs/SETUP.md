@@ -1,198 +1,176 @@
-# 셋업 가이드 (단일 슬랙 채널 운영)
+# 셋업 가이드 — Cloudflare Pages + GitHub 자동 배포
 
-> 채널: `#차주용-보고` (또는 운영 중인 단일 채널)
-> 채널 ID: `C0B6FK9BCE5`
-> 워크스페이스: `interohriginichq.slack.com`
-> 소요 시간: 약 30분 (1회만)
+> 채널: `https://interohriginichq.slack.com/archives/C0B6FK9BCE5` (단일)
+> 소요 시간: 약 25분 (1회만, 결제 카드 등록 불필요)
 
----
-
-## 사전 준비
-
-- [ ] Slack 워크스페이스 관리자 권한 (`interohriginichq`)
-- [ ] Cloudflare 계정 ([signup](https://dash.cloudflare.com/sign-up), 무료)
-- [ ] Node.js 18+ 설치 확인 (`node -v`)
-- [ ] GitHub 레포 `interohrigindev/interohrigin-dev`
+이 가이드는 **Cloudflare Pages + Pages Functions**로 배포합니다. R2(파일 저장소)는 사용하지 않고, 첨부 이미지는 슬랙 메시지로 점프하는 링크로 표시합니다.
 
 ---
 
-## 1. Slack App 생성 (5분)
+## 1. Slack App 준비 (이미 완료된 경우 스킵)
 
-1. https://api.slack.com/apps → **Create New App** → "From scratch"
-2. App 이름: `Executive Dashboard Bot` · Workspace: `interohriginichq`
-3. 좌측 **OAuth & Permissions** → **Bot Token Scopes** 추가:
-   - `channels:history` — 채널 메시지 읽기
-   - `channels:read` — 채널 정보
-   - `chat:write` — (선택) 봇 발송
-   - `files:read` — 이미지 첨부 다운로드
-   - `reactions:read` — 이모지 반응 감지
-   - `users:read` — 작성자 이름
-4. **Install to Workspace** → 권한 확인 → 설치
-5. 설치 후 표시되는 **Bot User OAuth Token** (`xoxb-...`) 복사 → 메모장 보관
-6. 좌측 **Basic Information** → **Signing Secret** 복사 → 메모장 보관
+이미 메모장에 다음 3개 값이 있다면 다음 단계로:
+- `SLACK_BOT_TOKEN` (xoxb-...)
+- `SLACK_SIGNING_SECRET` (32자 hex)
+- `DASHBOARD_KEY` (본인이 정한 임의 문자열)
 
-> Event URL은 다음 (Worker 배포 후) 단계에서 설정.
+아니라면 (이전 안내 참고):
+1. https://api.slack.com/apps → Create New App → From scratch
+2. OAuth Scopes 6개: `channels:history`, `channels:read`, `chat:write`, `files:read`, `reactions:read`, `users:read`
+3. Install to Workspace → Bot Token 복사
+4. Basic Information → Signing Secret 복사
 
 ---
 
-## 2. 로컬에서 Worker 배포 (15분)
+## 2. Cloudflare Pages 프로젝트 생성 (5분)
 
-```bash
-cd ~/projects/executive-dashboard/worker
-npm install
-
-# Cloudflare 로그인 (브라우저 자동 열림)
-npx wrangler login
-
-# KV 생성 → 출력된 id 메모
-npx wrangler kv:namespace create "MESSAGES"
-```
-
-`wrangler.toml`의 `id = "REPLACE_WITH_KV_ID_AFTER_CREATE"` 를 위 id로 교체.
-
-```bash
-# R2 버킷
-npx wrangler r2 bucket create executive-dashboard-images
-
-# Secrets 설정
-npx wrangler secret put SLACK_SIGNING_SECRET   # 1번 6항 값
-npx wrangler secret put SLACK_BOT_TOKEN        # 1번 5항 xoxb- 값
-npx wrangler secret put DASHBOARD_KEY          # 임의 랜덤 문자열 (예: jy-2026-xY9z)
-
-# 배포
-npx wrangler deploy
-```
-
-배포 완료 시 출력된 URL을 복사 (예: `https://executive-dashboard.YOUR-NAME.workers.dev`).
+1. https://dash.cloudflare.com → 좌측 **Workers & Pages** → **Create** → **Pages** 탭 → **Connect to Git**
+2. GitHub 인증 (처음이면) → **interohrigindev/interohrigin-dev** 레포 선택 → **Begin setup**
+3. **Build settings**:
+   - **Production branch**: `main`
+   - **Framework preset**: `None`
+   - **Build command**: (비워둠)
+   - **Build output directory**: `public`
+   - **Root directory**: `/` (기본)
+4. **Environment variables** → **Add variable** (Production):
+   - `SLACK_WORKSPACE` = `interohriginichq`
+   - `SLACK_CHANNEL_ID` = `C0B6FK9BCE5`
+   - `SLACK_CHANNEL_URL` = `https://interohriginichq.slack.com/archives/C0B6FK9BCE5`
+5. **Save and Deploy** 클릭 → 첫 빌드 진행 (1~2분)
+6. 배포 완료 시 URL 표시됨 — 예: `https://interohrigin-dev.pages.dev`
 
 ---
 
-## 3. Slack App에 Event URL 등록 (3분)
+## 3. KV 네임스페이스 + Secrets 연결 (5분)
 
-1. https://api.slack.com/apps → 만든 App 선택
+배포된 프로젝트 페이지 → 좌측 **Settings**
+
+### (a) KV 바인딩
+
+1. **Functions** 탭 → **KV namespace bindings** → **Add binding**
+2. **Variable name**: `MESSAGES`
+3. **KV namespace**: 드롭다운에서 `executive-dashboard-MESSAGES` 선택
+   (이미 만들어진 `ba52d2bbb46e4cd9a328814656abdd6d`)
+4. **Save**
+
+### (b) Secrets (환경변수의 보안 버전)
+
+같은 **Settings** → **Environment variables** → **Production** 섹션에서:
+
+| Variable name | 값 | 타입 |
+|------|------|------|
+| `SLACK_SIGNING_SECRET` | 메모장의 Signing Secret 값 | **Secret** (Encrypt 체크) |
+| `SLACK_BOT_TOKEN` | 메모장의 `xoxb-...` 값 | **Secret** (Encrypt 체크) |
+| `DASHBOARD_KEY` | 본인이 정한 키 | **Secret** (Encrypt 체크) |
+
+> 일반 변수와 달리 Secret은 한 번 저장하면 다시 볼 수 없습니다 (보안).
+
+저장 후 **Deployments** 탭 → 최근 배포의 **Retry deployment** 클릭 (Secrets 적용 위해 재배포).
+
+---
+
+## 4. Slack App에 Event URL 등록 (3분)
+
+1. https://api.slack.com/apps → 본인 앱 선택
 2. 좌측 **Event Subscriptions** → **Enable Events** ON
-3. **Request URL** 에 입력:
+3. **Request URL**:
    ```
-   https://executive-dashboard.YOUR-NAME.workers.dev/slack/events
+   https://interohrigin-dev.pages.dev/slack/events
    ```
-   → 자동으로 ✓ Verified 표시 확인
-4. **Subscribe to bot events** 에 추가:
-   - `message.channels` — 채널 메시지
-   - `reaction_added` — 이모지 추가
-   - `reaction_removed` — 이모지 제거 (해결됨 취소)
-5. **Save Changes**
-6. 상단 노란 띠 → **reinstall your app**
+   (위 3번에서 발급된 Pages URL + `/slack/events`)
+   → 자동으로 ✓ Verified
+4. **Subscribe to bot events** 추가:
+   - `message.channels`
+   - `reaction_added`
+   - `reaction_removed`
+5. **Save Changes** → 상단 띠 → **reinstall your app**
 
 ---
 
-## 4. 채널에 봇 초대 (1분)
+## 5. 슬랙 채널에 봇 초대 (1분)
 
-슬랙에서 `#차주용-보고` 채널 진입 →
+채널 `https://interohriginichq.slack.com/archives/C0B6FK9BCE5` 진입:
 
 ```
 /invite @Executive Dashboard Bot
 ```
 
-봇이 채널에 들어가야 메시지·이미지·이모지를 받을 수 있습니다.
-
 ---
 
-## 5. 임원에게 공유 (1분)
+## 6. 임원에게 공유
 
-대시보드 URL: `https://executive-dashboard.YOUR-NAME.workers.dev`
+대시보드 URL: `https://interohrigin-dev.pages.dev`
 
 카카오워크/메일 템플릿:
 
 ```
-[차주용 PM] 임원 의견 보드 안내
+[차주용 PM] 임원 의견 보드
 
-▣ 대시보드: https://executive-dashboard.YOUR-NAME.workers.dev
-▣ 접속 키: jy-2026-xY9z
+▣ 보기: https://interohrigin-dev.pages.dev
+▣ 접속 키: (DASHBOARD_KEY 값)
 
 처음 접속 시:
 1) 우상단 ⚙️ 설정 클릭
 2) "Dashboard Key" 위 키 붙여넣기 → 저장
-   (한 번만 입력하면 다음부터 자동)
 
-의견 작성 방법 — 슬랙 채널만 사용:
-▶ #차주용-보고 채널에 자유롭게 글 작성 (이미지 드래그앤드롭 OK)
-▶ 메시지에 이모지 반응으로 분류 표시:
-   ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
-▶ 추가 의견은 thread 답글로 작성
-▶ 처리 완료되면 PM이 ✅ 이모지로 표시 (자동 동기화)
+의견 작성 — 슬랙 채널만:
+▶ https://interohriginichq.slack.com/archives/C0B6FK9BCE5
+▶ 메시지 + 이미지 첨부 자유롭게
+▶ 이모지로 분류: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
+▶ thread 답글 = 자동 동기화
+▶ PM이 ✅ 누르면 자동 "해결됨"
 
-대시보드는 슬랙 의견을 한 화면에서 보기 좋게 정리해놓은 것입니다.
-직접 대시보드에 의견 작성도 가능하지만, 슬랙이 더 편하실 겁니다.
+이미지는 슬랙에서 보기로 열립니다 (대시보드에서 "슬랙에서 보기" 클릭).
 ```
 
 ---
 
-## 6. PM 작업 흐름 (운영 시)
+## 7. 운영 흐름
 
-### 임원이 슬랙에 글 올림
-→ 5초 후 대시보드에 자동 등장
-→ PM에게 슬랙 알림 (기본 슬랙 알림 설정 그대로)
-
-### PM이 처리할 때
-
-1. 대시보드에서 의견 확인 + 우선순위 판단
-2. 처리할 항목 좌측 **체크박스** 선택 (여러 탭에 걸쳐 선택 가능)
-3. 우상단 **🤖 Claude Code Inbox 생성** 클릭 → `inbox-YYYY-MM-DD.md` 다운로드
-
-터미널에서:
-
-```bash
-cd ~/Interohrigin-hr   # 작업 대상 레포로 이동
-mv ~/Downloads/inbox-2026-05-27.md ./inbox.md
-claude code -p "@inbox.md 의 항목들을 우선순위 순으로 처리해줘. 각 항목마다 (1) 어느 파일 수정 (2) 변경 요약 (3) git diff. ⚠️결정필요는 사람 확인 후 진행."
 ```
-
-### 완료 보고 (슬랙에서)
-
-PM이 슬랙 메시지에 ✅ 이모지 반응 → 대시보드 자동 "해결됨" 표시 → 임원이 슬랙 채널에서도 ✅ 확인 가능.
-
-선택: thread에 "완료" 답글 추가 → 다른 임원에게 통보.
+임원 슬랙에 글 작성
+   ↓ (5초 후)
+대시보드 자동 표시
+   ↓
+PM 의견 선택 → "🤖 Claude Code Inbox 생성"
+   ↓
+inbox.md 다운로드
+   ↓
+claude code -p "@inbox.md ..." → PR 자동
+   ↓
+PM 슬랙에 ✅ → 자동 "해결됨"
+```
 
 ---
 
-## 7. 문제 해결
+## 8. 자주 발생하는 문제
 
 ### Event URL Verification 실패
-- Worker 헬스 확인: `curl https://YOUR-WORKER.workers.dev/health`
-- Secrets 확인: `npx wrangler secret list`
+- 배포가 끝났는지 확인: 브라우저로 `https://interohrigin-dev.pages.dev/health` 접속 → `{"ok":true,...}` 표시되어야 함
+- Secret이 올바른지 (특히 SLACK_SIGNING_SECRET)
+- Functions가 활성화되었는지: Pages 대시보드 → Functions 탭 → "Active" 표시
 
 ### "서버 미연결" 표시
-- 우상단 ⚙️ 설정 → **Dashboard Key** 입력 확인 (PM이 설정한 키와 일치 여부)
-
-### 이미지가 깨짐
-- 봇이 채널에 들어가 있는지 (`/invite @봇이름`)
-- `files:read` scope 추가 후 reinstall
+- 우상단 ⚙️ 설정 → Dashboard Key 입력 확인
 
 ### 슬랙 메시지가 대시보드에 안 보임
-- `npx wrangler tail` 로 실시간 로그 확인
-- `wrangler.toml`의 `SLACK_CHANNEL_ID` 가 실제 채널 ID와 일치하는지 확인 (현재 `C0B6FK9BCE5`)
-- Event Subscriptions에 `message.channels` 추가 + reinstall 확인
+- 봇이 채널에 들어갔는지 (`/invite @봇이름`)
+- Event Subscriptions에 `message.channels` 추가 + reinstall
+- Pages 대시보드 → Functions 탭 → Real-time logs로 에러 확인
 
-### 이모지 반응이 동기화 안 됨
-- `reaction_added` / `reaction_removed` Event 구독 추가 + reinstall
+### 코드를 수정한 뒤 반영 안 됨
+- GitHub에 push → 1~2분 후 Pages 자동 재빌드
+- 브라우저에서 우상단 **🔄 데이터 새로고침** 버튼
 
 ---
 
-## 8. 비용 한도
+## 9. 비용
 
-| 서비스 | 무료 한도 | 예상 사용 |
+| 서비스 | 무료 한도 | 우리 사용량 |
 |------|------|------|
-| Cloudflare Workers | 10만 req/일 | ~1,000 req/일 |
-| Cloudflare KV | 1,000 write/일 | ~50 write/일 |
-| Cloudflare R2 | 10GB 저장 | 이미지 100MB |
-| Slack Free Plan | 메시지 무제한 | — |
+| Cloudflare Pages 빌드 | 500 builds/월 | ~10/월 |
+| Pages Functions | 10만 req/일 | ~1,000/일 |
+| Cloudflare KV | 1,000 write/일 | ~50/일 |
+| Slack Free | 무제한 | — |
 
-→ **월 $0**
-
----
-
-## 다음 단계 (선택 확장)
-
-- **Anthropic API 자동 분류** — 의견 → 어느 레포/파일 수정 추정 (월 ~$0.1)
-- **GitHub Issue 자동 등록** — 분류된 의견 → 레포 이슈
-- **Claude Code 자동 실행** — `/cc-do <id>` 슬랙 슬래시 커맨드 → 헤드리스 실행 + PR 자동
+→ **월 $0** (결제 카드 등록 불필요)
