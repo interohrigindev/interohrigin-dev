@@ -2046,23 +2046,27 @@ async function api(path, options = {}) {
 // ======================================================
 // 서버 동기화 (없으면 로컬 폴백)
 // ======================================================
+// 반환: 데이터가 직전과 달라졌으면 true (재렌더 필요 여부 판단용)
 async function fetchPanel(panel) {
+  STATE._lastJson = STATE._lastJson || {};
+  let messages;
   if (!backendConfigured()) {
-    // 폴백 — localStorage 로컬 데모
-    const local = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
-    STATE.discussions[panel] = local;
-    return local;
+    messages = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+  } else {
+    try {
+      const data = await api(`/api/messages?panel=${encodeURIComponent(panel)}`);
+      messages = data.messages || [];
+      if (data.channelUrl) STATE.channelUrl = data.channelUrl;
+    } catch (e) {
+      console.warn("fetchPanel fallback:", e);
+      messages = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
+    }
   }
-  try {
-    const data = await api(`/api/messages?panel=${encodeURIComponent(panel)}`);
-    STATE.discussions[panel] = data.messages || [];
-    if (data.channelUrl) STATE.channelUrl = data.channelUrl;
-    return STATE.discussions[panel];
-  } catch (e) {
-    console.warn("fetchPanel fallback:", e);
-    STATE.discussions[panel] = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
-    return STATE.discussions[panel];
-  }
+  STATE.discussions[panel] = messages;
+  const newJson = JSON.stringify(messages);
+  const changed = STATE._lastJson[panel] !== newJson;
+  STATE._lastJson[panel] = newJson;
+  return changed;
 }
 
 async function refreshAllPanels() {
@@ -2088,8 +2092,11 @@ function startPolling() {
   if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
     const cur = getCurrentPanel();
-    await fetchPanel(cur);
-    renderDiscussionThread(cur);
+    const changed = await fetchPanel(cur);
+    // 데이터가 바뀐 경우에만 재렌더 (입력 중인 답글창이 사라지지 않도록)
+    if (changed) renderDiscussionThread(cur);
+    const t = document.getElementById("hd-updated");
+    if (t) t.textContent = new Date().toLocaleTimeString("ko-KR");
   }, 5000);
 }
 
@@ -2141,6 +2148,12 @@ function renderDiscussionThread(panel) {
   const cnt = document.getElementById("dc-" + panel);
   if (cnt) cnt.textContent = list.length;
   if (!c) return;
+  // 재렌더 전 — 열려있는 답글창 + 입력 중인 텍스트 보존
+  const openReplies = {};
+  c.querySelectorAll(".reply-compose.open").forEach(el => {
+    const ta = el.querySelector("textarea");
+    openReplies[el.id] = ta ? ta.value : "";
+  });
   if (list.length === 0) {
     c.innerHTML = '<div class="empty-thread">아직 받은 의견이 없습니다.<br>지정된 <strong>슬랙 채널</strong>에 글이 올라오면 5초 안에 여기 표시됩니다.<br><br><a href="' + (STATE.channelUrl || "https://interohriginichq.slack.com/archives/C0B6FK9BCE5") + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;background:var(--accent);color:white;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:700;">💬 슬랙 채널 열기</a></div>';
   } else {
@@ -2195,6 +2208,15 @@ function renderDiscussionThread(panel) {
         const k = cb.dataset.panel + "|" + cb.dataset.id;
         if (cb.checked) STATE.selected.add(k); else STATE.selected.delete(k);
       });
+    });
+    // 재렌더 전 열려있던 답글창 + 입력 텍스트 복원
+    Object.keys(openReplies).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add("open");
+        const ta = el.querySelector("textarea");
+        if (ta) ta.value = openReplies[id];
+      }
     });
   }
   updateUnread();
