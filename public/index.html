@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>인터오리진 경영진 보고 — 차주용 담당 프로젝트 현황 (2026-05-27)</title>
+<title>인터오리진 개발 프로젝트 종합 현황 (경영진 보고)</title>
 <style>
   :root {
     --bg: #f5f7fa;
@@ -634,7 +634,7 @@
   <div class="inner">
     <div>
       <div class="eyebrow">INTEROHRIGIN · Executive Briefing</div>
-      <h1>차주용 담당 프로젝트 종합 현황<small>2026년 3~5월 · 9개 프로젝트 · 임원진 검토용 · 지속 커뮤니케이션 페이지</small></h1>
+      <h1>인터오리진 개발 프로젝트 종합 현황<small>2026년 3~5월 · 9개 프로젝트 · 임원진 검토용 · 지속 커뮤니케이션 페이지</small></h1>
     </div>
     <div class="meta-buttons">
       <div class="header-meta">
@@ -1573,14 +1573,18 @@
   </div>
 
   <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;margin-bottom:12px;line-height:1.6;">
+      <div>✏️ <strong>직접 입력 가능</strong> — 각 금액 칸(2026-04 / 2026-05 / 6개월 누계)을 클릭해 실제 청구 금액을 입력하면 <strong>소계·총계가 자동 계산</strong>됩니다. 입력값은 이 브라우저에 저장되어 새로고침·PDF 출력에도 유지됩니다. (파란 칸 = 직접 입력한 값)</div>
+      <button onclick="resetCostOverrides()" style="flex-shrink:0;margin-left:12px;background:white;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">입력값 초기화</button>
+    </div>
     <table class="t">
       <thead>
         <tr>
-          <th style="width:22%;">서비스</th>
-          <th style="width:22%;">플랜/항목</th>
+          <th style="width:20%;">서비스</th>
+          <th style="width:20%;">플랜/항목</th>
           <th class="right" style="width:11%;">단가</th>
-          <th class="right" style="width:9%;">2026-04</th>
-          <th class="right" style="width:9%;">2026-05</th>
+          <th class="right" style="width:10%;">2026-04</th>
+          <th class="right" style="width:10%;">2026-05</th>
           <th class="right" style="width:11%;">6개월 누계</th>
           <th>비고</th>
         </tr>
@@ -1962,21 +1966,74 @@ function renderBarChart(containerId, data, defaultColor) {
   `).join("");
 }
 
-function fmtCost(v) {
-  if (v === "—" || v == null) return '<span class="ph">기재 필요</span>';
-  if (typeof v === "string" && (v.includes("+") || v.includes("$"))) return v;
-  return "$" + v;
+// 금액 문자열에서 숫자만 추출 ("$100"→100, "—"→null, "100"→100)
+function costNum(v) {
+  if (v == null) return null;
+  const s = String(v).replace(/[^0-9.]/g, "");
+  return s === "" ? null : parseFloat(s);
+}
+function getCostOverrides() {
+  try { return JSON.parse(localStorage.getItem("jy_cost_overrides") || "{}"); } catch { return {}; }
+}
+function saveCostOverride(idx, field, raw) {
+  const o = getCostOverrides();
+  o[idx] = o[idx] || {};
+  const val = raw.trim();
+  if (val === "") { delete o[idx][field]; if (Object.keys(o[idx]).length === 0) delete o[idx]; }
+  else o[idx][field] = val;
+  localStorage.setItem("jy_cost_overrides", JSON.stringify(o));
+  renderCosts();
+}
+function resetCostOverrides() {
+  if (!confirm("직접 입력한 과금 값을 모두 지우고 원래대로 되돌릴까요?")) return;
+  localStorage.removeItem("jy_cost_overrides");
+  renderCosts();
 }
 
 function renderCosts() {
   const tbody = document.getElementById("cost-table");
   if (!tbody) return;
-  tbody.innerHTML = COSTS.map(r => {
-    if (r.group) return `<tr class="group-row"><td colspan="7">${r.group}</td></tr>`;
-    if (r.subtotal) return `<tr class="subtotal"><td colspan="3">${r.subtotal}</td><td class="right">${fmtCost(r.apr)}</td><td class="right">${fmtCost(r.may)}</td><td class="right">${fmtCost(r.total6m)}</td><td></td></tr>`;
-    if (r.total) return `<tr class="total"><td colspan="3">${r.total}</td><td class="right">${r.apr}</td><td class="right">${r.may}</td><td class="right">${r.total6m}</td><td></td></tr>`;
-    return `<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);">${r.plan}</td><td class="right" style="color:var(--text-dim);">${r.unit}</td><td class="right">${fmtCost(r.apr)}</td><td class="right">${fmtCost(r.may)}</td><td class="right">${fmtCost(r.total6m)}</td><td style="color:var(--text-dim);font-size:11px;">${r.note || ""}</td></tr>`;
-  }).join("");
+  const ov = getCostOverrides();
+  // override 우선, 없으면 원본
+  const cellVal = (idx, r, f) => (ov[idx] && ov[idx][f] != null) ? ov[idx][f] : r[f];
+
+  let grand = { apr: 0, may: 0, total6m: 0 };       // 전체 누계 (숫자 합)
+  let grandAlpha = { apr: false, may: false, total6m: false };
+  let grp = null;                                     // 현재 그룹 누계
+  let grpAlpha = null;
+
+  const rows = [];
+  COSTS.forEach((r, idx) => {
+    if (r.group) {
+      grp = { apr: 0, may: 0, total6m: 0 };
+      grpAlpha = { apr: false, may: false, total6m: false };
+      rows.push(`<tr class="group-row"><td colspan="7">${r.group}</td></tr>`);
+      return;
+    }
+    if (r.subtotal) {
+      // 자동 계산된 그룹 소계 표시
+      const fmt = (f) => grp[f] > 0 ? "$" + grp[f].toLocaleString() + (grpAlpha[f] ? " +α" : "") : (grpAlpha[f] ? "α" : "$0");
+      rows.push(`<tr class="subtotal"><td colspan="3">${r.subtotal}</td><td class="right">${fmt("apr")}</td><td class="right">${fmt("may")}</td><td class="right">${fmt("total6m")}</td><td></td></tr>`);
+      return;
+    }
+    if (r.total) {
+      const fmt = (f) => "$" + grand[f].toLocaleString() + (grandAlpha[f] ? " + α" : "");
+      rows.push(`<tr class="total"><td colspan="3">${r.total} <span style="font-weight:400;font-size:10px;color:var(--text-dim);">(자동 합계)</span></td><td class="right">${fmt("apr")}</td><td class="right">${fmt("may")}</td><td class="right">${fmt("total6m")}</td><td></td></tr>`);
+      return;
+    }
+    // 항목 행 — 금액 3칸은 입력 가능
+    const inputCell = (f) => {
+      const raw = cellVal(idx, r, f);
+      const n = costNum(raw);
+      if (n != null) { grp[f] += n; grand[f] += n; }
+      else { grpAlpha[f] = true; grandAlpha[f] = true; }
+      const display = (raw == null || raw === "—") ? "" : String(raw).replace(/[$]/g, "");
+      const edited = ov[idx] && ov[idx][f] != null;
+      return `<td class="right"><input class="cost-input ${edited ? "edited" : ""}" type="text" inputmode="decimal" value="${display}" placeholder="기재" onchange="saveCostOverride(${idx}, '${f}', this.value)" style="width:72px;text-align:right;border:1px solid ${edited ? "var(--accent)" : "var(--border)"};border-radius:4px;padding:3px 6px;font-family:ui-monospace,monospace;font-size:11px;background:${edited ? "var(--accent-soft)" : "white"};"></td>`;
+    };
+    rows.push(`<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);">${r.plan}</td><td class="right" style="color:var(--text-dim);">${r.unit}</td>${inputCell("apr")}${inputCell("may")}${inputCell("total6m")}<td style="color:var(--text-dim);font-size:11px;">${r.note || ""}</td></tr>`);
+  });
+  tbody.innerHTML = rows.join("");
 }
 
 // 탭 정의
