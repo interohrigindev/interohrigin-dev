@@ -1574,23 +1574,33 @@
 
   <div class="section">
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;margin-bottom:12px;line-height:1.6;">
-      <div>✏️ <strong>직접 입력 가능</strong> — 각 금액 칸(2026-04 / 2026-05 / 6개월 누계)을 클릭해 실제 청구 금액을 입력하면 <strong>소계·총계가 자동 계산</strong>됩니다. 입력값은 이 브라우저에 저장되어 새로고침·PDF 출력에도 유지됩니다. (파란 칸 = 직접 입력한 값)</div>
+      <div>✏️ <strong>직접 입력 가능</strong> — 각 월(3월~12월) 칸에 실제 청구 금액을 입력하면 <strong>오른쪽 합계(가로 SUM) + 그룹 소계 + 총계가 자동 계산</strong>됩니다. 입력값은 이 브라우저에 저장되어 새로고침·PDF 출력에도 유지됩니다. (파란 칸 = 직접 입력한 값 · 표가 넓으면 좌우로 스크롤)</div>
       <button onclick="resetCostOverrides()" style="flex-shrink:0;margin-left:12px;background:white;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">입력값 초기화</button>
     </div>
-    <table class="t">
-      <thead>
-        <tr>
-          <th style="width:20%;">서비스</th>
-          <th style="width:20%;">플랜/항목</th>
-          <th class="right" style="width:11%;">단가</th>
-          <th class="right" style="width:10%;">2026-04</th>
-          <th class="right" style="width:10%;">2026-05</th>
-          <th class="right" style="width:11%;">6개월 누계</th>
-          <th>비고</th>
-        </tr>
-      </thead>
-      <tbody id="cost-table"></tbody>
-    </table>
+    <div style="overflow-x:auto;">
+      <table class="t" style="min-width:1100px;">
+        <thead>
+          <tr>
+            <th style="min-width:130px;">서비스</th>
+            <th style="min-width:120px;">플랜/항목</th>
+            <th class="right">단가</th>
+            <th class="right">3월</th>
+            <th class="right">4월</th>
+            <th class="right">5월</th>
+            <th class="right">6월</th>
+            <th class="right">7월</th>
+            <th class="right">8월</th>
+            <th class="right">9월</th>
+            <th class="right">10월</th>
+            <th class="right">11월</th>
+            <th class="right">12월</th>
+            <th class="right" style="background:var(--accent-soft);">합계</th>
+            <th style="min-width:120px;">비고</th>
+          </tr>
+        </thead>
+        <tbody id="cost-table"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="section">
@@ -1990,48 +2000,67 @@ function resetCostOverrides() {
   renderCosts();
 }
 
+// 월 정의 (3~12월) — 기존 데이터: apr=4월, may=5월
+const COST_MONTHS = [
+  { key: "m3", label: "3월" }, { key: "m4", label: "4월" }, { key: "m5", label: "5월" },
+  { key: "m6", label: "6월" }, { key: "m7", label: "7월" }, { key: "m8", label: "8월" },
+  { key: "m9", label: "9월" }, { key: "m10", label: "10월" }, { key: "m11", label: "11월" }, { key: "m12", label: "12월" },
+];
+function costBase(r, mkey) {
+  if (mkey === "m4") return r.apr;   // 기존 2026-04 데이터
+  if (mkey === "m5") return r.may;   // 기존 2026-05 데이터
+  return null;                        // 나머지 월은 직접 입력 대상
+}
+const N_COLS_BEFORE = 3;             // 서비스+플랜+단가
+const TOTAL_COLS = N_COLS_BEFORE + COST_MONTHS.length + 2; // +합계+비고
+
 function renderCosts() {
   const tbody = document.getElementById("cost-table");
   if (!tbody) return;
   const ov = getCostOverrides();
-  // override 우선, 없으면 원본
-  const cellVal = (idx, r, f) => (ov[idx] && ov[idx][f] != null) ? ov[idx][f] : r[f];
+  const cellVal = (idx, r, mkey) => (ov[idx] && ov[idx][mkey] != null) ? ov[idx][mkey] : costBase(r, mkey);
 
-  let grand = { apr: 0, may: 0, total6m: 0 };       // 전체 누계 (숫자 합)
-  let grandAlpha = { apr: false, may: false, total6m: false };
-  let grp = null;                                     // 현재 그룹 누계
-  let grpAlpha = null;
+  // 누계 누산기 초기화 헬퍼
+  const blank = () => { const o = { row: 0, rowA: false }; COST_MONTHS.forEach(m => { o[m.key] = 0; o[m.key + "A"] = false; }); return o; };
+  let grand = blank();
+  let grp = blank();
+
+  const money = (v, alpha) => v > 0 ? "$" + v.toLocaleString() + (alpha ? " +α" : "") : (alpha ? "α" : "-");
 
   const rows = [];
   COSTS.forEach((r, idx) => {
     if (r.group) {
-      grp = { apr: 0, may: 0, total6m: 0 };
-      grpAlpha = { apr: false, may: false, total6m: false };
-      rows.push(`<tr class="group-row"><td colspan="7">${r.group}</td></tr>`);
+      grp = blank();
+      rows.push(`<tr class="group-row"><td colspan="${TOTAL_COLS}">${r.group}</td></tr>`);
       return;
     }
     if (r.subtotal) {
-      // 자동 계산된 그룹 소계 표시
-      const fmt = (f) => grp[f] > 0 ? "$" + grp[f].toLocaleString() + (grpAlpha[f] ? " +α" : "") : (grpAlpha[f] ? "α" : "$0");
-      rows.push(`<tr class="subtotal"><td colspan="3">${r.subtotal}</td><td class="right">${fmt("apr")}</td><td class="right">${fmt("may")}</td><td class="right">${fmt("total6m")}</td><td></td></tr>`);
+      const cells = COST_MONTHS.map(m => `<td class="right">${money(grp[m.key], grp[m.key + "A"])}</td>`).join("");
+      const sumCell = `<td class="right" style="background:var(--accent-soft);"><strong>${money(grp.row, grp.rowA)}</strong></td>`;
+      rows.push(`<tr class="subtotal"><td colspan="${N_COLS_BEFORE}">${r.subtotal}</td>${cells}${sumCell}<td></td></tr>`);
       return;
     }
     if (r.total) {
-      const fmt = (f) => "$" + grand[f].toLocaleString() + (grandAlpha[f] ? " + α" : "");
-      rows.push(`<tr class="total"><td colspan="3">${r.total} <span style="font-weight:400;font-size:10px;color:var(--text-dim);">(자동 합계)</span></td><td class="right">${fmt("apr")}</td><td class="right">${fmt("may")}</td><td class="right">${fmt("total6m")}</td><td></td></tr>`);
+      const cells = COST_MONTHS.map(m => `<td class="right">${money(grand[m.key], grand[m.key + "A"])}</td>`).join("");
+      const sumCell = `<td class="right" style="background:#c7d2fe;"><strong>${money(grand.row, grand.rowA)}</strong></td>`;
+      rows.push(`<tr class="total"><td colspan="${N_COLS_BEFORE}">${r.total} <span style="font-weight:400;font-size:10px;color:var(--text-dim);">(자동 합계)</span></td>${cells}${sumCell}<td></td></tr>`);
       return;
     }
-    // 항목 행 — 금액 3칸은 입력 가능
-    const inputCell = (f) => {
-      const raw = cellVal(idx, r, f);
+    // 항목 행 — 각 월 입력 가능, 합계는 가로 SUM
+    let rowSum = 0, rowAlpha = false;
+    const monthCells = COST_MONTHS.map(m => {
+      const raw = cellVal(idx, r, m.key);
       const n = costNum(raw);
-      if (n != null) { grp[f] += n; grand[f] += n; }
-      else { grpAlpha[f] = true; grandAlpha[f] = true; }
+      if (n != null) { grp[m.key] += n; grand[m.key] += n; rowSum += n; }
+      else { grp[m.key + "A"] = true; grand[m.key + "A"] = true; rowAlpha = true; }
       const display = (raw == null || raw === "—") ? "" : String(raw).replace(/[$]/g, "");
-      const edited = ov[idx] && ov[idx][f] != null;
-      return `<td class="right"><input class="cost-input ${edited ? "edited" : ""}" type="text" inputmode="decimal" value="${display}" placeholder="기재" onchange="saveCostOverride(${idx}, '${f}', this.value)" style="width:72px;text-align:right;border:1px solid ${edited ? "var(--accent)" : "var(--border)"};border-radius:4px;padding:3px 6px;font-family:ui-monospace,monospace;font-size:11px;background:${edited ? "var(--accent-soft)" : "white"};"></td>`;
-    };
-    rows.push(`<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);">${r.plan}</td><td class="right" style="color:var(--text-dim);">${r.unit}</td>${inputCell("apr")}${inputCell("may")}${inputCell("total6m")}<td style="color:var(--text-dim);font-size:11px;">${r.note || ""}</td></tr>`);
+      const edited = ov[idx] && ov[idx][m.key] != null;
+      return `<td class="right"><input type="text" inputmode="decimal" value="${display}" placeholder="-" onchange="saveCostOverride(${idx}, '${m.key}', this.value)" style="width:46px;text-align:right;border:1px solid ${edited ? "var(--accent)" : "var(--border)"};border-radius:4px;padding:2px 3px;font-family:ui-monospace,monospace;font-size:10px;background:${edited ? "var(--accent-soft)" : "white"};"></td>`;
+    }).join("");
+    if (rowSum > 0) { grp.row += rowSum; grand.row += rowSum; }
+    if (rowAlpha) { grp.rowA = true; grand.rowA = true; }
+    const rowSumCell = `<td class="right" style="font-weight:700;background:var(--panel-2);">${rowSum > 0 ? "$" + rowSum.toLocaleString() : (rowAlpha ? "-" : "$0")}</td>`;
+    rows.push(`<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);font-size:11px;">${r.plan}</td><td class="right" style="color:var(--text-dim);font-size:10px;">${r.unit}</td>${monthCells}${rowSumCell}<td style="color:var(--text-dim);font-size:10px;">${r.note || ""}</td></tr>`);
   });
   tbody.innerHTML = rows.join("");
 }
