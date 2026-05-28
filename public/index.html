@@ -2058,10 +2058,8 @@ function buildDiscussion(panel) {
 
     <div style="background:var(--accent-soft);border:1px solid #93c5fd;border-radius:8px;padding:10px 14px;font-size:12px;color:#1e3a8a;margin-bottom:14px;line-height:1.7;">
       💡 <strong>운영 안내</strong> — 임원·이사가 슬랙 채널에 글을 올리면 5초 안에 여기 표시됩니다.
-      PM(차주용)이 처리 완료 시:
-      <strong>슬랙 메시지에 ✅ 이모지 반응 → 자동 "해결됨" 처리</strong>
-      / 슬랙 thread에 답글 작성 → 자동으로 여기 답글에 표시.
-      <br>분류 이모지: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
+      <br><strong>완료 처리 2가지 방법</strong>: ① 대시보드의 <strong>✅ 완료 처리</strong> 버튼 클릭 / ② 슬랙 메시지에 ✅ 이모지 반응 — 둘 다 자동 동기화됩니다.
+      <br>슬랙 thread에 답글 작성 → 자동으로 여기 답글에 표시. 분류 이모지: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
     </div>
 
     <div class="d-thread" id="d-thread-${panel}"></div>
@@ -2106,9 +2104,9 @@ function renderDiscussionThread(panel) {
             return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgRefs.length ? `<div style="margin-top:4px;font-size:11px;color:var(--accent);">📎 이미지 ${rImgRefs.length}건 (슬랙 thread에서 확인)</div>` : ""}</div>`;
           }).join("")}</div>` : ""}
           <div class="item-actions">
-            ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn primary" style="text-decoration:none;">↳ 슬랙에서 답글 / ✅ 완료 처리</a>` : ""}
-            <button class="d-btn" onclick="toggleResolved('${panel}', '${it.id}')" title="대시보드에서 임시 표시 — 정식 완료는 슬랙 ✅ 이모지로">${it.resolved ? "다시 열기" : "임시 해결됨 표시"}</button>
-            <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">대시보드에서 숨기기</button>
+            <button class="d-btn ${it.resolved ? "" : "primary"}" onclick="toggleResolved('${panel}', '${it.id}')">${it.resolved ? "↩ 완료 취소" : "✅ 완료 처리"}</button>
+            ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn" style="text-decoration:none;">↳ 슬랙에서 답글</a>` : ""}
+            <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">삭제</button>
           </div>
         </div>
       `;
@@ -2196,7 +2194,7 @@ async function addReply(panel, id) {
   if (!content) return;
   const author = STATE.settings.author || prompt("답글 작성자 이름") || "익명";
   if (backendConfigured()) {
-    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, {
+    await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
       method: "PATCH",
       body: JSON.stringify({ reply: { author, content } }),
     });
@@ -2211,25 +2209,34 @@ async function addReply(panel, id) {
 }
 async function toggleResolved(panel, id) {
   const cur = (STATE.discussions[panel] || []).find(x => x.id === id);
-  const next = !cur?.resolved;
+  if (!cur) return;
+  const next = !cur.resolved;
+  // 낙관적 업데이트 — 즉시 화면 반영 (서버 응답 기다리지 않음)
+  cur.resolved = next;
+  renderDiscussionThread(panel);
   if (backendConfigured()) {
-    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, {
-      method: "PATCH",
-      body: JSON.stringify({ resolved: next }),
-    });
+    try {
+      await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ resolved: next }),
+      });
+    } catch (e) {
+      // 실패 시 롤백
+      cur.resolved = !next;
+      renderDiscussionThread(panel);
+      alert("완료 처리 실패: " + e.message);
+    }
   } else {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     const it = list.find(x => x.id === id);
     if (it) it.resolved = next;
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
-  await fetchPanel(panel);
-  renderDiscussionThread(panel);
 }
 async function deleteDiscussion(panel, id) {
   if (!confirm("이 의견을 삭제할까요?")) return;
   if (backendConfigured()) {
-    await api(`/api/messages/${encodeURIComponent(id)}?panel=${panel}`, { method: "DELETE" });
+    await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, { method: "DELETE" });
   } else {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list.filter(x => x.id !== id)));

@@ -1,9 +1,9 @@
-import { listMessages, addMessage } from "../_lib/storage";
+import { listMessages, addMessage, updateMessage, deleteMessage } from "../_lib/storage";
 import type { Env } from "../_lib/storage";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, X-Dashboard-Key",
 };
 
@@ -41,4 +41,26 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string }>();
   const m = await addMessage(env, body);
   return json({ ok: true, message: m });
+};
+
+// id를 쿼리 파라미터로 받음 (슬랙 ts의 특수문자 ':' '.' 라우팅 문제 회피)
+export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
+  if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
+  const url = new URL(request.url);
+  const panel = url.searchParams.get("panel") || "overview";
+  const id = url.searchParams.get("id");
+  if (!id) return json({ error: "id required" }, 400);
+  const body = await request.json<any>();
+  const m = await updateMessage(env, panel, id, body);
+  return json({ ok: true, message: m });
+};
+
+export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
+  if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
+  const url = new URL(request.url);
+  const panel = url.searchParams.get("panel") || "overview";
+  const id = url.searchParams.get("id");
+  if (!id) return json({ error: "id required" }, 400);
+  await deleteMessage(env, panel, id);
+  return json({ ok: true });
 };
