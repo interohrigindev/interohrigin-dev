@@ -2538,46 +2538,50 @@ function clearAllDiscussions() {
 
 // 초기화
 // ======================================================
-buildTabs();
-renderProjectTable(ACTIVE_PROJECTS, "ptable-active");
-renderProjectTable(DONE_PROJECTS, "ptable-done");
-renderTimeline("hr", "tl-hr");
-renderTimeline("finance", "tl-finance");
-renderTimeline("ophe", "tl-ophe");
-renderTimeline("ai-design", "tl-ai-design");
-renderTimeline("boomzap", "tl-boomzap");
-renderTimeline("completed", "tl-completed");
-renderBarChart("progress-chart", PROGRESS_DATA);
-renderBarChart("activity-chart", ACTIVITY_DATA, "var(--accent)");
-renderCosts();
-TABS.forEach(t => buildDiscussion(t.key));
-document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR");
+// 각 단계를 try-catch로 격리 — 한 곳이 실패해도 동기화는 반드시 시작되게
+function safe(label, fn) { try { fn(); } catch (e) { console.error("[init] " + label + " 실패:", e); } }
 
-// 모달 외부 클릭 닫기
-document.getElementById("settings-modal").addEventListener("click", e => {
-  if (e.target.id === "settings-modal") closeSettingsModal();
+safe("tabs", () => buildTabs());
+safe("projectTable", () => { renderProjectTable(ACTIVE_PROJECTS, "ptable-active"); renderProjectTable(DONE_PROJECTS, "ptable-done"); });
+safe("timeline", () => {
+  renderTimeline("hr", "tl-hr"); renderTimeline("finance", "tl-finance");
+  renderTimeline("ophe", "tl-ophe"); renderTimeline("ai-design", "tl-ai-design");
+  renderTimeline("boomzap", "tl-boomzap"); renderTimeline("completed", "tl-completed");
+});
+safe("charts", () => { renderBarChart("progress-chart", PROGRESS_DATA); renderBarChart("activity-chart", ACTIVITY_DATA, "var(--accent)"); });
+safe("costs", () => renderCosts());
+safe("discussions", () => TABS.forEach(t => buildDiscussion(t.key)));
+safe("genTime", () => { document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR"); });
+safe("modal", () => {
+  document.getElementById("settings-modal").addEventListener("click", e => {
+    if (e.target.id === "settings-modal") closeSettingsModal();
+  });
+});
+safe("hash", () => {
+  const h = location.hash.replace("#", "");
+  if (h && TABS.some(t => t.key === h)) activatePanel(h);
 });
 
-// 초기 서버 로드 + 폴링 시작
+// 초기 서버 로드 + 폴링 시작 — 렌더 에러와 무관하게 항상 실행
 (async function init() {
-  await refreshAllPanels();
-  if (backendConfigured()) startPolling();
-  else {
-    // 백엔드 미설정 시 1회 안내 (각 PC 최초 1회)
-    if (!localStorage.getItem("jy_dash_seen_setup_v1")) {
-      setTimeout(() => {
-        if (confirm("실시간 동기화를 위해 설정에서 백엔드 URL + Dashboard Key를 입력해주세요.\n지금 설정을 열까요?")) {
-          openSettingsModal();
-        }
-        localStorage.setItem("jy_dash_seen_setup_v1", "1");
-      }, 600);
-    }
+  try {
+    await refreshAllPanels();
+  } catch (e) { console.error("[init] refreshAllPanels 실패:", e); }
+
+  if (backendConfigured()) {
+    // 설정이 이미 있으면 → 페이지 열자마자 실시간 동기화 시작 (설정 열 필요 없음)
+    startPolling();
+    console.log("[init] 실시간 동기화 시작됨 (Dashboard Key 확인됨)");
+  } else if (!localStorage.getItem("jy_dash_seen_setup_v1")) {
+    // 최초 1회만 설정 안내 (Key 미입력 시)
+    setTimeout(() => {
+      if (confirm("실시간 동기화를 위해 Dashboard Key 입력이 필요합니다.\n지금 설정을 열까요?")) {
+        openSettingsModal();
+      }
+      localStorage.setItem("jy_dash_seen_setup_v1", "1");
+    }, 600);
   }
 })();
-
-// URL hash 진입
-const h = location.hash.replace("#", "");
-if (h && TABS.some(t => t.key === h)) activatePanel(h);
 </script>
 </body>
 </html>
