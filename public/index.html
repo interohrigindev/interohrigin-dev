@@ -511,6 +511,7 @@
   .d-item.cat-decision  { border-left-color: var(--orange); }
   .d-item.cat-feedback  { border-left-color: var(--green); }
   .d-item.resolved { background: var(--green-soft); border-left-color: var(--green); opacity: 0.85; }
+  .d-item.reviewing { background: var(--yellow-soft); border-left-color: var(--orange); }
   .d-item .d-item-head {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 6px; flex-wrap: wrap; gap: 6px;
@@ -1911,6 +1912,73 @@ const ACTIVITY_DATA = [
 
 const PRI_CLASS = { urgent: "pri-urgent", high: "pri-high", med: "pri-med", low: "pri-low" };
 
+// ======================================================
+// 프로젝트 데이터 렌더링 (정적 보고 영역)
+// ======================================================
+function renderProjectTable(arr, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  tbody.innerHTML = arr.map(p => `
+    <tr data-panel="${p.panel}">
+      <td><div class="pname">${p.name}${p.tasks > 0 ? `<span class="task-badge">${p.tasks}</span>` : ""}</div></td>
+      <td>차주용</td>
+      <td><div class="ppro-cell"><div class="row"><div class="bar"><div style="width:${p.progress}%;"></div></div><div class="pct">${p.progress}%</div></div></div></td>
+      <td class="center"><span class="pri ${PRI_CLASS[p.priority]}">${p.priorityLabel}</span></td>
+      <td class="center" style="color:var(--text-dim);font-size:12px;">${p.due}</td>
+      <td style="font-size:12px;">${p.stage === "—" ? '<span style="color:var(--text-mute);">—</span>' : p.stage}</td>
+      <td class="right" style="color:var(--text-dim);">${p.tasks}</td>
+    </tr>
+  `).join("");
+  tbody.querySelectorAll("tr").forEach(tr => {
+    tr.addEventListener("click", () => activatePanel(tr.dataset.panel));
+  });
+}
+
+function renderTimeline(panelKey, containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const entries = TIMELINE[panelKey] || [];
+  if (entries.length === 0) { c.innerHTML = '<div style="color:var(--text-mute);font-size:12px;padding:8px;">기록 없음</div>'; return; }
+  c.innerHTML = entries.map(e => `
+    <div class="te ${e.milestone ? "milestone" : ""}">
+      <div class="te-date">${e.date}</div>
+      <div class="te-title">${e.title}</div>
+      <div class="te-content">${escapeHTML(e.content)}</div>
+      <div class="te-source">📎 ${e.source}</div>
+    </div>
+  `).join("");
+}
+
+function renderBarChart(containerId, data, defaultColor) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const maxCount = Math.max(...data.map(x => x.count || 0)) || 1;
+  c.innerHTML = data.map(p => `
+    <div class="gauge-row">
+      <div class="lbl">${p.name || p.m}</div>
+      <div class="bar"><div style="width:${p.pct != null ? p.pct : (p.count / maxCount) * 100}%;background:${p.color || defaultColor};"></div></div>
+      <div class="val">${p.pct != null ? p.pct + "%" : p.count + "건"}</div>
+    </div>
+  `).join("");
+}
+
+function fmtCost(v) {
+  if (v === "—" || v == null) return '<span class="ph">기재 필요</span>';
+  if (typeof v === "string" && (v.includes("+") || v.includes("$"))) return v;
+  return "$" + v;
+}
+
+function renderCosts() {
+  const tbody = document.getElementById("cost-table");
+  if (!tbody) return;
+  tbody.innerHTML = COSTS.map(r => {
+    if (r.group) return `<tr class="group-row"><td colspan="7">${r.group}</td></tr>`;
+    if (r.subtotal) return `<tr class="subtotal"><td colspan="3">${r.subtotal}</td><td class="right">${fmtCost(r.apr)}</td><td class="right">${fmtCost(r.may)}</td><td class="right">${fmtCost(r.total6m)}</td><td></td></tr>`;
+    if (r.total) return `<tr class="total"><td colspan="3">${r.total}</td><td class="right">${r.apr}</td><td class="right">${r.may}</td><td class="right">${r.total6m}</td><td></td></tr>`;
+    return `<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);">${r.plan}</td><td class="right" style="color:var(--text-dim);">${r.unit}</td><td class="right">${fmtCost(r.apr)}</td><td class="right">${fmtCost(r.may)}</td><td class="right">${fmtCost(r.total6m)}</td><td style="color:var(--text-dim);font-size:11px;">${r.note || ""}</td></tr>`;
+  }).join("");
+}
+
 // 탭 정의
 const TABS = [
   { key: "overview",  emoji: "🏠", label: "종합 현황" },
@@ -2082,15 +2150,17 @@ function renderDiscussionThread(panel) {
       const imgRefs = (it.imageRefs || it.images || []).filter(Boolean);
       const beBase = backendBase();
       const slackUrl = it.slackLink || it.slackChannelUrl || STATE.channelUrl;
+      const status = it.status || (it.resolved ? "resolved" : "open");
       return `
-        <div class="d-item cat-${it.category} ${it.resolved ? "resolved" : ""}">
+        <div class="d-item cat-${it.category} ${status === "resolved" ? "resolved" : ""} ${status === "reviewing" ? "reviewing" : ""}">
           <div class="d-item-head">
             <div class="d-item-info">
               <input type="checkbox" class="inbox-pick" data-id="${it.id}" data-panel="${panel}" ${STATE.selected.has(panel+"|"+it.id) ? "checked" : ""} style="margin-right:4px;">
               <span class="d-cat-badge cat-${it.category}">${cat.emoji} ${cat.label}</span>
               <span class="author">${escapeHTML(it.author || "익명")}</span>
               <span class="at">· ${it.at}</span>
-              ${it.resolved ? '<span class="badge b-completed" style="margin-left:6px;">✅ 해결됨</span>' : ""}
+              ${status === "resolved" ? '<span class="badge b-completed" style="margin-left:6px;">✅ 완료</span>' : ""}
+              ${status === "reviewing" ? '<span class="badge b-warn" style="margin-left:6px;">👀 검토중</span>' : ""}
               ${it.fromSlack ? '<span class="badge b-progress" style="margin-left:6px;">📥 슬랙</span>' : ""}
               ${it.edited ? '<span class="badge b-warn" style="margin-left:6px;">수정됨</span>' : ""}
             </div>
@@ -2099,14 +2169,22 @@ function renderDiscussionThread(panel) {
           ${it.title ? `<div style="font-weight:700;margin-bottom:4px;">${escapeHTML(it.title)}</div>` : ""}
           <div class="body">${escapeHTML(it.content)}</div>
           ${imgRefs.length ? `<div style="margin-top:10px;padding:8px 12px;background:var(--accent-soft);border:1px solid #93c5fd;border-radius:6px;font-size:12px;">📎 첨부 이미지 ${imgRefs.length}건 — ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">슬랙에서 보기 →</a>` : "(슬랙 메시지에서 확인)"}</div>` : ""}
-          ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">슬랙 thread 답글 ${replies.length}건</div>${replies.map(r => {
+          ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">답글 ${replies.length}건</div>${replies.map(r => {
             const rImgRefs = (r.imageRefs || r.images || []).filter(Boolean);
-            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgRefs.length ? `<div style="margin-top:4px;font-size:11px;color:var(--accent);">📎 이미지 ${rImgRefs.length}건 (슬랙 thread에서 확인)</div>` : ""}</div>`;
+            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span>${r.toSlack ? ' <span style="color:var(--green);font-size:10px;">슬랙 전송됨</span>' : ""}</div><div class="body">${escapeHTML(r.content)}</div>${rImgRefs.length ? `<div style="margin-top:4px;font-size:11px;color:var(--accent);">📎 이미지 ${rImgRefs.length}건</div>` : ""}</div>`;
           }).join("")}</div>` : ""}
           <div class="item-actions">
-            <button class="d-btn ${it.resolved ? "" : "primary"}" onclick="toggleResolved('${panel}', '${it.id}')">${it.resolved ? "↩ 완료 취소" : "✅ 완료 처리"}</button>
-            ${slackUrl ? `<a href="${slackUrl}" target="_blank" rel="noopener" class="d-btn" style="text-decoration:none;">↳ 슬랙에서 답글</a>` : ""}
+            <button class="d-btn ${status === "reviewing" ? "primary" : ""}" onclick="setStatus('${panel}', '${it.id}', 'reviewing')">${status === "reviewing" ? "👀 검토중 해제" : "👀 검토중"}</button>
+            <button class="d-btn ${status === "resolved" ? "" : "primary"}" onclick="setStatus('${panel}', '${it.id}', 'resolved')">${status === "resolved" ? "↩ 완료 취소" : "✅ 완료"}</button>
+            <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">↳ 답글</button>
             <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">삭제</button>
+          </div>
+          <div class="reply-compose" id="reply-compose-${panel}-${it.id}">
+            <textarea id="reply-content-${panel}-${it.id}" placeholder="답글을 입력하세요. 슬랙 thread에도 함께 전송됩니다."></textarea>
+            <div style="margin-top:6px;text-align:right;">
+              <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">취소</button>
+              <button class="d-btn primary" onclick="addReply('${panel}', '${it.id}')">답글 등록</button>
+            </div>
           </div>
         </div>
       `;
@@ -2190,46 +2268,54 @@ function toggleReply(panel, id) {
   if (c) c.classList.toggle("open");
 }
 async function addReply(panel, id) {
-  const content = document.getElementById(`reply-content-${panel}-${id}`).value.trim();
+  const ta = document.getElementById(`reply-content-${panel}-${id}`);
+  const content = ta.value.trim();
   if (!content) return;
   const author = STATE.settings.author || prompt("답글 작성자 이름") || "익명";
+  // toSlack=true → 서버가 슬랙 thread에도 전송
   if (backendConfigured()) {
-    await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ reply: { author, content } }),
-    });
+    try {
+      await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ reply: { author, content, toSlack: true } }),
+      });
+    } catch (e) { alert("답글 등록 실패: " + e.message); return; }
   } else {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     const it = list.find(x => x.id === id);
     if (it) { it.replies = it.replies || []; it.replies.push({ author, content, at: new Date().toLocaleString("ko-KR") }); }
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
+  ta.value = "";
+  toggleReply(panel, id);
   await fetchPanel(panel);
   renderDiscussionThread(panel);
 }
-async function toggleResolved(panel, id) {
+// 상태 변경 (open ↔ reviewing ↔ resolved). 같은 상태 버튼 다시 누르면 open으로
+async function setStatus(panel, id, target) {
   const cur = (STATE.discussions[panel] || []).find(x => x.id === id);
   if (!cur) return;
-  const next = !cur.resolved;
-  // 낙관적 업데이트 — 즉시 화면 반영 (서버 응답 기다리지 않음)
-  cur.resolved = next;
+  const prev = cur.status || (cur.resolved ? "resolved" : "open");
+  const next = (prev === target) ? "open" : target;
+  // 낙관적 업데이트
+  cur.status = next;
+  cur.resolved = (next === "resolved");
   renderDiscussionThread(panel);
   if (backendConfigured()) {
     try {
       await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
         method: "PATCH",
-        body: JSON.stringify({ resolved: next }),
+        body: JSON.stringify({ status: next, resolved: next === "resolved" }),
       });
     } catch (e) {
-      // 실패 시 롤백
-      cur.resolved = !next;
+      cur.status = prev; cur.resolved = (prev === "resolved");
       renderDiscussionThread(panel);
-      alert("완료 처리 실패: " + e.message);
+      alert("상태 변경 실패: " + e.message);
     }
   } else {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     const it = list.find(x => x.id === id);
-    if (it) it.resolved = next;
+    if (it) { it.status = next; it.resolved = (next === "resolved"); }
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
 }

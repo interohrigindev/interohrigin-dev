@@ -18,8 +18,9 @@ export interface Message {
   content: string;
   at: string;
   _ts: number;
-  replies: Array<{ author: string; content: string; at: string; imageRefs?: string[]; slackTs?: string }>;
+  replies: Array<{ author: string; content: string; at: string; imageRefs?: string[]; slackTs?: string; toSlack?: boolean }>;
   resolved: boolean;
+  status?: "open" | "reviewing" | "resolved";
   slackTs?: string;
   slackChannel?: string;
   slackUserId?: string;
@@ -117,7 +118,25 @@ export async function markResolvedAcrossPanels(env: Env, slackTs: string, resolv
   for (const p of ALL_PANELS) {
     const list = await listMessages(env, p);
     const idx = list.findIndex(m => m.slackTs === slackTs);
-    if (idx !== -1) { list[idx].resolved = resolved; await saveMessages(env, p, list); return; }
+    if (idx !== -1) {
+      list[idx].resolved = resolved;
+      list[idx].status = resolved ? "resolved" : "open";
+      await saveMessages(env, p, list);
+      return;
+    }
+  }
+}
+
+export async function setStatusAcrossPanels(env: Env, slackTs: string, status: "open" | "reviewing" | "resolved"): Promise<void> {
+  for (const p of ALL_PANELS) {
+    const list = await listMessages(env, p);
+    const idx = list.findIndex(m => m.slackTs === slackTs);
+    if (idx !== -1) {
+      list[idx].status = status;
+      list[idx].resolved = (status === "resolved");
+      await saveMessages(env, p, list);
+      return;
+    }
   }
 }
 

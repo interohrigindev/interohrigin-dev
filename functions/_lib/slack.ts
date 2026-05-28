@@ -1,7 +1,7 @@
 /** Slack Events 처리 — R2 없이 이미지는 슬랙 permalink로 점프 */
 
 import type { Env } from "./storage";
-import { addMessage, updateMessage, deleteMessageByTs, markResolvedAcrossPanels, updateCategoryAcrossPanels } from "./storage";
+import { addMessage, updateMessage, deleteMessageByTs, markResolvedAcrossPanels, setStatusAcrossPanels, updateCategoryAcrossPanels } from "./storage";
 
 const REACTION_CATEGORY: Record<string, string> = {
   question: "question", grey_question: "question",
@@ -14,6 +14,7 @@ const RESOLVED_REACTIONS = new Set([
   "white_check_mark", "heavy_check_mark", "ballot_box_with_check",
   "white_tick", "done", "white_check",
 ]);
+const REVIEWING_REACTIONS = new Set(["eyes", "mag", "mag_right"]); // 👀 🔍
 
 export function panelFromText(text: string | undefined): string {
   if (!text) return "overview";
@@ -137,12 +138,14 @@ export async function handleSlackEvent(req: Request, env: Env): Promise<Response
 
     if (event.type === "reaction_added" && event.item?.ts) {
       const r = event.reaction;
-      if (RESOLVED_REACTIONS.has(r)) await markResolvedAcrossPanels(env, event.item.ts, true);
+      if (RESOLVED_REACTIONS.has(r)) await setStatusAcrossPanels(env, event.item.ts, "resolved");
+      else if (REVIEWING_REACTIONS.has(r)) await setStatusAcrossPanels(env, event.item.ts, "reviewing");
       const cat = REACTION_CATEGORY[r];
       if (cat) await updateCategoryAcrossPanels(env, event.item.ts, cat);
     }
     if (event.type === "reaction_removed" && event.item?.ts) {
-      if (RESOLVED_REACTIONS.has(event.reaction)) await markResolvedAcrossPanels(env, event.item.ts, false);
+      const r = event.reaction;
+      if (RESOLVED_REACTIONS.has(r) || REVIEWING_REACTIONS.has(r)) await setStatusAcrossPanels(env, event.item.ts, "open");
     }
   } catch (e) {
     console.error("Event error:", e);

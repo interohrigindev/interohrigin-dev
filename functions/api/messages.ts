@@ -1,4 +1,5 @@
-import { listMessages, addMessage, updateMessage, deleteMessage } from "../_lib/storage";
+import { listMessages, addMessage, updateMessage, deleteMessage, getMessage } from "../_lib/storage";
+import { reflectStatusToSlack, postThreadReply } from "../_lib/slack-api";
 import type { Env } from "../_lib/storage";
 
 const CORS = {
@@ -51,7 +52,23 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
   const id = url.searchParams.get("id");
   if (!id) return json({ error: "id required" }, 400);
   const body = await request.json<any>();
+
+  // 원본 메시지 (슬랙 ts/channel 확보용)
+  const before = await getMessage(env, panel, id);
   const m = await updateMessage(env, panel, id, body);
+
+  // 대시보드 → 슬랙 반영
+  if (before?.slackTs && before?.slackChannel) {
+    // (1) 상태 변경 → 이모지 반영
+    if (body.status) {
+      await reflectStatusToSlack(env, before.slackChannel, before.slackTs, body.status);
+    }
+    // (2) 답글 → 슬랙 thread 전송 (toSlack=true 일 때만)
+    if (body.reply && body.reply.toSlack) {
+      await postThreadReply(env, before.slackChannel, before.slackTs, body.reply.author, body.reply.content);
+    }
+  }
+
   return json({ ok: true, message: m });
 };
 
