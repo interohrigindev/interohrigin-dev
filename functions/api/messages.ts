@@ -1,6 +1,9 @@
 import { listMessages, addMessage, updateMessage, deleteMessage, getMessage } from "../_lib/storage";
-import { reflectStatusToSlack, postThreadReply } from "../_lib/slack-api";
+import { reflectStatusToSlack, postThreadReply, postChannelMessage } from "../_lib/slack-api";
 import type { Env } from "../_lib/storage";
+
+const CAT_EMOJI: Record<string, string> = { question: "❓", request: "📋", decision: "⚠️", feedback: "👍" };
+const CAT_LABEL2: Record<string, string> = { question: "질문", request: "요청", decision: "결정필요", feedback: "피드백" };
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -39,8 +42,24 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
-  const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string }>();
-  const m = await addMessage(env, body);
+  const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string; postToSlack?: boolean }>();
+
+  // 슬랙 채널에도 게시 → 게시된 ts를 slackTs로 저장 (이후 이모지/thread 양방향 연동)
+  let slackTs: string | undefined;
+  if (body.postToSlack) {
+    const emoji = CAT_EMOJI[body.category] || "❓";
+    const label = CAT_LABEL2[body.category] || "질문";
+    const text = `${emoji} *[${label}] ${body.author}*\n${body.title ? "*" + body.title + "*\n" : ""}${body.content}\n_경영진 대시보드에서 작성_`;
+    const ts = await postChannelMessage(env, text);
+    if (ts) slackTs = ts;
+  }
+
+  const m = await addMessage(env, {
+    ...body,
+    slackTs,
+    slackChannel: slackTs ? env.SLACK_CHANNEL_ID : undefined,
+    fromSlack: false,
+  });
   return json({ ok: true, message: m });
 };
 

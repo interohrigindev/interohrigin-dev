@@ -45,6 +45,20 @@ export async function reflectStatusToSlack(env: Env, channel: string, ts: string
   }
 }
 
+// 슬랙 채널에 새 메시지 게시 → 게시된 ts 반환 (대시보드 작성 의견용)
+export async function postChannelMessage(env: Env, text: string): Promise<string | null> {
+  if (!env.SLACK_BOT_TOKEN || !env.SLACK_CHANNEL_ID) return null;
+  try {
+    const res = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`, "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({ channel: env.SLACK_CHANNEL_ID, text }),
+    });
+    const data = await res.json<any>();
+    return data?.ok ? data.ts : null;
+  } catch (e) { console.error("postChannelMessage 실패:", e); return null; }
+}
+
 // 슬랙 thread에 답글 전송
 export async function postThreadReply(env: Env, channel: string, threadTs: string, author: string, content: string): Promise<void> {
   if (!env.SLACK_BOT_TOKEN || !channel || !threadTs) return;

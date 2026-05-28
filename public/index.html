@@ -2224,26 +2224,67 @@ function buildDiscussion(panel) {
   const channelUrl = STATE.channelUrl || "https://interohriginichq.slack.com/archives/C0B6FK9BCE5";
   root.innerHTML = `
     <div class="d-head">
-      <div class="d-title">📥 임원 요구사항·의견 (슬랙에서 수신) <span class="d-count" id="dc-${panel}">0</span>
+      <div class="d-title">📥 임원 요구사항·의견 <span class="d-count" id="dc-${panel}">0</span>
         ${beConn ? '<span class="badge b-active" style="margin-left:8px;">실시간 동기화</span>' : '<span class="badge b-paused" style="margin-left:8px;">서버 미연결</span>'}
       </div>
       <div class="d-actions">
-        <a href="${channelUrl}" target="_blank" rel="noopener" class="d-btn primary" style="text-decoration:none;display:inline-block;">💬 슬랙 채널로 가기</a>
+        <button class="d-btn primary" onclick="toggleCompose('${panel}')">✏️ 의견 작성</button>
+        <a href="${channelUrl}" target="_blank" rel="noopener" class="d-btn" style="text-decoration:none;display:inline-block;">💬 슬랙 채널</a>
         <button class="d-btn" onclick="refreshAllPanels()">🔄 새로고침</button>
         <button class="d-btn" onclick="exportDiscussionAsText('${panel}')">📄 텍스트 복사</button>
         <button class="d-btn primary" onclick="createInbox('${panel}')">🤖 Claude Code Inbox 생성</button>
       </div>
     </div>
 
+    <div class="d-compose" id="d-compose-${panel}" style="display:none;">
+      <div class="d-cat-row" data-panel="${panel}">
+        <button type="button" class="d-cat-chip cat-question active" data-cat="question">❓ 질문</button>
+        <button type="button" class="d-cat-chip cat-request" data-cat="request">📋 요청</button>
+        <button type="button" class="d-cat-chip cat-decision" data-cat="decision">⚠️ 결정필요</button>
+        <button type="button" class="d-cat-chip cat-feedback" data-cat="feedback">👍 피드백</button>
+      </div>
+      <div class="d-author-row">
+        <input class="d-input" id="d-author-${panel}" placeholder="작성자 (예: 차주용 / 차대표 / 강 이사)" value="${escAttr(STATE.settings.author || "")}">
+        <input class="d-input" id="d-title-${panel}" placeholder="제목 (선택, 한 줄 요약)">
+      </div>
+      <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 입력하세요. 저장하면 슬랙 채널에도 함께 올라갑니다."></textarea>
+      <div class="d-row-btn">
+        <label class="d-meta" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="d-toslack-${panel}" checked> 슬랙 채널에도 올리기
+        </label>
+        <div>
+          <button class="d-btn" onclick="toggleCompose('${panel}')">취소</button>
+          <button class="d-btn primary" onclick="addDiscussion('${panel}')">의견 저장</button>
+        </div>
+      </div>
+    </div>
+
     <div style="background:var(--accent-soft);border:1px solid #93c5fd;border-radius:8px;padding:10px 14px;font-size:12px;color:#1e3a8a;margin-bottom:14px;line-height:1.7;">
-      💡 <strong>운영 안내</strong> — 임원·이사가 슬랙 채널에 글을 올리면 5초 안에 여기 표시됩니다.
-      <br><strong>완료 처리 2가지 방법</strong>: ① 대시보드의 <strong>✅ 완료 처리</strong> 버튼 클릭 / ② 슬랙 메시지에 ✅ 이모지 반응 — 둘 다 자동 동기화됩니다.
-      <br>슬랙 thread에 답글 작성 → 자동으로 여기 답글에 표시. 분류 이모지: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
+      💡 <strong>운영 안내</strong> — 슬랙 채널에 글을 올리거나, 위 <strong>✏️ 의견 작성</strong> 버튼으로 여기서 직접 작성할 수 있습니다 (작성 시 슬랙에도 게시).
+      <br><strong>완료 처리</strong>: 대시보드 <strong>✅ 완료</strong> 버튼 또는 슬랙 메시지에 ✅ 이모지 — 양방향 자동 동기화.
+      <br>분류 이모지: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백
     </div>
 
     <div class="d-thread" id="d-thread-${panel}"></div>
   `;
+  // 카테고리 칩 토글
+  root.querySelectorAll(".d-cat-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      root.querySelectorAll(".d-cat-chip").forEach(x => x.classList.remove("active"));
+      chip.classList.add("active");
+    });
+  });
   renderDiscussionThread(panel);
+}
+
+function toggleCompose(panel) {
+  const el = document.getElementById("d-compose-" + panel);
+  if (!el) return;
+  el.style.display = (el.style.display === "none") ? "block" : "none";
+  if (el.style.display === "block") {
+    const ta = document.getElementById("d-content-" + panel);
+    if (ta) ta.focus();
+  }
 }
 
 function renderDiscussionThread(panel) {
@@ -2375,42 +2416,41 @@ async function addDiscussion(panel) {
     saveLocal(STATE);
   }
 
+  if (author !== "익명") {
+    STATE.settings.author = author;
+    saveLocal(STATE);
+  }
+
+  const toSlackEl = document.getElementById("d-toslack-" + panel);
+  const postToSlack = toSlackEl ? toSlackEl.checked : true;
+
   if (backendConfigured()) {
     try {
       await api("/api/messages", {
         method: "POST",
-        body: JSON.stringify({ panel, category, author, title, content }),
+        body: JSON.stringify({ panel, category, author, title, content, postToSlack }),
       });
     } catch (e) {
-      alert("서버 저장 실패: " + e.message + "\n로컬에만 저장됩니다.");
+      alert("서버 저장 실패: " + e.message);
+      return;
     }
   } else {
-    // 로컬 폴백
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     list.push({
       id: "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
       category, author, title, content,
       at: new Date().toLocaleString("ko-KR"),
-      _ts: Date.now(), replies: [], resolved: false, images: [],
+      _ts: Date.now(), replies: [], resolved: false, status: "open", images: [],
     });
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
 
-  // 슬랙 직접 발송 (선택)
-  const sendSlack = document.getElementById("d-slack-" + panel).checked && STATE.settings.slackWebhook;
-  if (sendSlack) {
-    try {
-      const tab = TABS.find(t => t.key === panel);
-      const cat = CATS[category];
-      const text = `${cat.emoji} *[${tab.emoji} ${tab.label}] ${cat.label}* — ${author}\n${title ? "*" + title + "*\n" : ""}${content}\n_경영진 대시보드에서 작성_`;
-      await fetch(STATE.settings.slackWebhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ text }) });
-    } catch {}
-  }
-
   document.getElementById("d-content-" + panel).value = "";
   document.getElementById("d-title-" + panel).value = "";
+  toggleCompose(panel); // 작성 폼 닫기
   await fetchPanel(panel);
   renderDiscussionThread(panel);
+  updateUnread();
 }
 
 function toggleReply(panel, id) {
