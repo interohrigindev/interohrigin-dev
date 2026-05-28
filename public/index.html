@@ -859,16 +859,16 @@
       <div class="desc">참고용 — 비개발자는 건너뛰셔도 됩니다</div>
     </div>
     <div class="stat-row">
-      <div class="stat"><div class="num">80+</div><div class="lbl">DB 테이블</div></div>
-      <div class="stat"><div class="num">49</div><div class="lbl">데이터 구조 업데이트</div></div>
-      <div class="stat"><div class="num">39+</div><div class="lbl">화면 페이지</div></div>
+      <div class="stat"><div class="num">90+</div><div class="lbl">DB 테이블</div></div>
+      <div class="stat"><div class="num">154</div><div class="lbl">데이터 구조 업데이트</div></div>
+      <div class="stat"><div class="num">45+</div><div class="lbl">화면 페이지</div></div>
       <div class="stat"><div class="num">5</div><div class="lbl">파일 저장소</div></div>
     </div>
     <div class="stat-row">
       <div class="stat"><div class="num">8</div><div class="lbl">AI 분석 종류</div></div>
-      <div class="stat"><div class="num">41</div><div class="lbl">개발 단계</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">완료 PDCA 사이클</div></div>
       <div class="stat"><div class="num">3</div><div class="lbl">AI 제공사</div></div>
-      <div class="stat"><div class="num">5</div><div class="lbl">외부 연동</div></div>
+      <div class="stat"><div class="num">✓</div><div class="lbl">AI 비용 추적</div></div>
     </div>
   </div>
 
@@ -963,10 +963,9 @@
         <h3>📁 인사노무</h3>
         <ul class="bulleted">
           <li>연차 자동 부여·촉진 (입사일 기준, 반차 4시간)</li>
-          <li>전자 계약</li>
-          <li>인사 명령</li>
-          <li>특이사항 기록</li>
-          <li>퇴사 설문</li>
+          <li><strong>긴급연차</strong> 신청·처리 (NEW, 5/28) — 임원 이메일·무급전환</li>
+          <li><strong>반복업무</strong> 자동화 (NEW, 5/28) — 주/월 반복 + 일일보고 자동반영</li>
+          <li>전자 계약 / 인사 명령 / 특이사항 / 퇴사 설문</li>
         </ul>
       </div>
       <div class="card">
@@ -1089,7 +1088,8 @@
           <dt>한 줄</dt><dd>고객 문의를 티켓으로 분류하고 AI가 응답을 도와주는 시스템</dd>
           <dt>대상 사용자</dt><dd>CS 담당자 · 관리자 · 고객 (외부)</dd>
           <dt>도입 효과</dt><dd>응답 누락 방지 / 응답 시간 단축 / 자주 묻는 질문 데이터화</dd>
-          <dt>통합 구조</dt><dd>HR과 같은 데이터베이스 → 직원·권한 마스터 공유</dd>
+          <dt>통합 구조</dt><dd>HR과 같은 데이터베이스 → 직원·권한 마스터 공유 (iocs_access 권한)</dd>
+          <dt>도메인</dt><dd><strong>cs.interohrigin.com</strong> 확정 (2026-05-28)</dd>
           <dt>현재 단계</dt><dd><strong>배포 준비 및 사용자 교육</strong></dd>
           <dt>전제</dt><dd>HR 시스템 알림 정책과 동일 (이메일 우선)</dd>
         </dl>
@@ -1606,10 +1606,11 @@
   </div>
 
   <div class="section">
-    <div class="notice">
-      <strong>토큰 단위 추적 한계.</strong>
-      HR DB에 AI 설정·리포트 테이블은 있으나 호출별 토큰 카운트 저장은 미구현.
-      붐앤잽만 자체적으로 토큰/비용 실시간 표시 (세션 누적). 정확한 5월 합산은 각 콘솔 (Anthropic · Google Cloud · OpenAI) 청구서 기준 수동 입력이 필요합니다.
+    <div class="notice success">
+      <strong>✅ HR 시스템 AI 비용 추적 구현됨 (2026-05-28, PDCA #3).</strong>
+      이전엔 미구현이던 토큰 단위 추적이 <code>ai_usage_log</code> 테이블 + <code>logAiUsage</code>로 실제 구현되어,
+      HR 시스템의 모든 AI 호출 비용이 자동 적재됩니다. HR 관리자 화면(billing)에서 <strong>기간별·시스템별·모델별·월별 실사용 AI 비용</strong>을 직접 확인할 수 있습니다.
+      붐앤잽도 자체 토큰/비용 실시간 표시 보유. <strong>HR/붐앤잽 외 프로젝트(Exhiboot·OPHE·AI디자인)</strong>의 정확한 합산은 각 콘솔(Anthropic·Google Cloud·OpenAI) 청구서 기준 입력이 필요합니다.
     </div>
   </div>
 
@@ -1838,7 +1839,13 @@ const TIMELINE = {
     { date: "2026-05-13~16", title: "사전질의서 v2.0 대규모 보강 (10+ commit)", content: "• 메타정보 수집 + 통합 해석 + 면접질문 + 생애주기 가이드 도입\n• Q6 자유입력 / Q8 장롱면허 표현 보완\n• 인트로에서 이메일·소속/직책 입력 제거 (간소화)\n• 결과 공개 공유 페이지 추가 (/survey-test-results)\n• 결과 페이지 기본정보 섹션 키/값 겹침 수정\n• ICI 카드에 해석 가이드 펼침 패널\n• ICI 계산식 보정 (양가적 응답 허용)\n• anon 역할 SELECT GRANT 부여\n• RLS silent rejection 해결 (저장 실패가 성공처럼 보이던 문제)\n\n0507 Gap Analysis FR-101~105 완료에 해당.", source: "git log 2026-05-13~16 commit 11건" },
     { date: "2026-05-17~22", title: "채용 프로세스 보강 + 비밀번호 재설정 수정", content: "• 채용 사전질의서 별도 발송 시에도 미응답 카드 노출 (운영 피드백)\n• 채용 — 불합격/지원불참 처리 되돌리기 기능 (실수 복구)\n• 비밀번호 재설정 redirectTo 운영 URL 환경변수 분기 (배포 환경 호환)\n\nPhase 2 채용 자동화 영역 보강.", source: "git log feat/fix 2026-05-17~22" },
     { date: "2026-05-23~25", title: "수습평가 5건 일괄 개선", content: "• 점수 아래 평가 인원/일자 표기 (가독성)\n• 할 일 카드 활성화\n• 도래일 표시 활성화\n• 리더 권한 분기 명확화\n• 통합 요약 추가\n• 역할 자동 선택\n\nPhase 1.8 수습평가 보강의 첫 결과물.", source: "git log feat 2026-05-23~25" },
-    { date: "2026-05-25~26", title: "전용 AI 에이전트 2종 도입 (.claude/agents/)", content: "• senior-dev — 시니어 개발자 서브 에이전트 (코드 리뷰·아키텍처 자문)\n• hr-debugger — HR 플랫폼 전용 디버깅 에이전트 (Supabase RLS·인증·도메인 이슈)\n\nClaude Code 작업 시 자동 호출 — 유지보수 효율 개선.", source: ".claude/agents/senior-dev.md · hr-debugger.md" }
+    { date: "2026-05-25~26", title: "전용 AI 에이전트 2종 도입 (.claude/agents/)", content: "• senior-dev — 시니어 개발자 서브 에이전트 (코드 리뷰·아키텍처 자문)\n• hr-debugger — HR 플랫폼 전용 디버깅 에이전트 (Supabase RLS·인증·도메인 이슈)\n\nClaude Code 작업 시 자동 호출 — 유지보수 효율 개선.", source: ".claude/agents/senior-dev.md · hr-debugger.md" },
+    { date: "2026-05-26~27", milestone: true, title: "인터랙티브 온라인 매뉴얼 (PDCA #1, Match 97.4%)", content: "직원용 사내 매뉴얼 Help Center 도입:\n• 실제 메뉴를 짚어주는 Tour(스포트라이트)\n• 직원 기본 메뉴 6개 챕터 + 프로젝트&업무 챕터\n• 외부 리서치 기반 베스트 프랙티스\n\n신규 입사자 온보딩 시간 단축 목적. 12/12 검증 통과.", source: "git log PDCA #1 · docs/archive interactive-manual" },
+    { date: "2026-05-27", milestone: true, title: "외부 사전질의서 PDF 임포트 (PDCA #2, Match 99.2%)", content: "지원자가 외부에서 받은 사전질의서(PDF)를 채용에 통합:\n• PDF 업로드 → Gemini가 자동 파싱\n• AI 분석/2차 면접 질문 생성에 외부 응답 포함\n• admin/공유 화면 표시\n\n채용 데이터 통합도 향상. 8/8 검증 통과.", source: "git log PDCA #2 · docs/archive external-pre-survey-import" },
+    { date: "2026-05-28", milestone: true, title: "💰 통합 AI 비용 대시보드 (PDCA #3, Match 98%)", content: "그간 '미구현'이던 AI 토큰 비용 추적이 실제 구현됨:\n• ai_usage_log 테이블 신설 (Migration 133)\n• logAiUsage — 모든 AI 호출의 토큰/비용 자동 적재\n• 단가 모듈 + 통합 비용 데이터 레이어\n• billing 화면에 실사용 AI 비용 — 기간별/시스템별/모델별/월별 표시\n\n→ 이제 HR 시스템 안에서 AI 비용을 직접 집계 가능 (과금 페이지 참조).", source: "git log PDCA #3 · Migration 133_ai_usage_log" },
+    { date: "2026-05-28", milestone: true, title: "긴급연차 신청·처리 (PDCA #4, Match 98.4%)", content: "정규 연차와 별도의 긴급연차 흐름:\n• 긴급연차 테이블 + RLS + 첨부 버킷 + 이메일 템플릿 (Migration 134)\n• 신청 UI 토글 + 임원급 이메일 발송 + 결재라인 자동\n• 목록/보완/전환/무급 처리\n• 연차신청 모달 → 페이지 전환 (긴급연차 스크롤 가림 해결)\n\n8/8 검증 통과.", source: "git log PDCA #4 · Migration 134_emergency_leave" },
+    { date: "2026-05-28", milestone: true, title: "반복업무 관리 (PDCA #5, Match 98.4%)", content: "매주/매월 반복되는 업무 자동화:\n• 반복업무 2테이블 + 3 RPC + materialize cron (Migration 135)\n• CF Function 알림 + 이메일 템플릿 + 관리화면\n• 체크화면 + 일일보고 자동 반영 (FR-08)\n• 메뉴권한 보유자도 등록 가능 (UI+RLS)\n\n7/7 검증 통과.", source: "git log PDCA #5 · Migration 135_recurring_task" },
+    { date: "2026-05-28", title: "IO CS 접근 권한 + 도메인 확정", content: "• 직원별 CS 접근 허용 (iocs_access)\n• CS 도메인 cs.interohrigin.com 확정\n\nCS 플랫폼이 HR과 통합 운영되며 별도 도메인으로 분리.", source: "git log feat(iocs)" }
   ],
   "finance": [
     { date: "2026-05-15", title: "재무관리 자동 배포 준비 — Cloudflare Pages", content: "main 브랜치에 코드 올리면 자동 빌드. 서브도메인 fn.interohrigin.com 예정 (README finance.* 표기는 outdated).", source: "auto-memory · io_finance_deploy.md" },
