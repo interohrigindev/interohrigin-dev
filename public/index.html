@@ -120,12 +120,14 @@
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .tab .tab-emoji { margin-right: 6px; }
   .tab .unread-dot {
-    position: absolute; top: 8px; right: 4px;
-    width: 8px; height: 8px;
-    background: var(--red); border-radius: 50%;
     display: none;
+    background: var(--red); color: white;
+    font-size: 10px; font-weight: 800;
+    border-radius: 9px; padding: 1px 6px;
+    margin-left: 6px; vertical-align: middle;
+    min-width: 16px; text-align: center;
   }
-  .tab.has-unread .unread-dot { display: block; }
+  .tab.has-unread .unread-dot { display: inline-block; }
 
   /* ===== 메인 ===== */
   main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
@@ -638,9 +640,9 @@
     </div>
     <div class="meta-buttons">
       <div class="header-meta">
-        <div>보고일 <strong>2026-05-27 (목)</strong></div>
-        <div>담당 <strong>차주용 (PM)</strong></div>
-        <div>의견 <strong id="hd-fb-count">0건</strong> 누적 · 갱신 <strong id="hd-updated">—</strong></div>
+        <div>보고일 <strong>2026-05-27 (목)</strong> · 담당 <strong>차주용 (PM)</strong></div>
+        <div>의견 총 <strong id="hd-fb-total">0</strong> · ✅완료 <strong id="hd-fb-resolved">0</strong> · 👀확인중 <strong id="hd-fb-reviewing">0</strong> · <span style="color:#fca5a5;">🔴미확인 <strong id="hd-fb-open" style="color:#fff;">0</strong></span></div>
+        <div>갱신 <strong id="hd-updated">—</strong></div>
       </div>
       <a href="https://interohriginichq.slack.com/archives/C0B6FK9BCE5" id="slack-channel-link" target="_blank" rel="noopener" class="top-btn primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">💬 슬랙 채널</a>
       <button class="top-btn" onclick="hardReload()" title="브라우저 캐시까지 비우고 페이지를 새로 받아옴 (프로젝트 정보 최신화)">🔄 데이터 새로고침</button>
@@ -2174,7 +2176,7 @@ async function fetchPanel(panel) {
 async function refreshAllPanels() {
   await Promise.all(TABS.map(t => fetchPanel(t.key)));
   TABS.forEach(t => renderDiscussionThread(t.key));
-  document.getElementById("hd-fb-count").textContent = totalDiscussionCount() + "건";
+  updateUnread();
   const t = document.getElementById("hd-updated");
   if (t) t.textContent = new Date().toLocaleTimeString("ko-KR");
   updateUnread();
@@ -2322,17 +2324,41 @@ function renderDiscussionThread(panel) {
     });
   }
   updateUnread();
-  const hd = document.getElementById("hd-fb-count");
-  if (hd) hd.textContent = totalDiscussionCount() + "건";
+}
+
+// 의견 통계 — status(미확인 open / 확인중 reviewing / 완료 resolved)별 집계
+function getStats() {
+  let total = 0, resolved = 0, reviewing = 0, open = 0;
+  const perPanelOpen = {};
+  for (const k in STATE.discussions) {
+    perPanelOpen[k] = 0;
+    (STATE.discussions[k] || []).forEach(it => {
+      total++;
+      const s = it.status || (it.resolved ? "resolved" : "open");
+      if (s === "resolved") resolved++;
+      else if (s === "reviewing") reviewing++;
+      else { open++; perPanelOpen[k]++; }
+    });
+  }
+  return { total, resolved, reviewing, open, perPanelOpen };
 }
 
 function updateUnread() {
+  const stats = getStats();
+  // 헤더 통계
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set("hd-fb-total", stats.total);
+  set("hd-fb-resolved", stats.resolved);
+  set("hd-fb-reviewing", stats.reviewing);
+  set("hd-fb-open", stats.open);
+  // 탭별 미확인 개수 배지
   TABS.forEach(t => {
-    const list = STATE.discussions[t.key] || [];
-    const viewedAt = STATE.viewedAt[t.key] || 0;
-    const hasUnread = list.some(it => (it._ts || 0) > viewedAt);
+    const cnt = stats.perPanelOpen[t.key] || 0;
     const tab = document.querySelector(`.tab[data-panel="${t.key}"]`);
-    if (tab) tab.classList.toggle("has-unread", hasUnread && tab.dataset.panel !== getCurrentPanel());
+    if (!tab) return;
+    const badge = tab.querySelector(".unread-dot");
+    if (badge) badge.textContent = cnt;
+    tab.classList.toggle("has-unread", cnt > 0);
   });
 }
 
