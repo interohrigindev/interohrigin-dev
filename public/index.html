@@ -1574,7 +1574,7 @@
 
   <div class="section">
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;margin-bottom:12px;line-height:1.6;">
-      <div>✏️ <strong>직접 입력 가능</strong> — 각 월(3월~12월) 칸에 실제 청구 금액을 입력하면 <strong>오른쪽 합계(가로 SUM) + 그룹 소계 + 총계가 자동 계산</strong>됩니다. 입력값은 이 브라우저에 저장되어 새로고침·PDF 출력에도 유지됩니다. (파란 칸 = 직접 입력한 값 · 표가 넓으면 좌우로 스크롤)</div>
+      <div>✏️ <strong>표 전체 편집 가능</strong> — 서비스명·플랜·단가·비고는 <strong>클릭해서 바로 수정</strong>, 각 월(3~12월) 칸은 금액 입력 → <strong>합계·소계·총계 자동 계산</strong>. 각 그룹 끝 <strong>＋항목 추가</strong>, 행 끝 <strong>× 삭제</strong>. 모든 변경은 이 브라우저에 저장(새로고침·PDF 유지). 좌우 스크롤 가능.</div>
       <button onclick="resetCostOverrides()" style="flex-shrink:0;margin-left:12px;background:white;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">입력값 초기화</button>
     </div>
     <div style="overflow-x:auto;">
@@ -1868,42 +1868,39 @@ const TIMELINE = {
   ]
 };
 
-const COSTS = [
-  { group: "1. 개발자 직접 사용 (차주용 본인 도구)" },
-  { service: "Anthropic Claude", plan: "Max Plan 5x", unit: "$100/월", apr: "100", may: "100", total6m: "600", note: "6개월 약정 가정" },
-  { service: "OpenAI Codex", plan: "API 종량제", unit: "사용량 기반", apr: "—", may: "—", total6m: "—", note: "콘솔 청구서 필요" },
-  { service: "GitHub Copilot", plan: "Pro", unit: "$10/월", apr: "10", may: "10", total6m: "60", note: "기재 추정" },
-  { service: "Cursor / Antigravity", plan: "Pro", unit: "$20/월", apr: "20", may: "20", total6m: "120", note: "기재 추정" },
-  { subtotal: "1. 개발자 도구 소계", apr: "130", may: "130", total6m: "780" },
-
-  { group: "2. 시스템 운영 사용 (프로덕션 API 호출)" },
-  { service: "HR — Claude API", plan: "Sonnet · CEO 리포트·결재 자동작성", unit: "토큰당", apr: "—", may: "—", total6m: "—", note: "4/16 회의: 한도 소진 이슈" },
-  { service: "HR — Gemini API", plan: "2.5 Flash · 이력서/면접/평가/수습/인수인계 분석", unit: "토큰당", apr: "0", may: "0", total6m: "0", note: "무료 플랜 (분당 15건)" },
-  { service: "HR — Deepgram", plan: "Nova-3 · 회의록 받아쓰기 한국어", unit: "$0.0043/분", apr: "—", may: "—", total6m: "—", note: "정확도 27% 개선" },
-  { service: "HR — OpenAI Whisper", plan: "받아쓰기 fallback", unit: "$0.006/분", apr: "—", may: "—", total6m: "—", note: "25MB 파일 제한" },
-  { service: "Exhiboot — Claude API", plan: "다국어 번역·제품 추천", unit: "토큰당", apr: "—", may: "—", total6m: "—", note: "콘솔 청구서 필요" },
-  { service: "Exhiboot — Resend", plan: "메일링 자동발송", unit: "1만건 $20", apr: "—", may: "—", total6m: "—", note: "발송량 기반" },
-  { service: "Exhiboot — PayPal", plan: "결제 수수료", unit: "건당 ~3.5%", apr: "—", may: "—", total6m: "—", note: "거래액 기반" },
-  { service: "OPHE — Cafe24", plan: "쇼핑몰 호스팅", unit: "월 정액", apr: "—", may: "—", total6m: "—", note: "Cafe24 측 청구" },
-  { service: "OPHE — GA4 + Clarity", plan: "분석 (무료)", unit: "$0", apr: "0", may: "0", total6m: "0", note: "" },
-  { service: "붐앤잽 — Gemini 2.5", plan: "Flash Lite (무료) · Flash $0.15/MTok", unit: "토큰당", apr: "0", may: "0", total6m: "0", note: "기본 무료 + 세션 누적 표시" },
-  { service: "재무관리 — Supabase RPC", plan: "자금계획·고정비·감사로그", unit: "$0", apr: "0", may: "0", total6m: "0", note: "HR DB 통합" },
-  { service: "AI 디자인 — 멀티 프로바이더", plan: "Anthropic + OpenAI + Google + OpenRouter", unit: "혼합", apr: "—", may: "—", total6m: "—", note: "통합 테스트 단계" },
-  { subtotal: "2. 시스템 API 소계", apr: "0", may: "0", total6m: "0" },
-
-  { group: "3. 인프라" },
-  { service: "Supabase PRO (HR · CS · 복지몰 · 재무관리)", plan: "Pro Plan (단일 인스턴스)", unit: "$25/월", apr: "25", may: "25", total6m: "150", note: "4 모듈 공유" },
-  { service: "Supabase Free (Exhiboot)", plan: "Free Tier", unit: "$0", apr: "0", may: "0", total6m: "0", note: "트래픽 한도 도달 시 PRO 전환" },
-  { service: "Supabase Free (OPHE · AI Design)", plan: "Free Tier", unit: "$0", apr: "0", may: "0", total6m: "0", note: "" },
-  { service: "Firebase (I&C 리뉴얼)", plan: "Spark/Blaze", unit: "사용량 기반", apr: "—", may: "—", total6m: "—", note: "Storage 비용 발생 가능" },
-  { service: "Cloudflare D1 + Workers (붐앤잽)", plan: "Free Tier 현재", unit: "$0", apr: "0", may: "0", total6m: "0", note: "유료 한도 도달 시 ~$5/월" },
-  { service: "Cloudflare Pages (HR · IR · 재무 · OPHE)", plan: "Free", unit: "$0", apr: "0", may: "0", total6m: "0", note: "현재 무료 한도 내" },
-  { service: "Vercel (AI Design)", plan: "Hobby (Pro 검토 중)", unit: "Pro $20/월", apr: "—", may: "—", total6m: "—", note: "Pro 전환 여부 결정 필요" },
-  { service: "도메인 (interohrigin.com 외)", plan: "연간", unit: "~$20/년", apr: "—", may: "—", total6m: "10", note: "" },
-  { service: "Google Workspace", plan: "Business Starter", unit: "$6/유저/월", apr: "—", may: "—", total6m: "—", note: "유저 수 × 단가" },
-  { subtotal: "3. 인프라 소계", apr: "25", may: "25", total6m: "160" },
-
-  { total: "총계 (확정 + 미입력 α)", apr: "$155 + α", may: "$155 + α", total6m: "$940 + α" }
+// 과금 기본 데이터 (seed) — 그룹 > 항목 구조. m4=기존 4월, m5=기존 5월
+const COST_GROUPS_SEED = [
+  { name: "1. 개발자 직접 사용 (차주용 본인 도구)", items: [
+    { service: "Anthropic Claude", plan: "Max Plan 5x", unit: "$100/월", note: "6개월 약정 가정", months: { m4: "100", m5: "100" } },
+    { service: "OpenAI Codex", plan: "API 종량제", unit: "사용량 기반", note: "콘솔 청구서 필요", months: {} },
+    { service: "GitHub Copilot", plan: "Pro", unit: "$10/월", note: "기재 추정", months: { m4: "10", m5: "10" } },
+    { service: "Cursor / Antigravity", plan: "Pro", unit: "$20/월", note: "기재 추정", months: { m4: "20", m5: "20" } },
+  ]},
+  { name: "2. 시스템 운영 사용 (프로덕션 API 호출)", items: [
+    { service: "HR — Claude API", plan: "Sonnet · CEO 리포트·결재 자동작성", unit: "토큰당", note: "4/16 회의: 한도 소진 이슈", months: {} },
+    { service: "HR — Gemini API", plan: "2.5 Flash · 이력서/면접/평가/수습/인수인계", unit: "토큰당", note: "무료 플랜 (분당 15건)", months: { m4: "0", m5: "0" } },
+    { service: "HR — Deepgram", plan: "Nova-3 · 회의록 받아쓰기 한국어", unit: "$0.0043/분", note: "정확도 27% 개선", months: {} },
+    { service: "HR — OpenAI Whisper", plan: "받아쓰기 fallback", unit: "$0.006/분", note: "25MB 파일 제한", months: {} },
+    { service: "Exhiboot — Claude API", plan: "다국어 번역·제품 추천", unit: "토큰당", note: "콘솔 청구서 필요", months: {} },
+    { service: "Exhiboot — Resend", plan: "메일링 자동발송", unit: "1만건 $20", note: "발송량 기반", months: {} },
+    { service: "Exhiboot — PayPal", plan: "결제 수수료", unit: "건당 ~3.5%", note: "거래액 기반", months: {} },
+    { service: "OPHE — Cafe24", plan: "쇼핑몰 호스팅", unit: "월 정액", note: "Cafe24 측 청구", months: {} },
+    { service: "OPHE — GA4 + Clarity", plan: "분석 (무료)", unit: "$0", note: "", months: { m4: "0", m5: "0" } },
+    { service: "붐앤잽 — Gemini 2.5", plan: "Flash Lite 무료 · Flash $0.15/MTok", unit: "토큰당", note: "기본 무료 + 세션 누적", months: { m4: "0", m5: "0" } },
+    { service: "재무관리 — Supabase RPC", plan: "자금계획·고정비·감사로그", unit: "$0", note: "HR DB 통합", months: { m4: "0", m5: "0" } },
+    { service: "AI 디자인 — 멀티 프로바이더", plan: "Anthropic+OpenAI+Google+OpenRouter", unit: "혼합", note: "통합 테스트 단계", months: {} },
+  ]},
+  { name: "3. 인프라", items: [
+    { service: "Supabase PRO (HR·CS·복지몰·재무)", plan: "Pro Plan (단일 인스턴스)", unit: "$25/월", note: "4 모듈 공유", months: { m4: "25", m5: "25" } },
+    { service: "Supabase Free (Exhiboot)", plan: "Free Tier", unit: "$0", note: "한도 도달 시 PRO 전환", months: { m4: "0", m5: "0" } },
+    { service: "Supabase Free (OPHE·AI Design)", plan: "Free Tier", unit: "$0", note: "", months: { m4: "0", m5: "0" } },
+    { service: "Firebase (I&C 리뉴얼)", plan: "Spark/Blaze", unit: "사용량 기반", note: "Storage 비용 발생 가능", months: {} },
+    { service: "Cloudflare D1+Workers (붐앤잽)", plan: "Free Tier 현재", unit: "$0", note: "한도 시 ~$5/월", months: { m4: "0", m5: "0" } },
+    { service: "Cloudflare Pages (HR·IR·재무·OPHE)", plan: "Free", unit: "$0", note: "무료 한도 내", months: { m4: "0", m5: "0" } },
+    { service: "Vercel (AI Design)", plan: "Hobby (Pro 검토 중)", unit: "Pro $20/월", note: "Pro 전환 여부 결정", months: {} },
+    { service: "도메인 (interohrigin.com 외)", plan: "연간", unit: "~$20/년", note: "", months: {} },
+    { service: "Google Workspace", plan: "Business Starter", unit: "$6/유저/월", note: "유저 수 × 단가", months: {} },
+  ]},
 ];
 
 const PROGRESS_DATA = [
@@ -1982,86 +1979,105 @@ function costNum(v) {
   const s = String(v).replace(/[^0-9.]/g, "");
   return s === "" ? null : parseFloat(s);
 }
-function getCostOverrides() {
-  try { return JSON.parse(localStorage.getItem("jy_cost_overrides") || "{}"); } catch { return {}; }
+// 편집 가능한 working copy (없으면 seed 복사)
+function getCostGroups() {
+  try {
+    const saved = localStorage.getItem("jy_cost_groups_v1");
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return JSON.parse(JSON.stringify(COST_GROUPS_SEED)); // deep copy
 }
-function saveCostOverride(idx, field, raw) {
-  const o = getCostOverrides();
-  o[idx] = o[idx] || {};
-  const val = raw.trim();
-  if (val === "") { delete o[idx][field]; if (Object.keys(o[idx]).length === 0) delete o[idx]; }
-  else o[idx][field] = val;
-  localStorage.setItem("jy_cost_overrides", JSON.stringify(o));
+function saveCostGroups(data) {
+  localStorage.setItem("jy_cost_groups_v1", JSON.stringify(data));
+  renderCosts();
+}
+let _costCache = null;
+function costData() { if (!_costCache) _costCache = getCostGroups(); return _costCache; }
+function persistCost() { localStorage.setItem("jy_cost_groups_v1", JSON.stringify(_costCache)); }
+
+function editCostCell(gi, ii, field, value) {
+  const d = costData();
+  if (field.startsWith("m")) { d[gi].items[ii].months = d[gi].items[ii].months || {}; d[gi].items[ii].months[field] = value.trim(); }
+  else d[gi].items[ii][field] = value.trim();
+  persistCost();
+  renderCosts(); // 합계 갱신
+}
+function addCostItem(gi) {
+  const d = costData();
+  d[gi].items.push({ service: "새 항목", plan: "", unit: "", note: "", months: {} });
+  persistCost();
+  renderCosts();
+}
+function deleteCostItem(gi, ii) {
+  const d = costData();
+  const name = d[gi].items[ii].service || "이 항목";
+  if (!confirm(`"${name}"을(를) 삭제할까요?`)) return;
+  d[gi].items.splice(ii, 1);
+  persistCost();
   renderCosts();
 }
 function resetCostOverrides() {
-  if (!confirm("직접 입력한 과금 값을 모두 지우고 원래대로 되돌릴까요?")) return;
-  localStorage.removeItem("jy_cost_overrides");
+  if (!confirm("과금 표를 기본값으로 되돌릴까요? (추가/삭제/입력한 내용이 모두 사라집니다)")) return;
+  localStorage.removeItem("jy_cost_groups_v1");
+  _costCache = null;
   renderCosts();
 }
 
-// 월 정의 (3~12월) — 기존 데이터: apr=4월, may=5월
+// 월 정의 (3~12월)
 const COST_MONTHS = [
   { key: "m3", label: "3월" }, { key: "m4", label: "4월" }, { key: "m5", label: "5월" },
   { key: "m6", label: "6월" }, { key: "m7", label: "7월" }, { key: "m8", label: "8월" },
   { key: "m9", label: "9월" }, { key: "m10", label: "10월" }, { key: "m11", label: "11월" }, { key: "m12", label: "12월" },
 ];
-function costBase(r, mkey) {
-  if (mkey === "m4") return r.apr;   // 기존 2026-04 데이터
-  if (mkey === "m5") return r.may;   // 기존 2026-05 데이터
-  return null;                        // 나머지 월은 직접 입력 대상
-}
 const N_COLS_BEFORE = 3;             // 서비스+플랜+단가
 const TOTAL_COLS = N_COLS_BEFORE + COST_MONTHS.length + 2; // +합계+비고
+
+function escAttr(s) { return String(s == null ? "" : s).replace(/"/g, "&quot;"); }
 
 function renderCosts() {
   const tbody = document.getElementById("cost-table");
   if (!tbody) return;
-  const ov = getCostOverrides();
-  const cellVal = (idx, r, mkey) => (ov[idx] && ov[idx][mkey] != null) ? ov[idx][mkey] : costBase(r, mkey);
-
-  // 누계 누산기 초기화 헬퍼
-  const blank = () => { const o = { row: 0, rowA: false }; COST_MONTHS.forEach(m => { o[m.key] = 0; o[m.key + "A"] = false; }); return o; };
-  let grand = blank();
-  let grp = blank();
-
+  const groups = costData();
   const money = (v, alpha) => v > 0 ? "$" + v.toLocaleString() + (alpha ? " +α" : "") : (alpha ? "α" : "-");
+  const blank = () => { const o = { row: 0, rowA: false }; COST_MONTHS.forEach(m => { o[m.key] = 0; o[m.key + "A"] = false; }); return o; };
 
+  let grand = blank();
   const rows = [];
-  COSTS.forEach((r, idx) => {
-    if (r.group) {
-      grp = blank();
-      rows.push(`<tr class="group-row"><td colspan="${TOTAL_COLS}">${r.group}</td></tr>`);
-      return;
-    }
-    if (r.subtotal) {
-      const cells = COST_MONTHS.map(m => `<td class="right">${money(grp[m.key], grp[m.key + "A"])}</td>`).join("");
-      const sumCell = `<td class="right" style="background:var(--accent-soft);"><strong>${money(grp.row, grp.rowA)}</strong></td>`;
-      rows.push(`<tr class="subtotal"><td colspan="${N_COLS_BEFORE}">${r.subtotal}</td>${cells}${sumCell}<td></td></tr>`);
-      return;
-    }
-    if (r.total) {
-      const cells = COST_MONTHS.map(m => `<td class="right">${money(grand[m.key], grand[m.key + "A"])}</td>`).join("");
-      const sumCell = `<td class="right" style="background:#c7d2fe;"><strong>${money(grand.row, grand.rowA)}</strong></td>`;
-      rows.push(`<tr class="total"><td colspan="${N_COLS_BEFORE}">${r.total} <span style="font-weight:400;font-size:10px;color:var(--text-dim);">(자동 합계)</span></td>${cells}${sumCell}<td></td></tr>`);
-      return;
-    }
-    // 항목 행 — 각 월 입력 가능, 합계는 가로 SUM
-    let rowSum = 0, rowAlpha = false;
-    const monthCells = COST_MONTHS.map(m => {
-      const raw = cellVal(idx, r, m.key);
-      const n = costNum(raw);
-      if (n != null) { grp[m.key] += n; grand[m.key] += n; rowSum += n; }
-      else { grp[m.key + "A"] = true; grand[m.key + "A"] = true; rowAlpha = true; }
-      const display = (raw == null || raw === "—") ? "" : String(raw).replace(/[$]/g, "");
-      const edited = ov[idx] && ov[idx][m.key] != null;
-      return `<td class="right"><input type="text" inputmode="decimal" value="${display}" placeholder="-" onchange="saveCostOverride(${idx}, '${m.key}', this.value)" style="width:46px;text-align:right;border:1px solid ${edited ? "var(--accent)" : "var(--border)"};border-radius:4px;padding:2px 3px;font-family:ui-monospace,monospace;font-size:10px;background:${edited ? "var(--accent-soft)" : "white"};"></td>`;
-    }).join("");
-    if (rowSum > 0) { grp.row += rowSum; grand.row += rowSum; }
-    if (rowAlpha) { grp.rowA = true; grand.rowA = true; }
-    const rowSumCell = `<td class="right" style="font-weight:700;background:var(--panel-2);">${rowSum > 0 ? "$" + rowSum.toLocaleString() : (rowAlpha ? "-" : "$0")}</td>`;
-    rows.push(`<tr><td><strong>${r.service}</strong></td><td style="color:var(--text-dim);font-size:11px;">${r.plan}</td><td class="right" style="color:var(--text-dim);font-size:10px;">${r.unit}</td>${monthCells}${rowSumCell}<td style="color:var(--text-dim);font-size:10px;">${r.note || ""}</td></tr>`);
+
+  groups.forEach((g, gi) => {
+    let grp = blank();
+    rows.push(`<tr class="group-row"><td colspan="${TOTAL_COLS}">${g.name}</td></tr>`);
+
+    (g.items || []).forEach((it, ii) => {
+      const months = it.months || {};
+      let rowSum = 0, rowAlpha = false;
+      const monthCells = COST_MONTHS.map(m => {
+        const raw = months[m.key];
+        const n = costNum(raw);
+        if (n != null) { grp[m.key] += n; grand[m.key] += n; rowSum += n; }
+        else { grp[m.key + "A"] = true; grand[m.key + "A"] = true; rowAlpha = true; }
+        const display = (raw == null || raw === "—") ? "" : String(raw).replace(/[$]/g, "");
+        const filled = display !== "";
+        return `<td class="right"><input type="text" inputmode="decimal" value="${escAttr(display)}" placeholder="-" onchange="editCostCell(${gi},${ii},'${m.key}',this.value)" style="width:46px;text-align:right;border:1px solid ${filled ? "var(--accent)" : "var(--border)"};border-radius:4px;padding:2px 3px;font-family:ui-monospace,monospace;font-size:10px;background:${filled ? "var(--accent-soft)" : "white"};"></td>`;
+      }).join("");
+      if (rowSum > 0) { grp.row += rowSum; grand.row += rowSum; }
+      if (rowAlpha) { grp.rowA = true; grand.rowA = true; }
+      const rowSumCell = `<td class="right" style="font-weight:700;background:var(--panel-2);">${rowSum > 0 ? "$" + rowSum.toLocaleString() : (rowAlpha ? "-" : "$0")}</td>`;
+      // 편집 가능 셀 (서비스/플랜/단가/비고) — contenteditable
+      const ed = (field, val, style) => `<td contenteditable="true" data-ph="입력" onblur="editCostCell(${gi},${ii},'${field}',this.textContent)" style="${style}outline:none;" title="클릭해서 편집">${val || ""}</td>`;
+      rows.push(`<tr>${ed("service", `<strong>${it.service || ""}</strong>`, "")}${ed("plan", it.plan, "color:var(--text-dim);font-size:11px;")}${ed("unit", it.unit, "color:var(--text-dim);font-size:10px;text-align:right;")}${monthCells}${rowSumCell}<td style="white-space:nowrap;"><span contenteditable="true" onblur="editCostCell(${gi},${ii},'note',this.textContent)" style="color:var(--text-dim);font-size:10px;outline:none;">${it.note || ""}</span> <button onclick="deleteCostItem(${gi},${ii})" title="이 항목 삭제" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 4px;">×</button></td></tr>`);
+    });
+
+    // 그룹 소계 + 항목 추가 버튼
+    const subCells = COST_MONTHS.map(m => `<td class="right">${money(grp[m.key], grp[m.key + "A"])}</td>`).join("");
+    rows.push(`<tr class="subtotal"><td colspan="${N_COLS_BEFORE}">${g.name.replace(/^\d+\.\s*/, "")} 소계</td>${subCells}<td class="right" style="background:var(--accent-soft);"><strong>${money(grp.row, grp.rowA)}</strong></td><td></td></tr>`);
+    rows.push(`<tr><td colspan="${TOTAL_COLS}" style="padding:6px 12px;"><button onclick="addCostItem(${gi})" style="background:var(--panel-2);border:1px dashed var(--border-strong);color:var(--accent);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">＋ 항목 추가</button></td></tr>`);
   });
+
+  // 총계
+  const totCells = COST_MONTHS.map(m => `<td class="right">${money(grand[m.key], grand[m.key + "A"])}</td>`).join("");
+  rows.push(`<tr class="total"><td colspan="${N_COLS_BEFORE}">총계 <span style="font-weight:400;font-size:10px;color:var(--text-dim);">(자동 합계)</span></td>${totCells}<td class="right" style="background:#c7d2fe;"><strong>${money(grand.row, grand.rowA)}</strong></td><td></td></tr>`);
+
   tbody.innerHTML = rows.join("");
 }
 
