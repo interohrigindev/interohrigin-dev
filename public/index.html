@@ -561,6 +561,45 @@
     border-radius: 8px;
   }
 
+  /* ===== GitHub 커밋 섹션 ===== */
+  .commits-box {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px; margin-top: 24px;
+  }
+  .commits-box .c-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .commits-box .c-title { font-size: 15px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .commits-box .c-repo { font-size: 11px; color: var(--text-mute); font-family: ui-monospace, monospace; }
+  .c-list { display: flex; flex-direction: column; }
+  .c-day { margin-bottom: 10px; }
+  .c-day-label { font-size: 11px; font-weight: 800; color: var(--accent); margin: 8px 0 4px; }
+  .c-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 5px 0 5px 12px; border-left: 2px solid var(--border); margin-left: 4px;
+    font-size: 12px;
+  }
+  .c-item .c-type {
+    flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 1px 7px;
+    border-radius: 4px; min-width: 44px; text-align: center;
+  }
+  .c-type.feat { background: var(--green-soft); color: var(--green); }
+  .c-type.fix  { background: var(--red-soft); color: var(--red); }
+  .c-type.docs { background: var(--accent-soft); color: var(--accent); }
+  .c-type.etc  { background: var(--grey-soft); color: var(--text-dim); }
+  .c-item .c-msg { color: var(--text); line-height: 1.5; flex: 1; }
+  .c-item .c-sha { color: var(--text-mute); font-family: ui-monospace, monospace; font-size: 10px; }
+  .c-empty { color: var(--text-mute); font-size: 12px; padding: 16px; text-align: center; }
+  .c-summary {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .c-summary .c-stat {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px; font-size: 11px; color: var(--text-dim);
+  }
+  .c-summary .c-stat strong { color: var(--text); }
+
   /* ===== 푸터 ===== */
   footer {
     background: white; border-top: 1px solid var(--border);
@@ -790,6 +829,8 @@
   </div>
 
   <!-- 전체 자유 의견 (overview discussion) -->
+  <div class="commits-box" id="commits-overview"></div>
+
   <div id="discussion-overview" data-discussion="overview"></div>
 
 </section>
@@ -1022,6 +1063,8 @@
   </div>
 
   <!-- HR 토론 -->
+  <div class="commits-box" id="commits-hr"></div>
+
   <div id="discussion-hr" data-discussion="hr"></div>
 </section>
 
@@ -1204,6 +1247,8 @@
     <div class="timeline" id="tl-finance"></div>
   </div>
 
+  <div class="commits-box" id="commits-finance"></div>
+
   <div id="discussion-finance" data-discussion="finance"></div>
 </section>
 
@@ -1294,6 +1339,8 @@
     </div>
     <div class="timeline" id="tl-ophe"></div>
   </div>
+
+  <div class="commits-box" id="commits-ophe"></div>
 
   <div id="discussion-ophe" data-discussion="ophe"></div>
 </section>
@@ -1479,6 +1526,8 @@
     <div class="timeline" id="tl-boomzap"></div>
   </div>
 
+  <div class="commits-box" id="commits-boomzap"></div>
+
   <div id="discussion-boomzap" data-discussion="boomzap"></div>
 </section>
 
@@ -1548,6 +1597,8 @@
     </div>
     <div class="timeline" id="tl-completed"></div>
   </div>
+
+  <div class="commits-box" id="commits-completed"></div>
 
   <div id="discussion-completed" data-discussion="completed"></div>
 </section>
@@ -2117,6 +2168,16 @@ const CATS = {
   feedback: { emoji: "👍", label: "피드백",    color: "var(--green)"  }
 };
 
+// 패널 → GitHub 레포 매핑 (커밋 진행상황 자동 정리)
+const PANEL_REPOS = {
+  overview:  [{ repo: "interohrigindev/interohrigin-dev", label: "임원 대시보드" }],
+  hr:        [{ repo: "interohrigindev/interohrigin-hr", label: "HR 플랫폼" }],
+  finance:   [{ repo: "interohrigindev/io-finance", label: "재무관리" }],
+  ophe:      [{ repo: "interohrigindev/ophe", label: "OPHE" }],
+  boomzap:   [{ repo: "interohrigindev/boomnzap", label: "붐앤잽" }],
+  completed: [{ repo: "interohrigindev/exhiboot", label: "Exhiboot" }, { repo: "interohrigindev/interohrigin-ir", label: "I&C 리뉴얼" }],
+};
+
 // ======================================================
 // 백엔드 연결 (Cloudflare Worker)
 // ======================================================
@@ -2244,6 +2305,79 @@ function totalDiscussionCount() {
 function getCurrentPanel() {
   const a = document.querySelector(".tab.active");
   return a ? a.dataset.panel : "overview";
+}
+
+// ======================================================
+// GitHub 커밋 진행상황
+// ======================================================
+function commitType(msg) {
+  const m = msg.toLowerCase();
+  if (m.startsWith("feat")) return "feat";
+  if (m.startsWith("fix")) return "fix";
+  if (m.startsWith("docs") || m.startsWith("chore")) return "docs";
+  return "etc";
+}
+function commitTypeLabel(t) { return { feat: "기능", fix: "수정", docs: "문서", etc: "기타" }[t] || "기타"; }
+
+async function fetchCommits(repo, limit = 8) {
+  if (!backendConfigured()) return { error: "서버 미연결" };
+  try {
+    return await api(`/api/commits?repo=${encodeURIComponent(repo)}&limit=${limit}`);
+  } catch (e) { return { error: e.message }; }
+}
+
+async function renderCommits(panel) {
+  const box = document.getElementById("commits-" + panel);
+  if (!box) return;
+  const repos = PANEL_REPOS[panel];
+  if (!repos || !repos.length) { box.style.display = "none"; return; }
+
+  box.innerHTML = `<div class="c-head"><div class="c-title">🔗 GitHub 개발 진행상황 (최근 커밋)</div>
+    <button class="d-btn" onclick="renderCommits('${panel}')">🔄 새로고침</button></div>
+    <div id="c-body-${panel}"><div class="c-empty">불러오는 중…</div></div>`;
+
+  const bodyEl = document.getElementById("c-body-" + panel);
+  let html = "";
+  for (const { repo, label } of repos) {
+    const data = await fetchCommits(repo, 8);
+    if (data.error) {
+      html += `<div style="margin-bottom:14px;"><div class="c-day-label">${label} <span class="c-repo">${repo}</span></div>
+        <div class="c-empty">${data.error.includes("GITHUB_TOKEN") ? "⚠️ GitHub 토큰 미설정 — 설정 안내 참조" : "불러오기 실패: " + escapeHTML(data.error)}</div></div>`;
+      continue;
+    }
+    const commits = data.commits || [];
+    // 타입별 집계
+    const counts = { feat: 0, fix: 0, docs: 0, etc: 0 };
+    commits.forEach(c => counts[commitType(c.message)]++);
+    // 날짜별 그룹
+    const byDay = {};
+    commits.forEach(c => {
+      const d = (c.date || "").slice(0, 10);
+      (byDay[d] = byDay[d] || []).push(c);
+    });
+    html += `<div style="margin-bottom:16px;">
+      <div class="c-day-label">${label} <span class="c-repo">${repo}${data.cached ? " · 캐시" : ""}</span></div>
+      <div class="c-summary">
+        <span class="c-stat">최근 <strong>${commits.length}</strong>커밋</span>
+        <span class="c-stat">🟢 기능 <strong>${counts.feat}</strong></span>
+        <span class="c-stat">🔴 수정 <strong>${counts.fix}</strong></span>
+        <span class="c-stat">🔵 문서/기타 <strong>${counts.docs + counts.etc}</strong></span>
+      </div>`;
+    if (commits.length === 0) {
+      html += `<div class="c-empty">커밋 없음</div>`;
+    } else {
+      for (const day in byDay) {
+        html += `<div class="c-day"><div class="c-day-label" style="color:var(--text-dim);">${day}</div>`;
+        byDay[day].forEach(c => {
+          const t = commitType(c.message);
+          html += `<div class="c-item"><span class="c-type ${t}">${commitTypeLabel(t)}</span><span class="c-msg">${escapeHTML(c.message)} <span class="c-sha">${c.sha}</span></span></div>`;
+        });
+        html += `</div>`;
+      }
+    }
+    html += `</div>`;
+  }
+  bodyEl.innerHTML = html;
 }
 
 function buildDiscussion(panel) {
@@ -2669,6 +2803,12 @@ async function activatePanel(key) {
   await fetchPanel(key);
   renderDiscussionThread(key);
   updateUnread();
+  // 해당 패널에 GitHub 레포가 있으면 커밋 로드 (한 번만 — 이미 로드했으면 스킵)
+  if (PANEL_REPOS[key] && !STATE._commitsLoaded?.[key]) {
+    STATE._commitsLoaded = STATE._commitsLoaded || {};
+    STATE._commitsLoaded[key] = true;
+    renderCommits(key);
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
   history.replaceState(null, "", "#" + key);
 }
@@ -2782,6 +2922,13 @@ safe("hash", () => {
     // 설정이 이미 있으면(또는 URL ?key= 로 받았으면) → 즉시 실시간 동기화
     startPolling();
     console.log("[init] 실시간 동기화 시작됨");
+    // 현재 보이는 패널의 GitHub 커밋 로드
+    const cur = getCurrentPanel();
+    if (PANEL_REPOS[cur]) {
+      STATE._commitsLoaded = STATE._commitsLoaded || {};
+      STATE._commitsLoaded[cur] = true;
+      renderCommits(cur);
+    }
   }
   // 키가 없으면 팝업 없이 조용히 — 각 의견 영역에 '서버 미연결' 배지만 표시됨.
   // 어느 기기든 자동 연결하려면 키 포함 공유 URL(?key=...)을 사용하세요.

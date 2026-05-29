@@ -174,3 +174,20 @@ PM 슬랙에 ✅ → 자동 "해결됨"
 | Slack Free | 무제한 | — |
 
 → **월 $0** (결제 카드 등록 불필요)
+
+---
+
+## 10. GitHub 커밋 진행상황 연동 (선택)
+
+각 프로젝트 탭에 GitHub 레포의 최근 커밋을 "개발 진행상황"으로 표시하려면 토큰이 필요합니다 (레포가 private이라 인증 필수).
+
+1. https://github.com/settings/tokens → **Generate new token (classic)**
+2. 권한(scope): **`repo`** 체크 (private 레포 읽기)
+3. 만료기간: 90일 또는 No expiration
+4. 생성된 토큰(`ghp_...`) 복사
+5. Cloudflare Pages → Settings → Environment variables → Production →
+   - `GITHUB_TOKEN` = `ghp_...` (**Secret**, Encrypt 체크)
+6. Deployments → Retry deployment
+
+연동 레포: interohrigin-hr · io-finance · ophe · boomnzap · exhiboot · interohrigin-ir · interohrigin-dev
+→ HR/재무/OPHE/붐앤잽/완료(Exhiboot·I&C)/종합 탭에 최근 커밋이 기능/수정/문서로 분류되어 표시됩니다. (KV 10분 캐시)

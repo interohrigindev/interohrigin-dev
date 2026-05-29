@@ -8,6 +8,7 @@ export interface Env {
   SLACK_WORKSPACE: string;
   SLACK_CHANNEL_ID: string;
   SLACK_CHANNEL_URL: string;
+  GITHUB_TOKEN?: string;
 }
 
 export interface Message {
