@@ -502,6 +502,42 @@
   }
   .d-meta { font-size: 11px; color: var(--text-dim); }
 
+  /* 슬랙형 자유 입력창 (텍스트 + 이미지 붙여넣기/드래그 + 링크) */
+  .d-author { max-width: 280px; margin-bottom: 8px; }
+  .d-slackbox {
+    border: 1px solid var(--border); border-radius: 10px; background: #fff;
+    padding: 8px; transition: border-color .15s, box-shadow .15s;
+  }
+  .d-slackbox.focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .d-slackbox.drag { border-color: var(--accent); background: var(--accent-soft); }
+  .d-slackbox .d-text { border: none; box-shadow: none !important; min-height: 60px; padding: 6px; }
+  .d-slackbox .d-text:focus { outline: none; border: none; }
+  .d-attach { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 4px 0; }
+  .d-attach .att {
+    position: relative; width: 72px; height: 72px; border-radius: 8px;
+    overflow: hidden; border: 1px solid var(--border); background: #f1f5f9;
+  }
+  .d-attach .att img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .d-attach .att.uploading { display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-mute); }
+  .d-attach .att .att-x {
+    position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+    border: none; border-radius: 50%; background: rgba(15,23,42,0.7); color: #fff;
+    font-size: 13px; line-height: 18px; padding: 0; cursor: pointer;
+  }
+  .d-slackbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 2px 0; flex-wrap: wrap; }
+  .d-slackbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .d-iconbtn {
+    border: 1px solid var(--border); background: #fff; border-radius: 8px;
+    padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-soft);
+  }
+  .d-iconbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .d-hint { font-size: 11px; color: var(--text-mute); }
+  .d-img-grid { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .d-img-grid a { display: block; width: 130px; height: 130px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .d-img-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .d-item .body a, .d-item .reply .body a { color: var(--accent); text-decoration: underline; word-break: break-all; }
+  .d-item .reply .body { white-space: pre-wrap; word-wrap: break-word; }
+
   .d-thread { display: flex; flex-direction: column; gap: 10px; }
   .d-item {
     background: white; border: 1px solid var(--border);
@@ -2347,6 +2383,101 @@ async function renderCommits(panel) {
   bodyEl.innerHTML = html;
 }
 
+// ======================================================
+// 이미지 첨부 (슬랙형 입력창) + 링크 자동연결
+// ======================================================
+// 패널별 작성 중 첨부 이미지: panel -> [{id,name,mime,thumb} | {uploading:true,tmp}]
+const composeAttachments = {};
+function attListFor(panel) { if (!composeAttachments[panel]) composeAttachments[panel] = []; return composeAttachments[panel]; }
+
+// 이미지 조회 URL (img 태그는 헤더를 못 실으므로 키를 쿼리로 전달 — 키는 어차피 내장 공개값)
+function imgUrl(ref) {
+  const id = (ref && typeof ref === "object") ? ref.id : ref;
+  return backendBase() + "/api/upload?id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(dashboardKey());
+}
+
+// 캔버스로 최대 변까지 축소 (KV/전송 용량 절감). PNG(캡처)는 PNG 유지.
+function downscaleImage(file, maxDim = 1600, quality = 0.85) {
+  return new Promise(resolve => {
+    if (!file || !file.type || !file.type.startsWith("image/")) { resolve(file); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, maxDim / Math.max(w, h));
+      w = Math.max(1, Math.round(w * scale)); h = Math.max(1, Math.round(h * scale));
+      const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      const outType = file.type === "image/png" ? "image/png" : "image/jpeg";
+      cv.toBlob(b => resolve(b || file), outType, quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+async function uploadImageBlob(blob, name) {
+  const res = await fetch(backendBase() + "/api/upload?key=" + encodeURIComponent(dashboardKey()), {
+    method: "POST",
+    headers: {
+      "Content-Type": blob.type || "image/jpeg",
+      "X-Dashboard-Key": dashboardKey(),
+      "X-File-Name": encodeURIComponent(name || "image"),
+    },
+    body: blob,
+  });
+  if (!res.ok) throw new Error("업로드 " + res.status);
+  return res.json(); // { ok, id, url }
+}
+
+async function handleComposeFiles(panel, files) {
+  if (!backendConfigured()) { alert("이미지 첨부는 서버 연결 상태에서만 됩니다."); return; }
+  const imgs = Array.from(files || []).filter(f => f.type && f.type.startsWith("image/"));
+  if (!imgs.length) return;
+  const list = attListFor(panel);
+  for (const f of imgs) {
+    const placeholder = { uploading: true, tmp: "t" + Date.now() + Math.random().toString(36).slice(2, 6) };
+    list.push(placeholder); renderAttachChips(panel);
+    try {
+      const blob = (await downscaleImage(f)) || f;
+      const r = await uploadImageBlob(blob, f.name);
+      const idx = list.indexOf(placeholder);
+      const item = { id: r.id, name: f.name || "image", mime: blob.type || f.type, thumb: URL.createObjectURL(blob) };
+      if (idx >= 0) list.splice(idx, 1, item); else list.push(item);
+    } catch (e) {
+      const idx = list.indexOf(placeholder); if (idx >= 0) list.splice(idx, 1);
+      alert("이미지 업로드 실패: " + e.message);
+    }
+    renderAttachChips(panel);
+  }
+}
+
+function renderAttachChips(panel) {
+  const box = document.getElementById("d-attach-" + panel);
+  if (!box) return;
+  const list = attListFor(panel);
+  box.innerHTML = list.map(a => a.uploading
+    ? `<div class="att uploading">업로드중…</div>`
+    : `<div class="att"><img src="${a.thumb || imgUrl(a)}" alt=""><button type="button" class="att-x" title="제거" onclick="removeAttach('${panel}','${a.id}')">×</button></div>`
+  ).join("");
+}
+
+function removeAttach(panel, id) {
+  composeAttachments[panel] = attListFor(panel).filter(a => a.id !== id);
+  renderAttachChips(panel);
+}
+
+// 이미 HTML 이스케이프된 텍스트에서 URL을 클릭 가능한 링크로 변환
+function linkify(escaped) {
+  return (escaped || "").replace(/(https?:\/\/[^\s<]+)/g, m => {
+    let url = m, tail = "";
+    const tm = url.match(/[)\]\.,!?;:]+$/);
+    if (tm) { tail = tm[0]; url = url.slice(0, -tail.length); }
+    return `<a href="${url}" target="_blank" rel="noopener">${url}</a>${tail}`;
+  });
+}
+
 function buildDiscussion(panel) {
   const root = document.getElementById("discussion-" + panel);
   if (!root) return;
@@ -2372,15 +2503,17 @@ function buildDiscussion(panel) {
         <button type="button" class="d-cat-chip cat-decision" data-cat="decision">⚠️ 결정필요</button>
         <button type="button" class="d-cat-chip cat-feedback" data-cat="feedback">👍 피드백</button>
       </div>
-      <div class="d-author-row">
-        <input class="d-input" id="d-author-${panel}" placeholder="작성자 (예: 차주용 / 차대표 / 강 이사)" value="${escAttr(STATE.settings.author || "")}">
-        <input class="d-input" id="d-title-${panel}" placeholder="제목 (선택, 한 줄 요약)">
-      </div>
-      <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 입력하고 '의견 저장'을 누르세요. 모든 임원이 같은 화면에서 봅니다."></textarea>
-      <div class="d-row-btn">
-        <div class="d-meta">작성한 의견은 모든 임원에게 실시간 공유됩니다. 분류: ❓ 질문 / 📋 요청 / ⚠️ 결정필요 / 👍 피드백</div>
-        <div>
-          <button class="d-btn primary" onclick="addDiscussion('${panel}')">의견 저장</button>
+      <input class="d-input d-author" id="d-author-${panel}" placeholder="작성자 (예: 차주용 / 차대표 / 강 이사)" value="${escAttr(STATE.settings.author || "")}">
+      <div class="d-slackbox" id="d-slackbox-${panel}">
+        <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 자유롭게 작성하세요.&#10;캡처 이미지는 붙여넣기(⌘/Ctrl+V) 하거나 끌어다 놓으세요. 링크는 자동으로 연결됩니다."></textarea>
+        <div class="d-attach" id="d-attach-${panel}"></div>
+        <div class="d-slackbar">
+          <div class="d-slackbar-left">
+            <button type="button" class="d-iconbtn" onclick="document.getElementById('d-file-${panel}').click()" title="이미지 첨부">📎 이미지</button>
+            <input type="file" id="d-file-${panel}" accept="image/*" multiple style="display:none">
+            <span class="d-hint">이미지 붙여넣기·드래그 지원 · 모든 임원에게 실시간 공유</span>
+          </div>
+          <button class="d-btn primary" onclick="addDiscussion('${panel}')">의견 보내기</button>
         </div>
       </div>
     </div>
@@ -2394,7 +2527,38 @@ function buildDiscussion(panel) {
       chip.classList.add("active");
     });
   });
+  // 슬랙형 입력창 — 이미지 붙여넣기 / 드래그&드롭 / 파일선택
+  wireComposer(panel, root);
+  renderAttachChips(panel);
   renderDiscussionThread(panel);
+}
+
+// 입력창에 이미지 붙여넣기·드래그·파일선택 이벤트 연결
+function wireComposer(panel, root) {
+  const ta = root.querySelector("#d-content-" + panel);
+  const box = root.querySelector("#d-slackbox-" + panel);
+  const fileEl = root.querySelector("#d-file-" + panel);
+  if (fileEl) fileEl.addEventListener("change", e => { handleComposeFiles(panel, e.target.files); fileEl.value = ""; });
+  if (ta && box) {
+    ta.addEventListener("focus", () => box.classList.add("focus"));
+    ta.addEventListener("blur", () => box.classList.remove("focus"));
+    ta.addEventListener("paste", e => {
+      const items = (e.clipboardData && e.clipboardData.items) || [];
+      const imgs = [];
+      for (const it of items) {
+        if (it.kind === "file" && it.type.startsWith("image/")) { const f = it.getAsFile(); if (f) imgs.push(f); }
+      }
+      if (imgs.length) { e.preventDefault(); handleComposeFiles(panel, imgs); }
+    });
+  }
+  if (box) {
+    box.addEventListener("dragover", e => { e.preventDefault(); box.classList.add("drag"); });
+    box.addEventListener("dragleave", () => box.classList.remove("drag"));
+    box.addEventListener("drop", e => {
+      e.preventDefault(); box.classList.remove("drag");
+      if (e.dataTransfer && e.dataTransfer.files) handleComposeFiles(panel, e.dataTransfer.files);
+    });
+  }
 }
 
 function toggleCompose(panel) {
@@ -2437,11 +2601,11 @@ function renderDiscussionThread(panel) {
             </div>
           </div>
           ${it.title ? `<div style="font-weight:700;margin-bottom:4px;">${escapeHTML(it.title)}</div>` : ""}
-          <div class="body">${escapeHTML(it.content)}</div>
-          ${imgRefs.length ? `<div style="margin-top:10px;padding:8px 12px;background:var(--accent-soft);border:1px solid #93c5fd;border-radius:6px;font-size:12px;">📎 첨부 이미지 ${imgRefs.length}건</div>` : ""}
+          <div class="body">${linkify(escapeHTML(it.content))}</div>
+          ${imgRefs.length ? `<div class="d-img-grid">${imgRefs.map(r => `<a href="${imgUrl(r)}" target="_blank" rel="noopener"><img src="${imgUrl(r)}" alt="${escAttr((r && r.name) || "image")}" loading="lazy"></a>`).join("")}</div>` : ""}
           ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">답글 ${replies.length}건</div>${replies.map(r => {
             const rImgRefs = (r.imageRefs || r.images || []).filter(Boolean);
-            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${escapeHTML(r.content)}</div>${rImgRefs.length ? `<div style="margin-top:4px;font-size:11px;color:var(--accent);">📎 이미지 ${rImgRefs.length}건</div>` : ""}</div>`;
+            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${linkify(escapeHTML(r.content))}</div>${rImgRefs.length ? `<div class="d-img-grid" style="margin-top:6px;">${rImgRefs.map(ri => `<a href="${imgUrl(ri)}" target="_blank" rel="noopener"><img src="${imgUrl(ri)}" alt="" loading="lazy"></a>`).join("")}</div>` : ""}</div>`;
           }).join("")}</div>` : ""}
           <div class="item-actions">
             <button class="d-btn ${status === "reviewing" ? "primary" : ""}" onclick="setStatus('${panel}', '${it.id}', 'reviewing')">${status === "reviewing" ? "👀 검토중 해제" : "👀 검토중"}</button>
@@ -2519,9 +2683,12 @@ async function addDiscussion(panel) {
   const catBtn = document.querySelector(`.d-cat-row[data-panel="${panel}"] .d-cat-chip.active`);
   const category = catBtn ? catBtn.dataset.cat : "question";
   const author = document.getElementById("d-author-" + panel).value.trim() || "익명";
-  const title = document.getElementById("d-title-" + panel).value.trim();
   const content = document.getElementById("d-content-" + panel).value.trim();
-  if (!content) { alert("내용을 입력해주세요."); return; }
+  // 첨부 이미지 (업로드 완료된 것만)
+  const imageRefs = attListFor(panel).filter(a => !a.uploading).map(a => ({ id: a.id, name: a.name, mime: a.mime }));
+  const stillUploading = attListFor(panel).some(a => a.uploading);
+  if (stillUploading) { alert("이미지 업로드가 끝날 때까지 잠시만 기다려주세요."); return; }
+  if (!content && !imageRefs.length) { alert("내용을 입력하거나 이미지를 첨부해주세요."); return; }
 
   if (author !== "익명") {
     STATE.settings.author = author;
@@ -2532,7 +2699,7 @@ async function addDiscussion(panel) {
     try {
       await api("/api/messages", {
         method: "POST",
-        body: JSON.stringify({ panel, category, author, title, content }),
+        body: JSON.stringify({ panel, category, author, title: "", content, imageRefs }),
       });
     } catch (e) {
       alert("서버 저장 실패: " + e.message);
@@ -2542,15 +2709,16 @@ async function addDiscussion(panel) {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     list.push({
       id: "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
-      category, author, title, content,
+      category, author, title: "", content,
       at: new Date().toLocaleString("ko-KR"),
-      _ts: Date.now(), replies: [], resolved: false, status: "open", images: [],
+      _ts: Date.now(), replies: [], resolved: false, status: "open", imageRefs,
     });
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
 
   document.getElementById("d-content-" + panel).value = "";
-  document.getElementById("d-title-" + panel).value = "";
+  composeAttachments[panel] = [];
+  renderAttachChips(panel);
   await fetchPanel(panel);
   renderDiscussionThread(panel);
   updateUnread();

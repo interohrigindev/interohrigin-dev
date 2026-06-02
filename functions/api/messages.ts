@@ -1,6 +1,6 @@
 import { listMessages, addMessage, updateMessage, deleteMessage, getMessage } from "../_lib/storage";
 import { reflectStatusToSlack, postThreadReply, postChannelMessage } from "../_lib/slack-api";
-import type { Env } from "../_lib/storage";
+import type { Env, ImageRef } from "../_lib/storage";
 
 const CAT_EMOJI: Record<string, string> = { question: "❓", request: "📋", decision: "⚠️", feedback: "👍" };
 const CAT_LABEL2: Record<string, string> = { question: "질문", request: "요청", decision: "결정필요", feedback: "피드백" };
@@ -42,7 +42,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
-  const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string; postToSlack?: boolean }>();
+  const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string; imageRefs?: ImageRef[]; postToSlack?: boolean }>();
 
   // 슬랙 채널에도 게시 → 게시된 ts를 slackTs로 저장 (이후 이모지/thread 양방향 연동)
   let slackTs: string | undefined;

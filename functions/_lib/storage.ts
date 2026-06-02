@@ -1,5 +1,8 @@
 /** KV 저장 레이어 — Cloudflare Pages Functions용 */
 
+// 첨부 이미지 참조. 신규는 객체({id,name,mime}), 과거 슬랙 메시지는 문자열일 수 있음.
+export type ImageRef = string | { id: string; name?: string; mime?: string };
+
 export interface Env {
   MESSAGES: KVNamespace;
   SLACK_SIGNING_SECRET: string;
@@ -19,13 +22,13 @@ export interface Message {
   content: string;
   at: string;
   _ts: number;
-  replies: Array<{ author: string; content: string; at: string; imageRefs?: string[]; slackTs?: string; toSlack?: boolean }>;
+  replies: Array<{ author: string; content: string; at: string; imageRefs?: ImageRef[]; slackTs?: string; toSlack?: boolean }>;
   resolved: boolean;
   status?: "open" | "reviewing" | "resolved";
   slackTs?: string;
   slackChannel?: string;
   slackUserId?: string;
-  imageRefs?: string[]; // [{name, mimetype}] 슬랙 permalink로 점프
+  imageRefs?: ImageRef[]; // 첨부 이미지 참조 (KV `img:<id>`)
   fromSlack?: boolean;
   edited?: boolean;
 }
@@ -46,7 +49,7 @@ async function saveMessages(env: Env, panel: string, messages: Message[]): Promi
 export async function addMessage(env: Env, input: {
   panel: string; category: string; author: string; title?: string; content: string;
   slackTs?: string; slackChannel?: string; slackUserId?: string;
-  imageRefs?: string[]; fromSlack?: boolean;
+  imageRefs?: ImageRef[]; fromSlack?: boolean;
 }): Promise<Message> {
   const messages = await listMessages(env, input.panel);
   const now = Date.now();
