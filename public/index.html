@@ -2503,7 +2503,10 @@ function buildDiscussion(panel) {
         <button type="button" class="d-cat-chip cat-decision" data-cat="decision">⚠️ 결정필요</button>
         <button type="button" class="d-cat-chip cat-feedback" data-cat="feedback">👍 피드백</button>
       </div>
-      <input class="d-input d-author" id="d-author-${panel}" placeholder="작성자 (예: 차주용 / 차대표 / 강 이사)" value="${escAttr(STATE.settings.author || "")}">
+      <div class="d-author-row">
+        <input class="d-input" id="d-author-${panel}" placeholder="작성자 (예: 차주용 / 차대표 / 강 이사)" value="${escAttr(STATE.settings.author || "")}">
+        <input class="d-input" id="d-title-${panel}" placeholder="제목 (선택, 한 줄 요약)">
+      </div>
       <div class="d-slackbox" id="d-slackbox-${panel}">
         <textarea class="d-text" id="d-content-${panel}" placeholder="내용을 자유롭게 작성하세요.&#10;캡처 이미지는 붙여넣기(⌘/Ctrl+V) 하거나 끌어다 놓으세요. 링크는 자동으로 연결됩니다."></textarea>
         <div class="d-attach" id="d-attach-${panel}"></div>
@@ -2683,6 +2686,8 @@ async function addDiscussion(panel) {
   const catBtn = document.querySelector(`.d-cat-row[data-panel="${panel}"] .d-cat-chip.active`);
   const category = catBtn ? catBtn.dataset.cat : "question";
   const author = document.getElementById("d-author-" + panel).value.trim() || "익명";
+  const titleEl = document.getElementById("d-title-" + panel);
+  const title = titleEl ? titleEl.value.trim() : "";
   const content = document.getElementById("d-content-" + panel).value.trim();
   // 첨부 이미지 (업로드 완료된 것만)
   const imageRefs = attListFor(panel).filter(a => !a.uploading).map(a => ({ id: a.id, name: a.name, mime: a.mime }));
@@ -2699,7 +2704,7 @@ async function addDiscussion(panel) {
     try {
       await api("/api/messages", {
         method: "POST",
-        body: JSON.stringify({ panel, category, author, title: "", content, imageRefs }),
+        body: JSON.stringify({ panel, category, author, title, content, imageRefs }),
       });
     } catch (e) {
       alert("서버 저장 실패: " + e.message);
@@ -2709,7 +2714,7 @@ async function addDiscussion(panel) {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     list.push({
       id: "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
-      category, author, title: "", content,
+      category, author, title, content,
       at: new Date().toLocaleString("ko-KR"),
       _ts: Date.now(), replies: [], resolved: false, status: "open", imageRefs,
     });
@@ -2717,6 +2722,7 @@ async function addDiscussion(panel) {
   }
 
   document.getElementById("d-content-" + panel).value = "";
+  if (titleEl) titleEl.value = "";
   composeAttachments[panel] = [];
   renderAttachChips(panel);
   await fetchPanel(panel);
