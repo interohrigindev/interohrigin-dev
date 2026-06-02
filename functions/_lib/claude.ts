@@ -13,8 +13,11 @@ const CAT_LABEL: Record<string, string> = {
   question: "❓ 질문", request: "📋 요청", decision: "⚠️ 결정필요", feedback: "👍 피드백",
 };
 
+const kst = (ts?: number, fallback?: string) =>
+  (ts && Number.isFinite(ts)) ? new Date(ts).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }) : (fallback || "");
+
 export function buildInbox(messages: any[]): string {
-  const now = new Date().toLocaleString("ko-KR");
+  const now = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
   let md = `# Claude Code Inbox — 인터오리진 임원 의견 작업 지시\n\n`;
   md += `> 생성: ${now} · 의견 ${messages.length}건 · PM 차주용\n\n`;
   md += `## 사용법\n\n\`\`\`bash\nclaude code -p "@inbox.md 의 항목들을 우선순위 순으로 처리해줘. 각 항목마다 (1) 어느 레포의 어느 파일을 수정할지 추정 (2) 변경 사항 요약 (3) 실제 코드 변경 후 git diff. 결정필요는 사람 확인 후 진행."\n\`\`\`\n\n---\n\n`;
@@ -32,7 +35,7 @@ export function buildInbox(messages: any[]): string {
       const panelName = PANEL_NAMES[m.panel] || m.panel;
       const repoHint = PANEL_REPO_HINT[m.panel];
       md += `### ${i + 1}. ${panelName} — ${m.title || m.content.split("\n")[0].slice(0, 50)}\n\n`;
-      md += `- **작성자**: ${m.author}\n- **시각**: ${m.at}\n`;
+      md += `- **작성자**: ${m.author}\n- **시각**: ${kst(m._ts, m.at)}\n`;
       if (repoHint) md += `- **관련 레포**: ${repoHint}\n`;
       if (m.fromSlack) md += `- **출처**: 슬랙 (ts: \`${m.slackTs}\`)\n`;
       if (m.resolved) md += `- **상태**: ✓ 해결됨\n`;
@@ -40,7 +43,7 @@ export function buildInbox(messages: any[]): string {
       if (m.imageRefs?.length) md += `**첨부 이미지 ${m.imageRefs.length}건**: 슬랙 메시지에서 확인 (${m.slackTs})\n\n`;
       if (m.replies?.length) {
         md += `**답글:**\n\n`;
-        m.replies.forEach((r: any) => { md += `> **${r.author}** (${r.at}): ${r.content}\n\n`; });
+        m.replies.forEach((r: any) => { md += `> **${r.author}** (${kst(r._ts, r.at)}): ${r.content}\n\n`; });
       }
       md += `---\n\n`;
     });

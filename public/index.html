@@ -2272,7 +2272,7 @@ async function refreshAllPanels() {
   TABS.forEach(t => renderDiscussionThread(t.key));
   updateUnread();
   const t = document.getElementById("hd-updated");
-  if (t) t.textContent = new Date().toLocaleTimeString("ko-KR");
+  if (t) t.textContent = new Date().toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul" });
   updateUnread();
 }
 
@@ -2294,7 +2294,7 @@ function startPolling() {
     // 데이터가 바뀐 경우에만 재렌더 (입력 중인 답글창이 사라지지 않도록)
     if (changed) renderDiscussionThread(cur);
     const t = document.getElementById("hd-updated");
-    if (t) t.textContent = new Date().toLocaleTimeString("ko-KR");
+    if (t) t.textContent = new Date().toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul" });
   }, 5000);
 }
 
@@ -2302,6 +2302,14 @@ function startPolling() {
 // 토론 영역 동작
 // ======================================================
 function escapeHTML(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+// 작성 시각을 항상 한국시간(KST)으로 표시. epoch(_ts)가 있으면 그것으로 재계산(과거 UTC로 찍힌 글도 교정),
+// 없으면 기존 at 문자열을 그대로 사용.
+function fmtKST(ts, fallback) {
+  if (ts && Number.isFinite(ts)) {
+    try { return new Date(ts).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }); } catch (e) {}
+  }
+  return fallback || "";
+}
 function totalDiscussionCount() {
   let n = 0; for (const k in STATE.discussions) n += (STATE.discussions[k] || []).length; return n;
 }
@@ -2597,7 +2605,7 @@ function renderDiscussionThread(panel) {
               <input type="checkbox" class="inbox-pick" data-id="${it.id}" data-panel="${panel}" ${STATE.selected.has(panel+"|"+it.id) ? "checked" : ""} style="margin-right:4px;">
               <span class="d-cat-badge cat-${it.category}">${cat.emoji} ${cat.label}</span>
               <span class="author">${escapeHTML(it.author || "익명")}</span>
-              <span class="at">· ${it.at}</span>
+              <span class="at">· ${fmtKST(it._ts, it.at)}</span>
               ${status === "resolved" ? '<span class="badge b-completed" style="margin-left:6px;">✅ 완료</span>' : ""}
               ${status === "reviewing" ? '<span class="badge b-warn" style="margin-left:6px;">👀 검토중</span>' : ""}
               ${it.edited ? '<span class="badge b-warn" style="margin-left:6px;">수정됨</span>' : ""}
@@ -2608,7 +2616,7 @@ function renderDiscussionThread(panel) {
           ${imgRefs.length ? `<div class="d-img-grid">${imgRefs.map(r => `<a href="${imgUrl(r)}" target="_blank" rel="noopener"><img src="${imgUrl(r)}" alt="${escAttr((r && r.name) || "image")}" loading="lazy"></a>`).join("")}</div>` : ""}
           ${replies.length ? `<div class="replies"><div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">답글 ${replies.length}건</div>${replies.map(r => {
             const rImgRefs = (r.imageRefs || r.images || []).filter(Boolean);
-            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${r.at}</span></div><div class="body">${linkify(escapeHTML(r.content))}</div>${rImgRefs.length ? `<div class="d-img-grid" style="margin-top:6px;">${rImgRefs.map(ri => `<a href="${imgUrl(ri)}" target="_blank" rel="noopener"><img src="${imgUrl(ri)}" alt="" loading="lazy"></a>`).join("")}</div>` : ""}</div>`;
+            return `<div class="reply"><div class="author">↳ ${escapeHTML(r.author || "익명")} <span class="at">· ${fmtKST(r._ts, r.at)}</span></div><div class="body">${linkify(escapeHTML(r.content))}</div>${rImgRefs.length ? `<div class="d-img-grid" style="margin-top:6px;">${rImgRefs.map(ri => `<a href="${imgUrl(ri)}" target="_blank" rel="noopener"><img src="${imgUrl(ri)}" alt="" loading="lazy"></a>`).join("")}</div>` : ""}</div>`;
           }).join("")}</div>` : ""}
           <div class="item-actions">
             <button class="d-btn ${status === "reviewing" ? "primary" : ""}" onclick="setStatus('${panel}', '${it.id}', 'reviewing')">${status === "reviewing" ? "👀 검토중 해제" : "👀 검토중"}</button>
@@ -2715,7 +2723,7 @@ async function addDiscussion(panel) {
     list.push({
       id: "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
       category, author, title, content,
-      at: new Date().toLocaleString("ko-KR"),
+      at: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
       _ts: Date.now(), replies: [], resolved: false, status: "open", imageRefs,
     });
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
@@ -2749,7 +2757,7 @@ async function addReply(panel, id) {
   } else {
     const list = JSON.parse(localStorage.getItem("jy_demo_" + panel) || "[]");
     const it = list.find(x => x.id === id);
-    if (it) { it.replies = it.replies || []; it.replies.push({ author, content, at: new Date().toLocaleString("ko-KR") }); }
+    if (it) { it.replies = it.replies || []; it.replies.push({ author, content, at: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }) }); }
     localStorage.setItem("jy_demo_" + panel, JSON.stringify(list));
   }
   ta.value = "";
@@ -2854,7 +2862,7 @@ async function createInbox(panel) {
 
 function localBuildInbox(messages) {
   // 서버와 동일 포맷 (로컬 폴백)
-  const now = new Date().toLocaleString("ko-KR");
+  const now = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
   const CAT = { question: "❓ 질문", request: "📋 요청", decision: "⚠️ 결정필요", feedback: "👍 피드백" };
   const PNAME = { overview:"🏠 종합", hr:"👥 HR", cs:"🎧 CS", finance:"💰 재무", ophe:"🌿 OPHE", "ai-design":"🎨 AI 디자인", boomzap:"💧 붐앤잽", completed:"✅ 완료", cost:"💵 과금", future:"🚀 향후" };
   let md = `# Claude Code Inbox\n\n> ${now} · ${messages.length}건\n\n`;
@@ -2865,7 +2873,7 @@ function localBuildInbox(messages) {
     md += `## ${CAT[cat]}\n\n`;
     g.forEach((m, i) => {
       md += `### ${i+1}. ${PNAME[m.panel] || m.panel} — ${m.title || m.content.split("\n")[0].slice(0, 40)}\n\n`;
-      md += `- 작성자: ${m.author}\n- 시각: ${m.at}\n\n\`\`\`\n${m.content}\n\`\`\`\n\n`;
+      md += `- 작성자: ${m.author}\n- 시각: ${fmtKST(m._ts, m.at)}\n\n\`\`\`\n${m.content}\n\`\`\`\n\n`;
       if (m.images && m.images.length) md += `첨부 이미지: ${m.images.length}건\n\n`;
       md += `---\n\n`;
     });
@@ -2952,9 +2960,9 @@ function exportDiscussionAsText(panel) {
   const list = STATE.discussions[panel] || [];
   if (list.length === 0) { alert("저장된 의견이 없습니다."); return; }
   const tab = TABS.find(t => t.key === panel);
-  const txt = `[${tab.emoji} ${tab.label}] 의견 정리 (${list.length}건)\n생성: ${new Date().toLocaleString("ko-KR")}\n\n` + list.map((f, i) => {
+  const txt = `[${tab.emoji} ${tab.label}] 의견 정리 (${list.length}건)\n생성: ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}\n\n` + list.map((f, i) => {
     const cat = CATS[f.category];
-    return `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${f.at}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author} · ${r.at}: ${r.content}`).join("\n")}`;
+    return `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${fmtKST(f._ts, f.at)}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author} · ${fmtKST(r._ts, r.at)}: ${r.content}`).join("\n")}`;
   }).join("\n\n---\n\n");
   navigator.clipboard.writeText(txt).then(() => alert("의견을 클립보드에 복사했습니다."));
 }
@@ -2966,7 +2974,7 @@ function emailDiscussion(panel) {
   const subject = `[${tab.label}] 의견 정리 (${list.length}건)`;
   const body = list.map((f, i) => {
     const cat = CATS[f.category];
-    return `${i+1}. [${cat.label}] ${f.author} · ${f.at}\n${f.title ? f.title + "\n" : ""}${f.content}\n${(f.replies||[]).map(r => `   답변(${r.author}): ${r.content}`).join("\n")}`;
+    return `${i+1}. [${cat.label}] ${f.author} · ${fmtKST(f._ts, f.at)}\n${f.title ? f.title + "\n" : ""}${f.content}\n${(f.replies||[]).map(r => `   답변(${r.author}): ${r.content}`).join("\n")}`;
   }).join("\n\n---\n\n");
   window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
@@ -2979,7 +2987,7 @@ function mailAllOpinions() {
     const tab = TABS.find(t => t.key === k);
     body += `\n=== ${tab.emoji} ${tab.label} (${list.length}건) ===\n` + list.map((f,i) => {
       const cat = CATS[f.category];
-      return `${i+1}. [${cat.label}] ${f.author} · ${f.at}\n${f.title ? f.title + "\n" : ""}${f.content}`;
+      return `${i+1}. [${cat.label}] ${f.author} · ${fmtKST(f._ts, f.at)}\n${f.title ? f.title + "\n" : ""}${f.content}`;
     }).join("\n\n");
   }
   if (!body.trim()) { alert("저장된 의견이 없습니다."); return; }
@@ -2994,7 +3002,7 @@ function exportAllJSON() {
   URL.revokeObjectURL(url);
 }
 function exportAllText() {
-  let out = `인터오리진 경영진 대시보드 - 전체 의견\n생성: ${new Date().toLocaleString("ko-KR")}\n\n`;
+  let out = `인터오리진 경영진 대시보드 - 전체 의견\n생성: ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}\n\n`;
   for (const k in STATE.discussions) {
     const list = STATE.discussions[k];
     if (!list || !list.length) continue;
@@ -3002,7 +3010,7 @@ function exportAllText() {
     out += `\n=== ${tab.emoji} ${tab.label} (${list.length}건) ===\n\n`;
     list.forEach((f, i) => {
       const cat = CATS[f.category];
-      out += `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${f.at}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author}: ${r.content}`).join("\n")}\n\n`;
+      out += `${i+1}. ${cat.emoji} [${cat.label}] ${f.author} · ${fmtKST(f._ts, f.at)}\n${f.title ? "제목: " + f.title + "\n" : ""}${f.content}\n${f.resolved ? "✓ 해결됨\n" : ""}${(f.replies||[]).map(r => `   ↳ ${r.author}: ${r.content}`).join("\n")}\n\n`;
     });
   }
   const blob = new Blob([out], { type: "text/plain;charset=utf-8" });
@@ -3033,7 +3041,7 @@ safe("timeline", () => {
 safe("charts", () => { renderBarChart("progress-chart", PROGRESS_DATA); renderBarChart("activity-chart", ACTIVITY_DATA, "var(--accent)"); });
 safe("costs", () => renderCosts());
 safe("discussions", () => TABS.forEach(t => buildDiscussion(t.key)));
-safe("genTime", () => { document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR"); });
+safe("genTime", () => { document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }); });
 safe("modal", () => {
   document.getElementById("settings-modal").addEventListener("click", e => {
     if (e.target.id === "settings-modal") closeSettingsModal();

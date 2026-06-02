@@ -22,7 +22,7 @@ export interface Message {
   content: string;
   at: string;
   _ts: number;
-  replies: Array<{ author: string; content: string; at: string; imageRefs?: ImageRef[]; slackTs?: string; toSlack?: boolean }>;
+  replies: Array<{ author: string; content: string; at: string; _ts?: number; imageRefs?: ImageRef[]; slackTs?: string; toSlack?: boolean }>;
   resolved: boolean;
   status?: "open" | "reviewing" | "resolved";
   slackTs?: string;
@@ -35,6 +35,9 @@ export interface Message {
 
 const ALL_PANELS = ["overview","hr","cs","finance","ophe","ai-design","boomzap","completed","cost","future"];
 const keyForPanel = (panel: string) => `panel:${panel}`;
+
+// Cloudflare Worker는 UTC로 실행되므로 timeZone을 명시해야 한국시간(KST)으로 찍힘
+const nowKST = (ms?: number) => new Date(ms ?? Date.now()).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 
 export async function listMessages(env: Env, panel: string): Promise<Message[]> {
   const raw = await env.MESSAGES.get(keyForPanel(panel));
@@ -59,7 +62,7 @@ export async function addMessage(env: Env, input: {
     author: input.author,
     title: input.title || "",
     content: input.content,
-    at: new Date(now).toLocaleString("ko-KR"),
+    at: nowKST(now),
     _ts: now,
     replies: [],
     resolved: false,
@@ -87,7 +90,7 @@ export async function updateMessage(env: Env, panel: string, id: string, patch: 
     const ts = id.startsWith("ts:") ? id.slice(3) : "";
     list.push({
       id, category: "question", author: "?", content: "",
-      at: new Date().toLocaleString("ko-KR"),
+      at: nowKST(),
       _ts: Date.now(), replies: [], resolved: false,
       slackTs: ts, fromSlack: true, imageRefs: [],
     });
@@ -98,7 +101,8 @@ export async function updateMessage(env: Env, panel: string, id: string, patch: 
     list[idx].replies.push({
       author: patch.reply.author || "익명",
       content: patch.reply.content,
-      at: new Date().toLocaleString("ko-KR"),
+      at: nowKST(),
+      _ts: Date.now(),
       imageRefs: patch.reply.imageRefs || [],
       slackTs: patch.reply.slackTs,
     });
