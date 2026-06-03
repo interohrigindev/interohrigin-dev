@@ -12,9 +12,11 @@ export interface Env {
   SLACK_CHANNEL_ID: string;
   SLACK_CHANNEL_URL: string;
   GITHUB_TOKEN?: string;
-  // 카카오워크 알림 — 봇(App Key) 방식 (권장)
-  KAKAOWORK_APP_KEY?: string;        // 봇 개발에서 발급된 App Key (Bearer)
-  KAKAOWORK_RECIPIENTS?: string;     // 알림 받을 멤버 이메일(콤마/공백 구분)
+  // 카카오워크 알림 — 봇(App Key) 방식 (권장). 단톡방 1곳에 모든 의견/답글 공유.
+  KAKAOWORK_APP_KEY?: string;          // 봇 개발에서 발급된 App Key (Bearer)
+  KAKAOWORK_CONVERSATION_ID?: string;  // 보낼 단톡방 id (기존 방에 봇 초대 후 conversations.list 로 확인)
+  KAKAOWORK_RECIPIENTS?: string;       // (CONVERSATION_ID 미지정 시) 이 이메일들로 봇이 그룹방 자동 생성
+  KAKAOWORK_CONVERSATION_NAME?: string;// (자동 생성 그룹방 이름)
   // 카카오워크 알림 — 인커밍 웹훅 방식 (폴백). 설정 시 {text} 로 POST.
   KAKAOWORK_WEBHOOK_URL?: string;
   // 알림 메시지에 넣을 대시보드 주소(미설정 시 기본 pages.dev 사용)

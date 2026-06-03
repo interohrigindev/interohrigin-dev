@@ -1,13 +1,15 @@
-/** 카카오워크 알림
- *  두 가지 방식을 모두 지원(설정된 것 우선):
- *   (A) 봇(App Key) 방식 — 권장. env.KAKAOWORK_APP_KEY + KAKAOWORK_RECIPIENTS(이메일들).
- *       users.find_by_email → conversations.open → messages.send 순서로 각 수신자에게 알림 DM.
- *   (B) 인커밍 웹훅 방식 — env.KAKAOWORK_WEBHOOK_URL 로 {text} POST.
+/** 카카오워크 알림 — 봇(App Key)으로 "단톡방 하나"에 모든 의견/답글 공유
+ *
+ *  전송 대상 conversation_id 결정 순서:
+ *   1) env.KAKAOWORK_CONVERSATION_ID 가 있으면 그 방으로 바로 전송 (권장: 기존 단톡방에 봇 초대 후 그 방 id 지정)
+ *   2) 없으면 env.KAKAOWORK_RECIPIENTS(이메일들)로 그룹 채팅방을 1회 생성/확보(KV 캐시)해서 그 방으로 전송
+ *   3) App Key 가 아예 없고 KAKAOWORK_WEBHOOK_URL 만 있으면 인커밍 웹훅({text})으로 폴백
  *  실패는 throw 하지 않음(알림 실패가 본 저장을 막지 않도록).
  */
 import type { Env, ImageRef } from "./storage";
 
 const API = "https://api.kakaowork.com/v1";
+const GROUP_CACHE_KEY = "kakao_group_conv"; // 자동 생성 그룹방 id 캐시
 
 const PANEL_NAMES: Record<string, string> = {
   overview: "🏠 종합 현황", hr: "👥 HR 플랫폼", cs: "🎧 CS 플랫폼", finance: "💰 재무관리",
@@ -34,7 +36,7 @@ function recipients(env: Env): string[] {
   return (env.KAKAOWORK_RECIPIENTS || "").split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
 }
 
-// --- 카카오워크 Web API 호출 (봇 App Key 인증) ---
+// --- 카카오워크 Web API (봇 App Key 인증) ---
 async function kwGet(env: Env, path: string): Promise<any> {
   const r = await fetch(API + path, { headers: { Authorization: `Bearer ${env.KAKAOWORK_APP_KEY}` } });
   return r.json().catch(() => ({}));
@@ -48,28 +50,48 @@ async function kwPost(env: Env, path: string, body: any): Promise<any> {
   return r.json().catch(() => ({}));
 }
 
-// 이메일 → conversation_id (KV 캐시 30일)
-async function convIdForEmail(env: Env, email: string): Promise<string | null> {
-  const cacheKey = `kakao_conv:${email.toLowerCase()}`;
-  try { const c = await env.MESSAGES.get(cacheKey); if (c) return c; } catch { /* noop */ }
+async function userIdByEmail(env: Env, email: string): Promise<string | null> {
   const u = await kwGet(env, `/users.find_by_email?email=${encodeURIComponent(email)}`);
-  const uid = u && u.user && u.user.id;
-  if (!uid) return null;
-  const c = await kwPost(env, `/conversations.open`, { user_id: uid });
+  return (u && u.user && u.user.id) ? String(u.user.id) : null;
+}
+
+// 봇이 속한 채팅방 목록 (id/type/name/users_count) — 단톡방 id 찾기용
+export async function listRooms(env: Env): Promise<any[]> {
+  if (!env.KAKAOWORK_APP_KEY) return [];
+  const r = await kwGet(env, `/conversations.list?limit=100`);
+  return (r && Array.isArray(r.conversations)) ? r.conversations : [];
+}
+
+// 전송 대상 단톡방 conversation_id 결정
+async function targetConversationId(env: Env): Promise<string | null> {
+  // 1) 명시된 단톡방 id
+  if (env.KAKAOWORK_CONVERSATION_ID) return String(env.KAKAOWORK_CONVERSATION_ID);
+
+  // 2) 수신자 이메일들로 그룹방 1회 생성 후 캐시
+  const emails = recipients(env);
+  if (!emails.length) return null;
+  try { const c = await env.MESSAGES.get(GROUP_CACHE_KEY); if (c) return c; } catch { /* noop */ }
+
+  const ids: string[] = [];
+  for (const e of emails) { const id = await userIdByEmail(env, e); if (id) ids.push(id); }
+  if (!ids.length) return null;
+
+  const body: any = ids.length === 1
+    ? { user_id: ids[0] }
+    : { user_ids: ids, conversation_name: env.KAKAOWORK_CONVERSATION_NAME || "IO 개발현황 알림" };
+  const c = await kwPost(env, `/conversations.open`, body);
   const cid = c && c.conversation && c.conversation.id;
-  if (cid) { try { await env.MESSAGES.put(cacheKey, String(cid), { expirationTtl: 60 * 60 * 24 * 30 }); } catch { /* noop */ } }
+  if (cid) { try { await env.MESSAGES.put(GROUP_CACHE_KEY, String(cid)); } catch { /* noop */ } }
   return cid ? String(cid) : null;
 }
 
-// 실제 전송 — 봇 우선, 없으면 웹훅
+// 실제 전송 — 봇(단톡방 1곳) 우선, 없으면 웹훅
 async function deliver(env: Env, text: string): Promise<void> {
   if (env.KAKAOWORK_APP_KEY) {
-    for (const email of recipients(env)) {
-      try {
-        const cid = await convIdForEmail(env, email);
-        if (cid) await kwPost(env, `/messages.send`, { conversation_id: cid, text });
-      } catch { /* 개별 수신자 실패 무시 */ }
-    }
+    try {
+      const cid = await targetConversationId(env);
+      if (cid) await kwPost(env, `/messages.send`, { conversation_id: cid, text });
+    } catch { /* noop */ }
     return;
   }
   if (env.KAKAOWORK_WEBHOOK_URL) {
@@ -114,21 +136,21 @@ export async function notifyNewReply(
   await deliver(env, lines.join("\n"));
 }
 
-// 설정 점검용 — 모드/수신자 해석 결과를 반환
+// 설정 점검용 — 모드/대상 단톡방/수신자 해석 결과
 export async function diagnose(env: Env): Promise<any> {
   const mode = env.KAKAOWORK_APP_KEY ? "bot" : (env.KAKAOWORK_WEBHOOK_URL ? "webhook" : "none");
-  const result: any = { mode, recipients: [] as any[] };
+  const result: any = { mode };
   if (mode === "bot") {
+    result.conversationIdEnv = env.KAKAOWORK_CONVERSATION_ID || null;
     result.recipientEmails = recipients(env);
-    for (const email of recipients(env)) {
-      const u = await kwGet(env, `/users.find_by_email?email=${encodeURIComponent(email)}`);
-      result.recipients.push({
-        email,
-        found: !!(u && u.user && u.user.id),
-        userId: (u && u.user && u.user.id) || null,
-        error: u && u.error ? u.error : undefined,
-      });
+    if (!env.KAKAOWORK_CONVERSATION_ID) {
+      result.recipients = [];
+      for (const email of recipients(env)) {
+        const id = await userIdByEmail(env, email);
+        result.recipients.push({ email, found: !!id, userId: id });
+      }
     }
+    try { result.targetConversationId = await targetConversationId(env); } catch (e: any) { result.targetConversationId = null; }
   }
   return result;
 }

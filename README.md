@@ -56,26 +56,35 @@
 | `DASHBOARD_KEY` | 대시보드 접근 키 (index.html 내장 기본값과 동일해야 함) |
 | `MESSAGES` (KV 바인딩) | 의견 저장 네임스페이스 |
 | `GITHUB_TOKEN` | 프로젝트 커밋 조회용 (선택) |
-| `KAKAOWORK_APP_KEY` | 카카오워크 봇 App Key (권장 방식). 설정 시 봇이 수신자에게 알림 DM 전송 |
-| `KAKAOWORK_RECIPIENTS` | 알림 받을 멤버 이메일들(콤마/공백 구분). 카카오워크 가입 이메일과 일치해야 함 |
+| `KAKAOWORK_APP_KEY` | 카카오워크 봇 App Key (권장 방식) |
+| `KAKAOWORK_CONVERSATION_ID` | 모든 의견/답글을 보낼 **단톡방 id** (기존 방에 봇 초대 후 `/api/kakao-rooms` 로 확인) |
+| `KAKAOWORK_RECIPIENTS` | (CONVERSATION_ID 미지정 시) 이 이메일들로 봇이 그룹방을 자동 생성해 거기로 전송 |
+| `KAKAOWORK_CONVERSATION_NAME` | (자동 생성 그룹방 이름, 선택) |
 | `KAKAOWORK_WEBHOOK_URL` | (대안) 인커밍 웹훅 URL. App Key 없이 이 URL 로 `{text}` 전송 |
 | `DASHBOARD_URL` | 알림 메시지에 넣을 대시보드 주소 (미설정 시 `https://interohrigin-dev.pages.dev`) |
 
-### 카카오워크 알림 연동 (봇 방식 — 권장)
+### 카카오워크 알림 연동 (봇 → 단톡방 1곳 공유)
 
-카카오워크 관리자 페이지 → **봇(Bot) 관리 → 봇(Bot) 개발**에서 봇을 만든다(알림형이라 Callback URL·대화기능 불필요).
+대시보드의 **모든 의견·답글**을 지정한 **단톡방 하나**에 봇이 공유한다.
 
-1. 봇 생성 → **권한**에서 `메시지 발송`·`채팅방 조회`·`채팅방 개설`·`멤버 조회` 체크 → 저장
-2. **App Key** 복사
-3. Cloudflare Pages → Settings → **Environment variables** 에 추가 → Save → **재배포**
-   - `KAKAOWORK_APP_KEY` = 복사한 App Key
-   - `KAKAOWORK_RECIPIENTS` = 알림 받을 사람들의 카카오워크 이메일 (예: `a@x.com, b@x.com`)
-4. 확인: `https://interohrigin-dev.pages.dev/api/kakao-test?key=<DASHBOARD_KEY>` 열기
-   - `mode`, 각 수신자 `found` 여부가 표시되고, 정상이면 봇이 테스트 DM을 보냄
-5. 이후 새 의견/답글이 올라오면 봇이 수신자들에게 자동 알림 (메시지의 🔗 링크로 바로 이동)
+봇 만들기: 관리자 페이지 → **봇(Bot) 관리 → 봇(Bot) 개발** → 봇 생성 →
+권한 `메시지 발송`·`채팅방 조회`·`채팅방 개설`·`멤버 조회` 체크 → 저장 → **App Key** 복사
+(알림형이라 Request/Callback URL·대화기능 불필요).
 
-> 동작 원리: `users.find_by_email`(이메일→user_id) → `conversations.open`(→conversation_id, 30일 KV 캐시) → `messages.send`.
-> 대안으로 인커밍 웹훅을 쓰려면 `KAKAOWORK_WEBHOOK_URL` 만 설정하면 됨(App Key 불필요).
+**방법 A — 기존 단톡방에 보내기 (권장)**
+1. 카카오워크에서 그 봇을 **"IO 개발현황" 단톡방에 초대**
+2. Cloudflare Pages 환경변수에 `KAKAOWORK_APP_KEY` 등록 → 재배포
+3. `https://interohrigin-dev.pages.dev/api/kakao-rooms?key=<DASHBOARD_KEY>` 열어 그 방의 **id** 확인
+4. 환경변수 `KAKAOWORK_CONVERSATION_ID` = 그 id → 재배포
+
+**방법 B — 봇이 그룹방 자동 생성**
+1. 환경변수 `KAKAOWORK_APP_KEY` + `KAKAOWORK_RECIPIENTS`(멤버 이메일들) 등록 → 재배포
+2. 봇이 그 멤버들로 그룹방을 만들어(이름은 `KAKAOWORK_CONVERSATION_NAME`) 거기로 전송
+
+확인: `https://interohrigin-dev.pages.dev/api/kakao-test?key=<DASHBOARD_KEY>` → `mode:bot`,
+`targetConversationId` 가 잡히고 단톡방에 테스트 메시지가 오면 완료.
+
+> 동작 원리: (A) `conversations.list` 로 방 id 확인 → `messages.send`. (B) `users.find_by_email` → `conversations.open(user_ids)` 그룹 생성(KV 캐시) → `messages.send`.
 
 > `DASHBOARD_KEY` 를 변경하면 `public/index.html` 의 `DEFAULT_KEY` 상수도 같은 값으로 맞춰야 합니다.
 

@@ -21,20 +21,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (diag.mode === "none") {
     return json({
       ok: false, mode: "none",
-      message: "카카오워크 미설정 — 봇 방식은 KAKAOWORK_APP_KEY + KAKAOWORK_RECIPIENTS, 웹훅 방식은 KAKAOWORK_WEBHOOK_URL 를 Cloudflare Pages 환경변수에 추가하세요.",
+      message: "카카오워크 미설정 — 봇 방식은 KAKAOWORK_APP_KEY(+ KAKAOWORK_CONVERSATION_ID 또는 KAKAOWORK_RECIPIENTS), 웹훅 방식은 KAKAOWORK_WEBHOOK_URL 를 환경변수에 추가하세요.",
     });
   }
 
-  // 봇 방식인데 수신자 해석이 모두 실패하면 전송 생략
-  if (diag.mode === "bot") {
-    const resolved = (diag.recipients || []).filter((r: any) => r.found);
-    if (!resolved.length) {
-      return json({
-        ok: false, mode: "bot",
-        message: "수신자 이메일을 카카오워크 멤버로 찾지 못했습니다. KAKAOWORK_RECIPIENTS 의 이메일이 '카카오워크 가입 이메일'과 일치하는지 확인하세요.",
-        diagnose: diag,
-      });
-    }
+  // 봇 방식인데 보낼 단톡방을 못 정하면 전송 생략
+  if (diag.mode === "bot" && !diag.targetConversationId) {
+    return json({
+      ok: false, mode: "bot",
+      message: "보낼 단톡방을 찾지 못했습니다. (1) 기존 단톡방에 봇을 초대하고 /api/kakao-rooms 에서 id를 확인해 KAKAOWORK_CONVERSATION_ID 에 넣거나, (2) KAKAOWORK_RECIPIENTS 의 이메일이 카카오워크 가입 이메일과 일치하는지 확인하세요.",
+      diagnose: diag,
+    });
   }
 
   await notifyNewMessage(env, {
