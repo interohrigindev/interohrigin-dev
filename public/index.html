@@ -864,10 +864,22 @@
   </div>
 
   <!-- 전체 자유 의견 (overview discussion) -->
-  <div class="commits-box" id="commits-overview"></div>
-
   <div id="discussion-overview" data-discussion="overview"></div>
 
+</section>
+
+<!-- ====================================================== -->
+<!-- 패널: GitHub 커밋 (전 프로젝트 통합) -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="commits">
+  <div class="section">
+    <div class="exec-headline">
+      <div class="h-eyebrow">개발 진행상황 · 전 프로젝트 통합</div>
+      <div class="h-title">🔗 GitHub 커밋 현황</div>
+      <div class="h-sub">모든 프로젝트의 최근 커밋을 한 화면에서 봅니다. <strong>🔄 전체 업데이트</strong>를 한 번 누르면 모든 저장소를 GitHub에서 즉시 최신으로 갱신합니다.</div>
+    </div>
+  </div>
+  <div class="commits-box" id="commits-all"></div>
 </section>
 
 <!-- ====================================================== -->
@@ -1098,7 +1110,6 @@
   </div>
 
   <!-- HR 토론 -->
-  <div class="commits-box" id="commits-hr"></div>
 
   <div id="discussion-hr" data-discussion="hr"></div>
 </section>
@@ -1191,8 +1202,6 @@
     </div>
   </div>
 
-  <div class="commits-box" id="commits-cs"></div>
-
   <div id="discussion-cs" data-discussion="cs"></div>
 </section>
 
@@ -1284,7 +1293,6 @@
     <div class="timeline" id="tl-finance"></div>
   </div>
 
-  <div class="commits-box" id="commits-finance"></div>
 
   <div id="discussion-finance" data-discussion="finance"></div>
 </section>
@@ -1377,7 +1385,6 @@
     <div class="timeline" id="tl-ophe"></div>
   </div>
 
-  <div class="commits-box" id="commits-ophe"></div>
 
   <div id="discussion-ophe" data-discussion="ophe"></div>
 </section>
@@ -1469,8 +1476,6 @@
     </div>
     <div class="timeline" id="tl-ai-design"></div>
   </div>
-
-  <div class="commits-box" id="commits-ai-design"></div>
 
   <div id="discussion-ai-design" data-discussion="ai-design"></div>
 </section>
@@ -1565,7 +1570,6 @@
     <div class="timeline" id="tl-boomzap"></div>
   </div>
 
-  <div class="commits-box" id="commits-boomzap"></div>
 
   <div id="discussion-boomzap" data-discussion="boomzap"></div>
 </section>
@@ -1637,7 +1641,6 @@
     <div class="timeline" id="tl-completed"></div>
   </div>
 
-  <div class="commits-box" id="commits-completed"></div>
 
   <div id="discussion-completed" data-discussion="completed"></div>
 </section>
@@ -2154,6 +2157,7 @@ function renderCosts() {
 // 탭 정의
 const TABS = [
   { key: "overview",  emoji: "🏠", label: "종합 현황" },
+  { key: "commits",   emoji: "🔗", label: "GitHub 커밋" },
   { key: "hr",        emoji: "👥", label: "HR 플랫폼" },
   { key: "cs",        emoji: "🎧", label: "CS 플랫폼" },
   { key: "finance",   emoji: "💰", label: "재무관리" },
@@ -2343,77 +2347,72 @@ async function fetchCommits(repo, limit = 8, fresh = false) {
   } catch (e) { return { error: e.message }; }
 }
 
-// fresh=true 면 캐시 무시하고 GitHub에서 즉시 최신 커밋을 가져옴 (🔄 업데이트 버튼)
-async function renderCommits(panel, fresh = false) {
-  const box = document.getElementById("commits-" + panel);
-  if (!box) return;
-  const repos = PANEL_REPOS[panel];
-  if (!repos || !repos.length) {
-    // 저장소 미연결 프로젝트 — 영역은 표시하되 안내
-    box.style.display = "";
-    box.innerHTML = `<div class="c-head"><div class="c-title">🔗 GitHub 개발 진행상황</div></div>
-      <div class="c-empty">이 프로젝트에 연결된 GitHub 저장소가 없습니다.</div>`;
-    return;
+// 저장소 1개의 커밋 블록 HTML 생성 (통합 뷰에서 재사용)
+function buildRepoBlock(repo, label, emoji, data) {
+  const head = `<div class="c-day-label" style="font-size:14px;font-weight:800;margin-bottom:4px;">${emoji || "📦"} ${label} <span class="c-repo">${repo}${data.cached ? " · 캐시" : ""}</span></div>`;
+  if (data.error) {
+    const e = String(data.error);
+    const friendly = e.includes("GITHUB_TOKEN") ? "⚠️ GitHub 토큰 미설정 — 설정 안내 참조"
+      : (e.includes("404") || e.includes("not allowed") || e.includes("not found")) ? "저장소가 아직 연결되지 않았거나 접근 권한이 없습니다."
+      : "불러오기 실패: " + escapeHTML(e);
+    return `<div style="margin-bottom:18px;">${head}<div class="c-empty">${friendly}</div></div>`;
   }
+  const commits = data.commits || [];
+  const counts = { feat: 0, fix: 0, docs: 0, etc: 0 };
+  commits.forEach(c => counts[commitType(c.message)]++);
+  const byDay = {};
+  commits.forEach(c => { const d = (c.date || "").slice(0, 10); (byDay[d] = byDay[d] || []).push(c); });
+  let html = `<div style="margin-bottom:18px;">${head}
+    <div class="c-summary">
+      <span class="c-stat">최근 <strong>${commits.length}</strong>커밋</span>
+      <span class="c-stat">🟢 기능 <strong>${counts.feat}</strong></span>
+      <span class="c-stat">🔴 수정 <strong>${counts.fix}</strong></span>
+      <span class="c-stat">🔵 문서/기타 <strong>${counts.docs + counts.etc}</strong></span>
+    </div>`;
+  if (commits.length === 0) {
+    html += `<div class="c-empty">커밋 없음</div>`;
+  } else {
+    for (const day in byDay) {
+      html += `<div class="c-day"><div class="c-day-label" style="color:var(--text-dim);">${day}</div>`;
+      byDay[day].forEach(c => {
+        const t = commitType(c.message);
+        html += `<div class="c-item"><span class="c-type ${t}">${commitTypeLabel(t)}</span><span class="c-msg">${escapeHTML(c.message)} <span class="c-sha">${c.sha}</span></span></div>`;
+      });
+      html += `</div>`;
+    }
+  }
+  return html + `</div>`;
+}
 
+// 전 프로젝트 커밋 통합 뷰 — fresh=true 면 모든 저장소를 캐시 무시하고 즉시 최신화 (🔄 전체 업데이트)
+async function renderAllCommits(fresh = false) {
+  const box = document.getElementById("commits-all");
+  if (!box) return;
+  // TABS 순서대로 PANEL_REPOS 있는 프로젝트 수집
+  const projects = [];
+  for (const t of TABS) {
+    const repos = PANEL_REPOS[t.key];
+    if (repos) for (const r of repos) projects.push({ repo: r.repo, label: r.label, emoji: t.emoji });
+  }
   box.style.display = "";
-  box.innerHTML = `<div class="c-head"><div class="c-title">🔗 GitHub 개발 진행상황 (최근 커밋)</div>
+  box.innerHTML = `<div class="c-head"><div class="c-title">🔗 전체 프로젝트 GitHub 커밋</div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <span class="c-repo" id="c-updated-${panel}"></span>
-      <button class="d-btn" id="c-refresh-${panel}" onclick="renderCommits('${panel}', true)">🔄 업데이트</button>
+      <span class="c-repo" id="c-all-updated"></span>
+      <button class="d-btn primary" onclick="renderAllCommits(true)">🔄 전체 업데이트</button>
     </div></div>
-    <div id="c-body-${panel}"><div class="c-empty">${fresh ? "GitHub에서 최신 커밋 가져오는 중…" : "불러오는 중…"}</div></div>`;
+    <div id="c-all-body"><div class="c-empty">${fresh ? "GitHub에서 최신 커밋 가져오는 중… (잠시만요)" : "불러오는 중…"}</div></div>`;
+  const bodyEl = document.getElementById("c-all-body");
 
-  const bodyEl = document.getElementById("c-body-" + panel);
+  // 모든 저장소를 병렬로 조회 (한 번에 빠르게)
+  const results = await Promise.all(projects.map(p => fetchCommits(p.repo, 8, fresh).then(data => ({ p, data }))));
   let html = "";
   let latestFetchedAt = 0;
-  for (const { repo, label } of repos) {
-    const data = await fetchCommits(repo, 8, fresh);
+  for (const { p, data } of results) {
     if (data.fetchedAt) latestFetchedAt = Math.max(latestFetchedAt, data.fetchedAt);
-    if (data.error) {
-      const e = String(data.error);
-      const friendly = e.includes("GITHUB_TOKEN") ? "⚠️ GitHub 토큰 미설정 — 설정 안내 참조"
-        : (e.includes("404") || e.includes("not allowed") || e.includes("not found")) ? "저장소가 아직 연결되지 않았거나 접근 권한이 없습니다."
-        : "불러오기 실패: " + escapeHTML(e);
-      html += `<div style="margin-bottom:14px;"><div class="c-day-label">${label} <span class="c-repo">${repo}</span></div>
-        <div class="c-empty">${friendly}</div></div>`;
-      continue;
-    }
-    const commits = data.commits || [];
-    // 타입별 집계
-    const counts = { feat: 0, fix: 0, docs: 0, etc: 0 };
-    commits.forEach(c => counts[commitType(c.message)]++);
-    // 날짜별 그룹
-    const byDay = {};
-    commits.forEach(c => {
-      const d = (c.date || "").slice(0, 10);
-      (byDay[d] = byDay[d] || []).push(c);
-    });
-    html += `<div style="margin-bottom:16px;">
-      <div class="c-day-label">${label} <span class="c-repo">${repo}${data.cached ? " · 캐시" : ""}</span></div>
-      <div class="c-summary">
-        <span class="c-stat">최근 <strong>${commits.length}</strong>커밋</span>
-        <span class="c-stat">🟢 기능 <strong>${counts.feat}</strong></span>
-        <span class="c-stat">🔴 수정 <strong>${counts.fix}</strong></span>
-        <span class="c-stat">🔵 문서/기타 <strong>${counts.docs + counts.etc}</strong></span>
-      </div>`;
-    if (commits.length === 0) {
-      html += `<div class="c-empty">커밋 없음</div>`;
-    } else {
-      for (const day in byDay) {
-        html += `<div class="c-day"><div class="c-day-label" style="color:var(--text-dim);">${day}</div>`;
-        byDay[day].forEach(c => {
-          const t = commitType(c.message);
-          html += `<div class="c-item"><span class="c-type ${t}">${commitTypeLabel(t)}</span><span class="c-msg">${escapeHTML(c.message)} <span class="c-sha">${c.sha}</span></span></div>`;
-        });
-        html += `</div>`;
-      }
-    }
-    html += `</div>`;
+    html += buildRepoBlock(p.repo, p.label, p.emoji, data);
   }
-  bodyEl.innerHTML = html;
-  // 업데이트 시각 표시
-  const upd = document.getElementById("c-updated-" + panel);
+  bodyEl.innerHTML = html || `<div class="c-empty">표시할 프로젝트가 없습니다.</div>`;
+  const upd = document.getElementById("c-all-updated");
   if (upd && latestFetchedAt) {
     const t = new Date(latestFetchedAt).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit" });
     upd.textContent = (fresh ? "방금 업데이트 · " : "업데이트 ") + t;
@@ -2972,11 +2971,10 @@ async function activatePanel(key) {
   await fetchPanel(key);
   renderDiscussionThread(key);
   updateUnread();
-  // 해당 패널에 GitHub 레포가 있으면 커밋 로드 (한 번만 — 이미 로드했으면 스킵)
-  if (PANEL_REPOS[key] && !STATE._commitsLoaded?.[key]) {
-    STATE._commitsLoaded = STATE._commitsLoaded || {};
-    STATE._commitsLoaded[key] = true;
-    renderCommits(key);
+  // GitHub 커밋 탭이면 전체 커밋을 한 번 로드 (캐시 사용 — 최신은 '전체 업데이트' 버튼)
+  if (key === "commits" && !STATE._commitsLoaded) {
+    STATE._commitsLoaded = true;
+    renderAllCommits();
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
   history.replaceState(null, "", "#" + key);
@@ -3149,12 +3147,10 @@ async function migrateLocalDemo() {
     try { await migrateLocalDemo(); } catch (e) { console.warn("[init] migrate 건너뜀:", e); }
     startPolling();
     console.log("[init] 실시간 동기화 시작됨");
-    // 현재 보이는 패널의 GitHub 커밋 로드
-    const cur = getCurrentPanel();
-    if (PANEL_REPOS[cur]) {
-      STATE._commitsLoaded = STATE._commitsLoaded || {};
-      STATE._commitsLoaded[cur] = true;
-      renderCommits(cur);
+    // GitHub 커밋 탭이 첫 화면이면 전체 커밋 로드
+    if (getCurrentPanel() === "commits" && !STATE._commitsLoaded) {
+      STATE._commitsLoaded = true;
+      renderAllCommits();
     }
   }
 })();
