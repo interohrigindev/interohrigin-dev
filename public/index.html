@@ -2964,6 +2964,8 @@ function buildTabs() {
     btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
   });
 }
+// 패널별 커밋 자동로드 가드 (세션 한정 — localStorage에 저장하지 않음)
+const commitsLoaded = {};
 async function activatePanel(key) {
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.dataset.panel === key));
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.panel === key));
@@ -2972,11 +2974,10 @@ async function activatePanel(key) {
   await fetchPanel(key);
   renderDiscussionThread(key);
   updateUnread();
-  // 해당 패널에 GitHub 레포가 있으면 커밋 로드 (한 번만 — 이미 로드했으면 스킵)
-  if (PANEL_REPOS[key] && !STATE._commitsLoaded?.[key]) {
-    STATE._commitsLoaded = STATE._commitsLoaded || {};
-    STATE._commitsLoaded[key] = true;
-    renderCommits(key);
+  // 해당 패널에 GitHub 레포가 있으면 최신 커밋 자동 로드 (탭 첫 진입 시 1회, 캐시 무시 = 항상 최신)
+  if (PANEL_REPOS[key] && !commitsLoaded[key]) {
+    commitsLoaded[key] = true;
+    renderCommits(key, true);
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
   history.replaceState(null, "", "#" + key);
@@ -3149,12 +3150,11 @@ async function migrateLocalDemo() {
     try { await migrateLocalDemo(); } catch (e) { console.warn("[init] migrate 건너뜀:", e); }
     startPolling();
     console.log("[init] 실시간 동기화 시작됨");
-    // 현재 보이는 패널의 GitHub 커밋 로드
+    // 현재 보이는 패널의 GitHub 커밋 자동 로드 (최신)
     const cur = getCurrentPanel();
-    if (PANEL_REPOS[cur]) {
-      STATE._commitsLoaded = STATE._commitsLoaded || {};
-      STATE._commitsLoaded[cur] = true;
-      renderCommits(cur);
+    if (PANEL_REPOS[cur] && !commitsLoaded[cur]) {
+      commitsLoaded[cur] = true;
+      renderCommits(cur, true);
     }
   }
 })();
