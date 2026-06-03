@@ -23,6 +23,8 @@ const ALLOWED_REPOS = new Set([
   "interohrigindev/exhiboot",
   "interohrigindev/interohrigin-ir",
   "interohrigindev/interohrigin-dev",
+  "interohrigindev/interohrigin-cs",
+  "interohrigindev/ai-design-agent",
 ]);
 
 export const onRequestOptions: PagesFunction = async () => new Response(null, { headers: CORS });
@@ -32,19 +34,22 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const url = new URL(request.url);
   const repo = url.searchParams.get("repo") || "";
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "8", 10), 20);
+  const fresh = url.searchParams.get("fresh") === "1"; // 강제 새로고침: 캐시 무시하고 GitHub 즉시 조회
   if (!ALLOWED_REPOS.has(repo)) return json({ error: "repo not allowed", repo }, 400);
 
-  // KV 캐시 (10분)
+  // KV 캐시 (10분) — fresh=1 이면 건너뜀
   const cacheKey = `commits:${repo}`;
-  try {
-    const cached = await env.MESSAGES.get(cacheKey);
-    if (cached) {
-      const c = JSON.parse(cached);
-      if (Date.now() - c.at < 10 * 60 * 1000) {
-        return json({ repo, cached: true, commits: c.commits.slice(0, limit) });
+  if (!fresh) {
+    try {
+      const cached = await env.MESSAGES.get(cacheKey);
+      if (cached) {
+        const c = JSON.parse(cached);
+        if (Date.now() - c.at < 10 * 60 * 1000) {
+          return json({ repo, cached: true, fetchedAt: c.at, commits: c.commits.slice(0, limit) });
+        }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
   if (!env.GITHUB_TOKEN) {
     return json({ error: "GITHUB_TOKEN 미설정 — Cloudflare Pages Secret에 추가 필요", repo }, 503);
@@ -73,8 +78,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       url: c.html_url || "",
     }));
     // 캐시 저장
-    try { await env.MESSAGES.put(cacheKey, JSON.stringify({ at: Date.now(), commits })); } catch {}
-    return json({ repo, cached: false, commits: commits.slice(0, limit) });
+    const now = Date.now();
+    try { await env.MESSAGES.put(cacheKey, JSON.stringify({ at: now, commits })); } catch {}
+    return json({ repo, cached: false, fetchedAt: now, commits: commits.slice(0, limit) });
   } catch (e: any) {
     return json({ error: e.message || String(e), repo }, 500);
   }

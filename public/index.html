@@ -1191,6 +1191,8 @@
     </div>
   </div>
 
+  <div class="commits-box" id="commits-cs"></div>
+
   <div id="discussion-cs" data-discussion="cs"></div>
 </section>
 
@@ -1467,6 +1469,8 @@
     </div>
     <div class="timeline" id="tl-ai-design"></div>
   </div>
+
+  <div class="commits-box" id="commits-ai-design"></div>
 
   <div id="discussion-ai-design" data-discussion="ai-design"></div>
 </section>
@@ -2172,8 +2176,10 @@ const CATS = {
 const PANEL_REPOS = {
   overview:  [{ repo: "interohrigindev/interohrigin-dev", label: "임원 대시보드" }],
   hr:        [{ repo: "interohrigindev/interohrigin-hr", label: "HR 플랫폼" }],
+  cs:        [{ repo: "interohrigindev/interohrigin-cs", label: "CS 플랫폼" }],
   finance:   [{ repo: "interohrigindev/io-finance", label: "재무관리" }],
   ophe:      [{ repo: "interohrigindev/ophe", label: "OPHE" }],
+  "ai-design": [{ repo: "interohrigindev/ai-design-agent", label: "AI 디자인 에이전트" }],
   boomzap:   [{ repo: "interohrigindev/boomnzap", label: "붐앤잽" }],
   completed: [{ repo: "interohrigindev/exhiboot", label: "Exhiboot" }, { repo: "interohrigindev/interohrigin-ir", label: "I&C 리뉴얼" }],
 };
@@ -2330,30 +2336,47 @@ function commitType(msg) {
 }
 function commitTypeLabel(t) { return { feat: "기능", fix: "수정", docs: "문서", etc: "기타" }[t] || "기타"; }
 
-async function fetchCommits(repo, limit = 8) {
+async function fetchCommits(repo, limit = 8, fresh = false) {
   if (!backendConfigured()) return { error: "서버 미연결" };
   try {
-    return await api(`/api/commits?repo=${encodeURIComponent(repo)}&limit=${limit}`);
+    return await api(`/api/commits?repo=${encodeURIComponent(repo)}&limit=${limit}${fresh ? "&fresh=1" : ""}`);
   } catch (e) { return { error: e.message }; }
 }
 
-async function renderCommits(panel) {
+// fresh=true 면 캐시 무시하고 GitHub에서 즉시 최신 커밋을 가져옴 (🔄 업데이트 버튼)
+async function renderCommits(panel, fresh = false) {
   const box = document.getElementById("commits-" + panel);
   if (!box) return;
   const repos = PANEL_REPOS[panel];
-  if (!repos || !repos.length) { box.style.display = "none"; return; }
+  if (!repos || !repos.length) {
+    // 저장소 미연결 프로젝트 — 영역은 표시하되 안내
+    box.style.display = "";
+    box.innerHTML = `<div class="c-head"><div class="c-title">🔗 GitHub 개발 진행상황</div></div>
+      <div class="c-empty">이 프로젝트에 연결된 GitHub 저장소가 없습니다.</div>`;
+    return;
+  }
 
+  box.style.display = "";
   box.innerHTML = `<div class="c-head"><div class="c-title">🔗 GitHub 개발 진행상황 (최근 커밋)</div>
-    <button class="d-btn" onclick="renderCommits('${panel}')">🔄 새로고침</button></div>
-    <div id="c-body-${panel}"><div class="c-empty">불러오는 중…</div></div>`;
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="c-repo" id="c-updated-${panel}"></span>
+      <button class="d-btn" id="c-refresh-${panel}" onclick="renderCommits('${panel}', true)">🔄 업데이트</button>
+    </div></div>
+    <div id="c-body-${panel}"><div class="c-empty">${fresh ? "GitHub에서 최신 커밋 가져오는 중…" : "불러오는 중…"}</div></div>`;
 
   const bodyEl = document.getElementById("c-body-" + panel);
   let html = "";
+  let latestFetchedAt = 0;
   for (const { repo, label } of repos) {
-    const data = await fetchCommits(repo, 8);
+    const data = await fetchCommits(repo, 8, fresh);
+    if (data.fetchedAt) latestFetchedAt = Math.max(latestFetchedAt, data.fetchedAt);
     if (data.error) {
+      const e = String(data.error);
+      const friendly = e.includes("GITHUB_TOKEN") ? "⚠️ GitHub 토큰 미설정 — 설정 안내 참조"
+        : (e.includes("404") || e.includes("not allowed") || e.includes("not found")) ? "저장소가 아직 연결되지 않았거나 접근 권한이 없습니다."
+        : "불러오기 실패: " + escapeHTML(e);
       html += `<div style="margin-bottom:14px;"><div class="c-day-label">${label} <span class="c-repo">${repo}</span></div>
-        <div class="c-empty">${data.error.includes("GITHUB_TOKEN") ? "⚠️ GitHub 토큰 미설정 — 설정 안내 참조" : "불러오기 실패: " + escapeHTML(data.error)}</div></div>`;
+        <div class="c-empty">${friendly}</div></div>`;
       continue;
     }
     const commits = data.commits || [];
@@ -2389,6 +2412,12 @@ async function renderCommits(panel) {
     html += `</div>`;
   }
   bodyEl.innerHTML = html;
+  // 업데이트 시각 표시
+  const upd = document.getElementById("c-updated-" + panel);
+  if (upd && latestFetchedAt) {
+    const t = new Date(latestFetchedAt).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit" });
+    upd.textContent = (fresh ? "방금 업데이트 · " : "업데이트 ") + t;
+  }
 }
 
 // ======================================================
