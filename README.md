@@ -56,15 +56,26 @@
 | `DASHBOARD_KEY` | 대시보드 접근 키 (index.html 내장 기본값과 동일해야 함) |
 | `MESSAGES` (KV 바인딩) | 의견 저장 네임스페이스 |
 | `GITHUB_TOKEN` | 프로젝트 커밋 조회용 (선택) |
-| `KAKAOWORK_WEBHOOK_URL` | 카카오워크 인커밍 웹훅 URL. 설정 시 새 의견/답글이 채팅방으로 알림 전송 (선택) |
+| `KAKAOWORK_APP_KEY` | 카카오워크 봇 App Key (권장 방식). 설정 시 봇이 수신자에게 알림 DM 전송 |
+| `KAKAOWORK_RECIPIENTS` | 알림 받을 멤버 이메일들(콤마/공백 구분). 카카오워크 가입 이메일과 일치해야 함 |
+| `KAKAOWORK_WEBHOOK_URL` | (대안) 인커밍 웹훅 URL. App Key 없이 이 URL 로 `{text}` 전송 |
 | `DASHBOARD_URL` | 알림 메시지에 넣을 대시보드 주소 (미설정 시 `https://interohrigin-dev.pages.dev`) |
 
-### 카카오워크 알림 연동
+### 카카오워크 알림 연동 (봇 방식 — 권장)
 
-1. 카카오워크 → 알림 받을 채팅방 → 우측 `+` / 앱 → **인커밍 웹훅** 추가 → 생성된 **Webhook URL** 복사
-2. Cloudflare Pages → 프로젝트 → Settings → **Environment variables** → `KAKAOWORK_WEBHOOK_URL` 에 붙여넣기 → Save → **재배포**
-3. 확인: 브라우저에서 `https://interohrigin-dev.pages.dev/api/kakao-test?key=<DASHBOARD_KEY>` 열기 → 채팅방에 테스트 메시지가 오면 완료
-4. 이후 대시보드에 새 의견/답글이 올라올 때마다 해당 채팅방으로 자동 알림 (메시지의 🔗 링크로 바로 이동)
+카카오워크 관리자 페이지 → **봇(Bot) 관리 → 봇(Bot) 개발**에서 봇을 만든다(알림형이라 Callback URL·대화기능 불필요).
+
+1. 봇 생성 → **권한**에서 `메시지 발송`·`채팅방 조회`·`채팅방 개설`·`멤버 조회` 체크 → 저장
+2. **App Key** 복사
+3. Cloudflare Pages → Settings → **Environment variables** 에 추가 → Save → **재배포**
+   - `KAKAOWORK_APP_KEY` = 복사한 App Key
+   - `KAKAOWORK_RECIPIENTS` = 알림 받을 사람들의 카카오워크 이메일 (예: `a@x.com, b@x.com`)
+4. 확인: `https://interohrigin-dev.pages.dev/api/kakao-test?key=<DASHBOARD_KEY>` 열기
+   - `mode`, 각 수신자 `found` 여부가 표시되고, 정상이면 봇이 테스트 DM을 보냄
+5. 이후 새 의견/답글이 올라오면 봇이 수신자들에게 자동 알림 (메시지의 🔗 링크로 바로 이동)
+
+> 동작 원리: `users.find_by_email`(이메일→user_id) → `conversations.open`(→conversation_id, 30일 KV 캐시) → `messages.send`.
+> 대안으로 인커밍 웹훅을 쓰려면 `KAKAOWORK_WEBHOOK_URL` 만 설정하면 됨(App Key 불필요).
 
 > `DASHBOARD_KEY` 를 변경하면 `public/index.html` 의 `DEFAULT_KEY` 상수도 같은 값으로 맞춰야 합니다.
 

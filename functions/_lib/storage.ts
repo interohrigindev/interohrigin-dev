@@ -12,7 +12,10 @@ export interface Env {
   SLACK_CHANNEL_ID: string;
   SLACK_CHANNEL_URL: string;
   GITHUB_TOKEN?: string;
-  // 카카오워크 알림 (Incoming Webhook). 설정 시 새 의견/답글이 채팅방으로 전송됨.
+  // 카카오워크 알림 — 봇(App Key) 방식 (권장)
+  KAKAOWORK_APP_KEY?: string;        // 봇 개발에서 발급된 App Key (Bearer)
+  KAKAOWORK_RECIPIENTS?: string;     // 알림 받을 멤버 이메일(콤마/공백 구분)
+  // 카카오워크 알림 — 인커밍 웹훅 방식 (폴백). 설정 시 {text} 로 POST.
   KAKAOWORK_WEBHOOK_URL?: string;
   // 알림 메시지에 넣을 대시보드 주소(미설정 시 기본 pages.dev 사용)
   DASHBOARD_URL?: string;
