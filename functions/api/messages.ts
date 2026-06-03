@@ -1,5 +1,6 @@
 import { listMessages, addMessage, updateMessage, deleteMessage, getMessage } from "../_lib/storage";
 import { reflectStatusToSlack, postThreadReply, postChannelMessage } from "../_lib/slack-api";
+import { notifyNewMessage, notifyNewReply } from "../_lib/kakaowork";
 import type { Env, ImageRef } from "../_lib/storage";
 
 const CAT_EMOJI: Record<string, string> = { question: "❓", request: "📋", decision: "⚠️", feedback: "👍" };
@@ -40,7 +41,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   return json({ panel, messages: messagesWithLinks, channelUrl: env.SLACK_CHANNEL_URL });
 };
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUntil }) => {
   if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
   const body = await request.json<{ panel: string; category: string; author: string; title?: string; content: string; imageRefs?: ImageRef[]; postToSlack?: boolean }>();
 
@@ -60,11 +61,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     slackChannel: slackTs ? env.SLACK_CHANNEL_ID : undefined,
     fromSlack: false,
   });
+
+  // 카카오워크 알림 (응답을 막지 않도록 waitUntil 로 비동기 전송)
+  waitUntil(notifyNewMessage(env, {
+    panel: body.panel, category: body.category, author: body.author,
+    title: body.title, content: body.content, imageRefs: body.imageRefs,
+  }));
+
   return json({ ok: true, message: m });
 };
 
 // id를 쿼리 파라미터로 받음 (슬랙 ts의 특수문자 ':' '.' 라우팅 문제 회피)
-export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPatch: PagesFunction<Env> = async ({ request, env, waitUntil }) => {
   if (!authorized(request, env)) return json({ error: "unauthorized" }, 401);
   const url = new URL(request.url);
   const panel = url.searchParams.get("panel") || "overview";
@@ -72,17 +80,24 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
   if (!id) return json({ error: "id required" }, 400);
   const body = await request.json<any>();
 
-  // 원본 메시지 (슬랙 ts/channel 확보용)
+  // 원본 메시지
   const before = await getMessage(env, panel, id);
   const m = await updateMessage(env, panel, id, body);
 
-  // 대시보드 → 슬랙 반영
+  // 답글 → 카카오워크 알림
+  if (body.reply && body.reply.content) {
+    waitUntil(notifyNewReply(
+      env, panel,
+      before ? { author: before.author, content: before.content } : null,
+      { author: body.reply.author || "익명", content: body.reply.content },
+    ));
+  }
+
+  // (레거시) 대시보드 → 슬랙 반영 — 슬랙 ts 가 있는 과거 메시지에만 동작
   if (before?.slackTs && before?.slackChannel) {
-    // (1) 상태 변경 → 이모지 반영
     if (body.status) {
       await reflectStatusToSlack(env, before.slackChannel, before.slackTs, body.status);
     }
-    // (2) 답글 → 슬랙 thread 전송 (toSlack=true 일 때만)
     if (body.reply && body.reply.toSlack) {
       await postThreadReply(env, before.slackChannel, before.slackTs, body.reply.author, body.reply.content);
     }
