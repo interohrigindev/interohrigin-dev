@@ -23,7 +23,7 @@ const ALLOWED_REPOS = new Set([
   "interohrigindev/exhiboot",
   "interohrigindev/interohrigin-ir",
   "interohrigindev/interohrigin-dev",
-  "interohrigindev/interohrigin-cs",
+  "interohrigindev/iocs",
   "interohrigindev/ai-design-agent",
 ]);
 
