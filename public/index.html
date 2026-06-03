@@ -636,6 +636,24 @@
   }
   .c-summary .c-stat strong { color: var(--text); }
 
+  /* 커밋 기반 자동 개발활동 요약 카드 */
+  .c-activity {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 12px;
+  }
+  .c-activity .ca-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .c-activity .ca-k { font-size: 12px; font-weight: 800; color: var(--accent-2); }
+  .c-activity .ca-v { font-size: 12px; color: var(--text-soft); }
+  .c-activity .ca-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .c-activity .ca-stats .c-stat {
+    background: white; border: 1px solid var(--border);
+    border-radius: 6px; padding: 3px 9px; font-size: 11px; color: var(--text-dim);
+  }
+  .c-activity .ca-stats .c-stat strong { color: var(--text); }
+  .c-activity .ca-latest { font-size: 12px; color: var(--text); line-height: 1.5; }
+  .c-activity .ca-latest .c-sha { color: var(--text-mute); font-family: ui-monospace, monospace; font-size: 10px; }
+
   /* ===== 푸터 ===== */
   footer {
     background: white; border-top: 1px solid var(--border);
@@ -2335,6 +2353,24 @@ function commitType(msg) {
   return "etc";
 }
 function commitTypeLabel(t) { return { feat: "기능", fix: "수정", docs: "문서", etc: "기타" }[t] || "기타"; }
+// 커밋 날짜 → 상대시간(오늘/어제/N일 전) + 며칠 이내 커밋 수 계산용
+function relTime(iso) {
+  if (!iso) return "";
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (d <= 0) return "오늘";
+  if (d === 1) return "어제";
+  if (d < 7) return d + "일 전";
+  if (d < 30) return Math.floor(d / 7) + "주 전";
+  return Math.floor(d / 30) + "개월 전";
+}
+function dateKST(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "2-digit", month: "2-digit", day: "2-digit" });
+}
+function countWithinDays(commits, days) {
+  const cut = Date.now() - days * 86400000;
+  return commits.filter(c => new Date(c.date).getTime() >= cut).length;
+}
 
 async function fetchCommits(repo, limit = 8, fresh = false) {
   if (!backendConfigured()) return { error: "서버 미연결" };
@@ -2389,17 +2425,26 @@ async function renderCommits(panel, fresh = false) {
       const d = (c.date || "").slice(0, 10);
       (byDay[d] = byDay[d] || []).push(c);
     });
+    const latest = commits[0]; // GitHub는 최신순
+    const recent7 = countWithinDays(commits, 7);
     html += `<div style="margin-bottom:16px;">
-      <div class="c-day-label">${label} <span class="c-repo">${repo}${data.cached ? " · 캐시" : ""}</span></div>
-      <div class="c-summary">
-        <span class="c-stat">최근 <strong>${commits.length}</strong>커밋</span>
-        <span class="c-stat">🟢 기능 <strong>${counts.feat}</strong></span>
-        <span class="c-stat">🔴 수정 <strong>${counts.fix}</strong></span>
-        <span class="c-stat">🔵 문서/기타 <strong>${counts.docs + counts.etc}</strong></span>
-      </div>`;
+      <div class="c-day-label">${label} <span class="c-repo">${repo}${data.cached ? " · 캐시" : ""}</span></div>`;
     if (commits.length === 0) {
       html += `<div class="c-empty">커밋 없음</div>`;
     } else {
+      // 커밋에서 자동 생성한 개발 활동 요약 (커밋 갱신 시 함께 갱신됨)
+      html += `<div class="c-activity">
+        <div class="ca-row"><span class="ca-k">📊 개발 활동</span>
+          <span class="ca-v">마지막 업데이트 <strong>${relTime(latest.date)}</strong> · ${dateKST(latest.date)}</span></div>
+        <div class="ca-stats">
+          <span class="c-stat">최근 <strong>${commits.length}</strong>커밋</span>
+          <span class="c-stat">🟢 기능 <strong>${counts.feat}</strong></span>
+          <span class="c-stat">🔴 수정 <strong>${counts.fix}</strong></span>
+          <span class="c-stat">🔵 문서/기타 <strong>${counts.docs + counts.etc}</strong></span>
+          <span class="c-stat">🔥 최근 7일 <strong>${recent7}</strong>건</span>
+        </div>
+        <div class="ca-latest">최근 작업 — ${escapeHTML(latest.message)} <span class="c-sha">${latest.sha}</span></div>
+      </div>`;
       for (const day in byDay) {
         html += `<div class="c-day"><div class="c-day-label" style="color:var(--text-dim);">${day}</div>`;
         byDay[day].forEach(c => {
