@@ -24,6 +24,7 @@ export interface Env {
   // HR 플랫폼 프로젝트 현황 라이브 동기화 (ceo-staff API 프록시)
   CEO_STAFF_TOKEN?: string;            // HR 플랫폼 Cloudflare의 CEO_STAFF_TOKEN 과 동일 값
   HR_API_URL?: string;                 // 미설정 시 https://interohrigin-hr2.pages.dev
+  HR_TARGET_EMPLOYEE?: string;         // 담당 프로젝트만 필터링할 직원명 (미설정 시 "차주용")
 }
 
 export interface Message {

@@ -63,6 +63,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     for (const e of (Array.isArray(emps) ? emps : [])) if (e && e.id) empMap[e.id] = e.name;
     const nm = (id: any) => (id && empMap[id]) || null;
 
+    // 대상 직원(차주용) id 찾기 — 이 직원이 담당(담당/관리/리더/임원)인 프로젝트만 표시
+    const targetName = env.HR_TARGET_EMPLOYEE || "차주용";
+    const target = (Array.isArray(emps) ? emps : []).find((e: any) => e && e.name === targetName);
+    if (!target) {
+      return json({ ok: true, configured: true, fetchedAt: Date.now(), count: 0, projects: [], note: `직원 '${targetName}'을(를) 찾지 못했습니다.` });
+    }
+    const tid = target.id;
+    const isMine = (p: any) =>
+      (Array.isArray(p.assignee_ids) && p.assignee_ids.includes(tid)) ||
+      p.manager_id === tid || p.leader_id === tid || p.executive_id === tid;
+
     // 프로젝트별 단계 모음
     const stagesByProj: Record<string, any[]> = {};
     for (const s of (Array.isArray(stages) ? stages : [])) {
@@ -70,7 +81,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       (stagesByProj[pid] = stagesByProj[pid] || []).push(s);
     }
 
-    const out = (Array.isArray(boards) ? boards : []).map((p: any) => {
+    const out = (Array.isArray(boards) ? boards : []).filter(isMine).map((p: any) => {
       const sts = (stagesByProj[p.id] || []).slice().sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0));
       const total = sts.length;
       const done = sts.filter(s => String(s.status) === "완료").length;
