@@ -87,18 +87,16 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       });
     }
 
-    // 2) 차주용이 담당/리더/임원/실무자인 보드만 PostgREST or 필터로 조회 (limit 무관)
-    const orFilter = `(manager_id.eq.${tid},leader_id.eq.${tid},executive_id.eq.${tid},assignee_ids.cs.{${tid}})`;
-    let boards: any;
-    try {
-      boards = await ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 300, filters: { or: orFilter } });
-      if (boards && boards.error) throw new Error(typeof boards.error === "string" ? boards.error : JSON.stringify(boards.error));
-      if (!Array.isArray(boards)) throw new Error("unexpected boards response");
-    } catch (_e) {
-      // 폴백: 전체(최대 1000) 가져와 클라이언트 필터
-      const all = await ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 1000 });
-      boards = (Array.isArray(all) ? all : []).filter(isMine);
+    // 2) 차주용 담당(manager) + 실무자(assignee) 보드를 각각 단일 필터로 조회 후 합침 (or 미사용 — 단일 필터가 안정적)
+    const [byMgr, byAsg] = await Promise.all([
+      ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 300, filters: { manager_id: `eq.${tid}` } }).catch(() => []),
+      ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 300, filters: { assignee_ids: `cs.{${tid}}` } }).catch(() => []),
+    ]);
+    const boardMap: Record<string, any> = {};
+    for (const b of [...(Array.isArray(byMgr) ? byMgr : []), ...(Array.isArray(byAsg) ? byAsg : [])]) {
+      if (b && b.id) boardMap[b.id] = b;
     }
+    const boards: any[] = Object.values(boardMap);
 
     // 3) 해당 보드들의 단계만 조회
     const boardIds = boards.map((b: any) => b.id).filter(Boolean);
