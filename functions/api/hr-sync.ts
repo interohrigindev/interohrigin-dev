@@ -51,38 +51,46 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
-    const [projects, tasks] = await Promise.all([
-      ceoStaff(env, "query", { table: "projects", select: "*", limit: 100 }),
-      ceoStaff(env, "query", { table: "project_tasks", select: "project_id,status", limit: 2000 }).catch(() => []),
+    // "프로젝트 & 업무" 보드 = project_boards, 단계 = pipeline_stages, 이름 = employees
+    const [boards, stages, emps] = await Promise.all([
+      ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 100 }),
+      ceoStaff(env, "query", { table: "pipeline_stages", select: "project_id,stage_name,status,deadline,stage_order", limit: 2000 }).catch(() => []),
+      ceoStaff(env, "query", { table: "employees", select: "id,name", limit: 500 }).catch(() => []),
     ]);
-    if (projects && projects.error) return json({ ok: false, error: projects.error });
+    if (boards && boards.error) return json({ ok: false, error: boards.error });
 
-    // 프로젝트별 진행률 = project_tasks 완료/전체
-    const byProj: Record<string, { total: number; done: number }> = {};
-    for (const t of (Array.isArray(tasks) ? tasks : [])) {
-      const pid = t && t.project_id; if (!pid) continue;
-      const e = byProj[pid] || (byProj[pid] = { total: 0, done: 0 });
-      e.total++; if (DONE.test(String(t.status))) e.done++;
+    const empMap: Record<string, string> = {};
+    for (const e of (Array.isArray(emps) ? emps : [])) if (e && e.id) empMap[e.id] = e.name;
+    const nm = (id: any) => (id && empMap[id]) || null;
+
+    // 프로젝트별 단계 모음
+    const stagesByProj: Record<string, any[]> = {};
+    for (const s of (Array.isArray(stages) ? stages : [])) {
+      const pid = s && s.project_id; if (!pid) continue;
+      (stagesByProj[pid] = stagesByProj[pid] || []).push(s);
     }
 
-    const out = (Array.isArray(projects) ? projects : []).map((p: any) => {
-      const st = byProj[p.id];
-      const progress = (st && st.total) ? Math.round((st.done / st.total) * 100)
-        : (typeof p.progress === "number" ? p.progress : null);
+    const out = (Array.isArray(boards) ? boards : []).map((p: any) => {
+      const sts = (stagesByProj[p.id] || []).slice().sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0));
+      const total = sts.length;
+      const done = sts.filter(s => String(s.status) === "완료").length;
+      const progress = total ? Math.round((done / total) * 100) : null;
+      const current = sts.find(s => String(s.status) !== "완료");
+      const nextDeadline = sts.filter(s => s.deadline && String(s.status) !== "완료").map(s => s.deadline).sort()[0] || null;
+      const assignees = (p.assignee_ids || []).map(nm).filter(Boolean);
       return {
         id: p.id,
-        name: p.name || p.project_name || "(이름 없음)",
+        name: p.project_name || p.name || "(이름 없음)",
         status: p.status || null,
         priority: p.priority ?? null,
-        manager_name: p.manager_name || null,
-        brand: p.brand || null,
-        category: p.category || null,
-        start_date: p.start_date || null,
-        end_date: p.end_date || p.launch_date || null,
-        description: p.description || null,
+        manager_name: nm(p.manager_id),
+        leader_name: nm(p.leader_id),
+        assignee_names: assignees,
         progress,
-        taskTotal: st ? st.total : 0,
-        taskDone: st ? st.done : 0,
+        stageDone: done,
+        stageTotal: total,
+        currentStage: current ? current.stage_name : (total ? "전체 단계 완료" : null),
+        nextDeadline,
       };
     });
 

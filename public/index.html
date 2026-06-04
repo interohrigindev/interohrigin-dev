@@ -2557,9 +2557,9 @@ async function renderHrSync(fresh = false) {
           ${p.priority ? `<span class="hrs-pri">우선순위 ${escapeHTML(String(p.priority))}</span>` : ""}
         </div>
         <div class="hrs-name">${escapeHTML(p.name)}</div>
-        ${prog !== null ? `<div class="hrs-prog"><div class="hp-bar"><div class="hp-fill ${prog >= 100 ? "green" : ""}" style="width:${prog}%"></div></div><div class="hrs-progt">진행률 ${prog}% (작업 ${p.taskDone}/${p.taskTotal})</div></div>` : ""}
-        <div class="hrs-meta">${p.manager_name ? `담당 ${escapeHTML(p.manager_name)}` : ""}${p.manager_name && p.end_date ? " · " : ""}${p.end_date ? `마감 ${escapeHTML(p.end_date)}` : ""}</div>
-        ${p.description ? `<div class="hrs-desc">${escapeHTML(p.description)}</div>` : ""}
+        ${prog !== null ? `<div class="hrs-prog"><div class="hp-bar"><div class="hp-fill ${prog >= 100 ? "green" : ""}" style="width:${prog}%"></div></div><div class="hrs-progt">진행률 ${prog}% (단계 ${p.stageDone}/${p.stageTotal})</div></div>` : ""}
+        ${p.currentStage ? `<div class="hrs-desc">📍 현재 단계: ${escapeHTML(p.currentStage)}</div>` : ""}
+        <div class="hrs-meta">${p.manager_name ? `담당 ${escapeHTML(p.manager_name)}` : (p.assignee_names && p.assignee_names.length ? "담당 " + p.assignee_names.map(escapeHTML).join(", ") : "")}${(p.manager_name || (p.assignee_names && p.assignee_names.length)) && p.nextDeadline ? " · " : ""}${p.nextDeadline ? `다음 마감 ${escapeHTML(p.nextDeadline)}` : ""}</div>
       </div>`;
     }).join("") + `</div>`;
   }
