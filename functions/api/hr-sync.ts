@@ -41,7 +41,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     return json({ ok: false, configured: false, message: "CEO_STAFF_TOKEN 미설정 — 대시보드 Cloudflare Pages 환경변수에 추가하세요. (HR 플랫폼 Cloudflare의 CEO_STAFF_TOKEN 값과 동일)" });
   }
 
-  const fresh = new URL(request.url).searchParams.get("fresh") === "1";
+  const sp = new URL(request.url).searchParams;
+  const fresh = sp.get("fresh") === "1" || sp.get("all") === "1";
   const cacheKey = "hr_sync";
   if (!fresh) {
     try {
@@ -81,7 +82,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       (stagesByProj[pid] = stagesByProj[pid] || []).push(s);
     }
 
-    const out = (Array.isArray(boards) ? boards : []).filter(isMine).map((p: any) => {
+    const debug = new URL(request.url).searchParams.get("all") === "1";
+    const mapOne = (p: any) => {
       const sts = (stagesByProj[p.id] || []).slice().sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0));
       const total = sts.length;
       const done = sts.filter(s => String(s.status) === "완료").length;
@@ -89,7 +91,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       const current = sts.find(s => String(s.status) !== "완료");
       const nextDeadline = sts.filter(s => s.deadline && String(s.status) !== "완료").map(s => s.deadline).sort()[0] || null;
       const assignees = (p.assignee_ids || []).map(nm).filter(Boolean);
-      return {
+      const o: any = {
         id: p.id,
         name: p.project_name || p.name || "(이름 없음)",
         status: p.status || null,
@@ -103,10 +105,19 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
         currentStage: current ? current.stage_name : (total ? "전체 단계 완료" : null),
         nextDeadline,
       };
-    });
+      if (debug) {
+        o.isMine = isMine(p);
+        o._manager_id = p.manager_id; o._leader_id = p.leader_id; o._executive_id = p.executive_id; o._assignee_ids = p.assignee_ids;
+        o._cols = Object.keys(p);
+      }
+      return o;
+    };
+    const allMapped = (Array.isArray(boards) ? boards : []).map(mapOne);
+    const out = debug ? allMapped : allMapped.filter((_, i) => isMine((boards as any[])[i]));
 
-    const payload = { ok: true, configured: true, fetchedAt: Date.now(), count: out.length, projects: out };
-    try { await env.MESSAGES.put(cacheKey, JSON.stringify(payload)); } catch { /* noop */ }
+    const payload: any = { ok: true, configured: true, fetchedAt: Date.now(), count: out.length, projects: out };
+    if (debug) { payload.totalBoards = Array.isArray(boards) ? boards.length : 0; payload.targetName = targetName; payload.targetId = tid; }
+    if (!debug) { try { await env.MESSAGES.put(cacheKey, JSON.stringify(payload)); } catch { /* noop */ } }
     return json(payload);
   } catch (e: any) {
     return json({ ok: false, error: e.message || String(e) }, 502);
