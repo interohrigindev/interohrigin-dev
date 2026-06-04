@@ -690,6 +690,9 @@
   /* HR 프로젝트 현황 라이브 동기화 카드 */
   .hrs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
   .hrs-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .hrs-card.hrs-link { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .hrs-card.hrs-link:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(37,99,235,0.1); }
+  .hrs-auto { margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--accent); }
   .hrs-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
   .hrs-card .h-status { margin: 0; font-size: 11.5px; padding: 3px 11px; }
   .hrs-pri { font-size: 11px; color: var(--text-mute); white-space: nowrap; }
@@ -2487,6 +2490,61 @@ const HR_STATUS = {
   cancelled: { label: "취소",   cls: "attention" },
 };
 let hrSyncLoaded = false;
+
+// HR 프로젝트명 → 기존 고정 탭 매핑 (매칭 없으면 자동 탭 생성)
+function hrMatchPanel(name) {
+  const n = name || "";
+  if (n.includes("HR 플랫폼")) return "hr";
+  if (n.includes("CS") || n.includes("고객관리")) return "cs";
+  if (n.includes("재무")) return "finance";
+  if (/ophe/i.test(n)) return "ophe";
+  if (n.includes("AI 디자인")) return "ai-design";
+  if (n.includes("I&C") || n.includes("리뉴얼")) return "irc";
+  if (n.includes("붐앤잽") || n.includes("복지몰") || n.includes("Exhiboot")) return "completed";
+  return null;
+}
+function hrPanelKey(p) { return "hrp_" + String(p.id || "").replace(/[^a-zA-Z0-9_-]/g, ""); }
+
+// HR에만 있고 고정 탭이 없는 프로젝트 → 자동으로 탭 + 패널 생성 (진행률·단계·담당 + 의견 영역)
+function ensureHrProjectTab(p) {
+  const key = hrPanelKey(p);
+  if (!document.querySelector(`.tab[data-panel="${key}"]`)) {
+    const nav = document.getElementById("tab-nav-inner");
+    if (nav) {
+      const tab = document.createElement("button");
+      tab.className = "tab"; tab.dataset.panel = key;
+      tab.innerHTML = `<span class="tab-emoji">🆕</span>${escapeHTML(p.name)}<span class="unread-dot"></span>`;
+      tab.addEventListener("click", () => activatePanel(key));
+      nav.appendChild(tab);
+    }
+  }
+  let panel = document.querySelector(`section.panel[data-panel="${key}"]`);
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.className = "panel"; panel.dataset.panel = key;
+    const main = document.querySelector("main"); if (main) main.appendChild(panel);
+  }
+  const s = HR_STATUS[p.status] || { label: p.status || "-", cls: "done" };
+  const prog = (typeof p.progress === "number") ? p.progress : 0;
+  panel.innerHTML = `
+    <div class="section">
+      <div class="exec-headline">
+        <div class="h-status ${s.cls}"><span class="dot"></span>${s.label}</div>
+        <div class="h-eyebrow">HR 연동 · 자동 생성 프로젝트</div>
+        <h2>${escapeHTML(p.name)}</h2>
+        <div class="h-progress"><div class="hp-label"><span>진행률</span><span class="hp-pct">${prog}%</span></div><div class="hp-bar"><div class="hp-fill ${prog >= 100 ? "green" : ""}" style="width:${prog}%"></div></div></div>
+        <div class="h-focus">
+          <div class="hf"><span class="hf-ic">📍</span><div><div class="hf-k">현재 단계</div><div class="hf-v">${escapeHTML(p.currentStage || "-")} (${p.stageDone}/${p.stageTotal})</div></div></div>
+          <div class="hf"><span class="hf-ic">🙋</span><div><div class="hf-k">담당 / 마감</div><div class="hf-v">${escapeHTML(p.manager_name || "-")}${p.nextDeadline ? " · 다음 마감 " + escapeHTML(p.nextDeadline) : ""}</div></div></div>
+        </div>
+        ${p.assignee_names && p.assignee_names.length ? `<div class="h-tags">${p.assignee_names.map(a => `<span class="h-tag">${escapeHTML(a)}</span>`).join("")}</div>` : ""}
+        <div class="d-meta" style="margin-top:10px;">이 탭은 HR '프로젝트 & 업무' 보드에서 자동 생성됐습니다. 아래에서 이 프로젝트에 의견을 남길 수 있습니다.</div>
+      </div>
+    </div>
+    <div id="discussion-${key}" data-discussion="${key}"></div>
+  `;
+  buildDiscussion(key);
+}
 async function renderHrSync(fresh = false) {
   const box = document.getElementById("hr-sync");
   if (!box) return;
@@ -2513,7 +2571,10 @@ async function renderHrSync(fresh = false) {
     body.innerHTML = `<div class="hrs-grid">` + ps.map(p => {
       const s = HR_STATUS[p.status] || { label: p.status || "-", cls: "done" };
       const prog = (typeof p.progress === "number") ? p.progress : null;
-      return `<div class="hrs-card">
+      const matched = hrMatchPanel(p.name);
+      const key = matched || hrPanelKey(p);
+      if (!matched) ensureHrProjectTab(p); // 고정 탭 없으면 자동 탭 생성
+      return `<div class="hrs-card hrs-link" onclick="activatePanel('${key}')" title="클릭하면 이 프로젝트 탭으로 이동">
         <div class="hrs-top">
           <span class="h-status ${s.cls}"><span class="dot"></span>${s.label}</span>
           ${p.priority ? `<span class="hrs-pri">우선순위 ${escapeHTML(String(p.priority))}</span>` : ""}
@@ -2522,6 +2583,7 @@ async function renderHrSync(fresh = false) {
         ${prog !== null ? `<div class="hrs-prog"><div class="hp-bar"><div class="hp-fill ${prog >= 100 ? "green" : ""}" style="width:${prog}%"></div></div><div class="hrs-progt">진행률 ${prog}% (단계 ${p.stageDone}/${p.stageTotal})</div></div>` : ""}
         ${p.currentStage ? `<div class="hrs-desc">📍 현재 단계: ${escapeHTML(p.currentStage)}</div>` : ""}
         <div class="hrs-meta">${p.manager_name ? `담당 ${escapeHTML(p.manager_name)}` : (p.assignee_names && p.assignee_names.length ? "담당 " + p.assignee_names.map(escapeHTML).join(", ") : "")}${(p.manager_name || (p.assignee_names && p.assignee_names.length)) && p.nextDeadline ? " · " : ""}${p.nextDeadline ? `다음 마감 ${escapeHTML(p.nextDeadline)}` : ""}</div>
+        ${!matched ? `<div class="hrs-auto">🆕 자동 생성 탭 · 클릭하면 열림</div>` : `<div class="hrs-auto" style="color:var(--text-mute);">↗ 프로젝트 탭 열기</div>`}
       </div>`;
     }).join("") + `</div>`;
   }
