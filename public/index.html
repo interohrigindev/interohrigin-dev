@@ -2763,7 +2763,16 @@ function renderDiscussionThread(panel) {
             <button class="d-btn ${status === "reviewing" ? "primary" : ""}" onclick="setStatus('${panel}', '${it.id}', 'reviewing')">${status === "reviewing" ? "👀 검토중 해제" : "👀 검토중"}</button>
             <button class="d-btn ${status === "resolved" ? "" : "primary"}" onclick="setStatus('${panel}', '${it.id}', 'resolved')">${status === "resolved" ? "↩ 완료 취소" : "✅ 완료"}</button>
             <button class="d-btn" onclick="toggleReply('${panel}', '${it.id}')">↳ 답글</button>
+            <button class="d-btn" onclick="toggleMove('${panel}', '${it.id}')">↪ 프로젝트로 이동</button>
             <button class="d-btn" onclick="deleteDiscussion('${panel}', '${it.id}')">삭제</button>
+          </div>
+          <div class="move-row" id="move-row-${panel}-${it.id}" style="display:none;margin-top:8px;padding:8px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;">
+            <span style="font-size:12px;color:var(--text-dim);margin-right:6px;">이 의견을 옮길 프로젝트:</span>
+            <select id="move-sel-${panel}-${it.id}" class="d-input" style="width:auto;display:inline-block;padding:5px 10px;">
+              ${TABS.filter(t => t.key !== panel).map(t => `<option value="${t.key}">${t.emoji} ${t.label}</option>`).join("")}
+            </select>
+            <button class="d-btn primary" style="margin-left:6px;" onclick="moveDiscussion('${panel}', '${it.id}')">이동</button>
+            <button class="d-btn" onclick="toggleMove('${panel}', '${it.id}')">취소</button>
           </div>
           <div class="reply-compose" id="reply-compose-${panel}-${it.id}">
             <textarea id="reply-content-${panel}-${it.id}" placeholder="답글을 입력하세요."></textarea>
@@ -2944,6 +2953,31 @@ async function deleteDiscussion(panel, id) {
   }
   await fetchPanel(panel);
   renderDiscussionThread(panel);
+}
+
+// 의견을 다른 프로젝트(패널)로 이동
+function toggleMove(panel, id) {
+  const row = document.getElementById(`move-row-${panel}-${id}`);
+  if (row) row.style.display = row.style.display === "none" ? "" : "none";
+}
+async function moveDiscussion(panel, id) {
+  const sel = document.getElementById(`move-sel-${panel}-${id}`);
+  const toPanel = sel ? sel.value : "";
+  if (!toPanel || toPanel === panel) return;
+  const label = (TABS.find(t => t.key === toPanel) || {}).label || toPanel;
+  if (!backendConfigured()) { alert("서버 연결 상태에서만 이동할 수 있습니다."); return; }
+  try {
+    await api(`/api/messages?panel=${panel}&id=${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ moveTo: toPanel }),
+    });
+  } catch (e) { alert("이동 실패: " + e.message); return; }
+  // 원본/대상 패널 모두 갱신
+  await Promise.all([fetchPanel(panel), fetchPanel(toPanel)]);
+  renderDiscussionThread(panel);
+  renderDiscussionThread(toPanel);
+  updateUnread();
+  alert(`의견을 「${label}」(으)로 옮겼습니다.`);
 }
 
 // ======================================================

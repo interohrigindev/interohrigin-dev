@@ -1,4 +1,4 @@
-import { listMessages, addMessage, updateMessage, deleteMessage, getMessage } from "../_lib/storage";
+import { listMessages, addMessage, updateMessage, deleteMessage, getMessage, moveMessage } from "../_lib/storage";
 import { reflectStatusToSlack, postThreadReply, postChannelMessage } from "../_lib/slack-api";
 import { notifyNewMessage, notifyNewReply } from "../_lib/kakaowork";
 import type { Env, ImageRef } from "../_lib/storage";
@@ -79,6 +79,13 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env, waitUnt
   const id = url.searchParams.get("id");
   if (!id) return json({ error: "id required" }, 400);
   const body = await request.json<any>();
+
+  // 의견을 다른 프로젝트(패널)로 이동
+  if (body.moveTo) {
+    const moved = await moveMessage(env, panel, body.moveTo, id);
+    if (!moved) return json({ error: "이동할 의견을 찾지 못했거나 대상이 동일합니다." }, 400);
+    return json({ ok: true, moved: true, message: moved, toPanel: body.moveTo });
+  }
 
   // 원본 메시지
   const before = await getMessage(env, panel, id);

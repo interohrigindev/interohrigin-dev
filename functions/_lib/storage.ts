@@ -44,6 +44,7 @@ export interface Message {
   imageRefs?: ImageRef[]; // 첨부 이미지 참조 (KV `img:<id>`)
   fromSlack?: boolean;
   edited?: boolean;
+  movedFrom?: string;
 }
 
 const ALL_PANELS = ["overview","hr","cs","finance","ophe","ai-design","boomzap","completed","cost","future"];
@@ -129,6 +130,25 @@ export async function updateMessage(env: Env, panel: string, id: string, patch: 
 export async function deleteMessage(env: Env, panel: string, id: string): Promise<void> {
   const list = await listMessages(env, panel);
   await saveMessages(env, panel, list.filter(m => m.id !== id));
+}
+
+// 의견을 다른 패널(프로젝트)로 이동 — 내용/답글/상태/시각 그대로 보존
+export async function moveMessage(env: Env, fromPanel: string, toPanel: string, id: string): Promise<Message | null> {
+  if (!toPanel || fromPanel === toPanel) return null;
+  const from = await listMessages(env, fromPanel);
+  const idx = from.findIndex(m => m.id === id);
+  if (idx === -1) return null;
+  const msg = from[idx];
+  // 대상에 같은 id가 있으면 새 id 부여 (충돌 방지)
+  const to = await listMessages(env, toPanel);
+  if (to.some(m => m.id === id)) {
+    msg.id = "id:" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+  }
+  msg.movedFrom = fromPanel;
+  to.push(msg);
+  await saveMessages(env, toPanel, to);
+  await saveMessages(env, fromPanel, from.filter((_, i) => i !== idx));
+  return msg;
 }
 
 export async function deleteMessageByTs(env: Env, panel: string, ts: string): Promise<void> {
