@@ -21,6 +21,9 @@ export interface Env {
   KAKAOWORK_WEBHOOK_URL?: string;
   // 알림 메시지에 넣을 대시보드 주소(미설정 시 기본 pages.dev 사용)
   DASHBOARD_URL?: string;
+  // HR 플랫폼 프로젝트 현황 라이브 동기화 (ceo-staff API 프록시)
+  CEO_STAFF_TOKEN?: string;            // HR 플랫폼 Cloudflare의 CEO_STAFF_TOKEN 과 동일 값
+  HR_API_URL?: string;                 // 미설정 시 https://interohrigin-hr2.pages.dev
 }
 
 export interface Message {
