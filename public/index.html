@@ -181,6 +181,39 @@
     font-size: 11px; color: var(--accent-2); font-weight: 600;
   }
 
+  /* ===== 임원 직관 톤업: 상태 신호등 + 진행률 바 + 한눈 카드 (JS 주입) ===== */
+  .exec-headline .h-status {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 800; padding: 5px 14px; border-radius: 999px; margin-bottom: 12px;
+  }
+  .exec-headline .h-status .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .h-status.ontrack   { background: var(--green-soft);  color: #15803d; border: 1px solid #86efac; }
+  .h-status.ontrack .dot   { background: #22c55e; }
+  .h-status.delayed   { background: var(--yellow-soft); color: #b45309; border: 1px solid #fcd34d; }
+  .h-status.delayed .dot   { background: #f59e0b; }
+  .h-status.attention { background: var(--red-soft);    color: #b91c1c; border: 1px solid #fca5a5; }
+  .h-status.attention .dot { background: #ef4444; }
+  .h-status.done      { background: #e0e7ff;            color: #4338ca; border: 1px solid #c7d2fe; }
+  .h-status.done .dot      { background: #6366f1; }
+
+  .exec-headline .h-progress { margin: 2px 0 14px; }
+  .h-progress .hp-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+  .h-progress .hp-pct { font-size: 18px; font-weight: 800; color: var(--text); }
+  .h-progress .hp-bar { height: 14px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .h-progress .hp-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .7s ease; }
+  .h-progress .hp-fill.green  { background: linear-gradient(90deg, #22c55e, #16a34a); }
+  .h-progress .hp-fill.yellow { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .h-progress .hp-fill.red    { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+  .exec-headline .h-focus { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .h-focus .hf {
+    flex: 1; min-width: 240px; background: white; border: 1px solid #c7d2fe;
+    border-radius: 10px; padding: 11px 14px; display: flex; gap: 11px; align-items: flex-start;
+  }
+  .h-focus .hf .hf-ic { font-size: 20px; line-height: 1.2; flex-shrink: 0; }
+  .h-focus .hf .hf-k { font-size: 11px; color: var(--text-dim); font-weight: 700; margin-bottom: 2px; }
+  .h-focus .hf .hf-v { font-size: 13.5px; color: var(--text); font-weight: 600; line-height: 1.45; }
+
   /* ===== KPI ===== */
   .kpi-row {
     display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
@@ -3000,6 +3033,57 @@ async function saveSettings() {
 }
 
 // ======================================================
+// ======================================================
+// 임원 직관 톤업 — 프로젝트별 상태/진행률/한눈 카드 (헤드라인에 주입)
+// ======================================================
+// cls: ontrack(정상) / delayed(지연·보완) / attention(주의·초과·보류) / done(완료·운영)
+const PROJECT_BRIEF = {
+  overview:    { status: "전사 진행중",       cls: "ontrack",   progress: 74, next: "6/9 재무 자금계획 베타 오픈", need: "지연 1건(AI 디자인) 해소" },
+  hr:          { status: "진행중 · 마감 보완", cls: "delayed",   progress: 73, next: "메뉴별 테스트 마무리 → 전사 확산", need: "대표·이사 검토 6건" },
+  cs:          { status: "지연 · 마감 초과",   cls: "attention", progress: 75, next: "배포 + 사용자 교육 완료", need: "4/30 마감 초과 해소" },
+  finance:     { status: "정상 진행",          cls: "ontrack",   progress: 83, next: "6/9 베타 오픈", need: "베타 일정 6/9 확정" },
+  ophe:        { status: "베타 오픈 · 운영중",  cls: "done",      progress: 83, next: "6/30 정식 운영 전환", need: "콘텐츠 업로드·운영 안정화" },
+  "ai-design": { status: "지연 · 보류(P2)",     cls: "attention", progress: 43, next: "통합 테스트 완료", need: "HR 안정화 후 재개" },
+  boomzap:     { status: "완료 · 운영중",       cls: "done",      progress: 100, next: "콘텐츠 운영·관리", need: "" },
+  completed:   { status: "대부분 완료 · 운영중", cls: "done",      progress: 95, next: "interohrigin.io 도메인 연결 (I&C)", need: "" },
+};
+
+function enhanceProjectHeadlines() {
+  for (const panel in PROJECT_BRIEF) {
+    const b = PROJECT_BRIEF[panel];
+    const hl = document.querySelector(`section[data-panel="${panel}"] .exec-headline`);
+    if (!hl || hl.dataset.enhanced) continue;
+    hl.dataset.enhanced = "1";
+    const fillCls = b.progress >= 100 ? "green" : (b.cls === "attention" ? "red" : (b.cls === "delayed" ? "yellow" : (b.cls === "done" ? "green" : "")));
+
+    // 1) 상태 신호등 — 맨 위
+    const status = document.createElement("div");
+    status.className = "h-status " + b.cls;
+    status.innerHTML = `<span class="dot"></span>${b.status}`;
+    hl.insertBefore(status, hl.firstChild);
+
+    // 2) 진행률 바 — 제목 아래
+    const prog = document.createElement("div");
+    prog.className = "h-progress";
+    prog.innerHTML = `<div class="hp-label"><span>진행률</span><span class="hp-pct">${b.progress}%</span></div>
+      <div class="hp-bar"><div class="hp-fill ${fillCls}" style="width:0%"></div></div>`;
+    const h2 = hl.querySelector("h2");
+    if (h2 && h2.nextSibling) hl.insertBefore(prog, h2.nextSibling); else hl.appendChild(prog);
+    // 막대 애니메이션
+    requestAnimationFrame(() => { const f = prog.querySelector(".hp-fill"); if (f) f.style.width = b.progress + "%"; });
+
+    // 3) 한눈 카드 — 요약 아래
+    const focus = document.createElement("div");
+    focus.className = "h-focus";
+    focus.innerHTML = `
+      <div class="hf"><span class="hf-ic">🎯</span><div><div class="hf-k">다음 할 일 · 마일스톤</div><div class="hf-v">${b.next}</div></div></div>
+      ${b.need ? `<div class="hf"><span class="hf-ic">🙋</span><div><div class="hf-k">지금 필요한 것</div><div class="hf-v">${b.need}</div></div></div>` : ""}`;
+    const summary = hl.querySelector(".h-summary");
+    if (summary && summary.nextSibling) hl.insertBefore(focus, summary.nextSibling); else hl.appendChild(focus);
+  }
+}
+
+// ======================================================
 // 탭
 // ======================================================
 function buildTabs() {
@@ -3116,6 +3200,7 @@ safe("timeline", () => {
 safe("charts", () => { renderBarChart("progress-chart", PROGRESS_DATA); renderBarChart("activity-chart", ACTIVITY_DATA, "var(--accent)"); });
 safe("costs", () => renderCosts());
 safe("discussions", () => TABS.forEach(t => buildDiscussion(t.key)));
+safe("brief", () => enhanceProjectHeadlines());
 safe("genTime", () => { document.getElementById("gen-time").textContent = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }); });
 safe("modal", () => {
   document.getElementById("settings-modal").addEventListener("click", e => {
