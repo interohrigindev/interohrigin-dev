@@ -52,19 +52,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
-    // "프로젝트 & 업무" 보드 = project_boards, 단계 = pipeline_stages, 이름 = employees
-    const [boards, stages, emps] = await Promise.all([
-      ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 100 }),
-      ceoStaff(env, "query", { table: "pipeline_stages", select: "project_id,stage_name,status,deadline,stage_order", limit: 2000 }).catch(() => []),
-      ceoStaff(env, "query", { table: "employees", select: "id,name", limit: 500 }).catch(() => []),
-    ]);
-    if (boards && boards.error) return json({ ok: false, error: boards.error });
-
+    // 1) 직원 목록 → 대상(차주용) id (보드가 100개+ 라 전체조회 대신 차주용 것만 서버필터)
+    const emps = await ceoStaff(env, "query", { table: "employees", select: "id,name", limit: 1000 }).catch(() => []);
     const empMap: Record<string, string> = {};
     for (const e of (Array.isArray(emps) ? emps : [])) if (e && e.id) empMap[e.id] = e.name;
     const nm = (id: any) => (id && empMap[id]) || null;
 
-    // 대상 직원(차주용) id 찾기 — 이 직원이 담당(담당/관리/리더/임원)인 프로젝트만 표시
     const targetName = env.HR_TARGET_EMPLOYEE || "차주용";
     const target = (Array.isArray(emps) ? emps : []).find((e: any) => e && e.name === targetName);
     if (!target) {
@@ -74,6 +67,31 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const isMine = (p: any) =>
       (Array.isArray(p.assignee_ids) && p.assignee_ids.includes(tid)) ||
       p.manager_id === tid || p.leader_id === tid || p.executive_id === tid;
+
+    // 2) 차주용이 담당/리더/임원/실무자인 보드만 PostgREST or 필터로 조회 (limit 무관)
+    const orFilter = `(manager_id.eq.${tid},leader_id.eq.${tid},executive_id.eq.${tid},assignee_ids.cs.{${tid}})`;
+    let boards: any;
+    try {
+      boards = await ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 300, filters: { or: orFilter } });
+      if (boards && boards.error) throw new Error(typeof boards.error === "string" ? boards.error : JSON.stringify(boards.error));
+      if (!Array.isArray(boards)) throw new Error("unexpected boards response");
+    } catch (_e) {
+      // 폴백: 전체(최대 1000) 가져와 클라이언트 필터
+      const all = await ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 1000 });
+      boards = (Array.isArray(all) ? all : []).filter(isMine);
+    }
+
+    // 3) 해당 보드들의 단계만 조회
+    const boardIds = boards.map((b: any) => b.id).filter(Boolean);
+    let stages: any = [];
+    if (boardIds.length) {
+      stages = await ceoStaff(env, "query", {
+        table: "pipeline_stages",
+        select: "project_id,stage_name,status,deadline,stage_order",
+        limit: 3000,
+        filters: { project_id: `in.(${boardIds.join(",")})` },
+      }).catch(() => []);
+    }
 
     // 프로젝트별 단계 모음
     const stagesByProj: Record<string, any[]> = {};
