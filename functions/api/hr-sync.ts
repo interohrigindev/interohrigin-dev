@@ -42,7 +42,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const sp = new URL(request.url).searchParams;
-  const fresh = sp.get("fresh") === "1" || sp.get("all") === "1";
+  const fresh = sp.get("fresh") === "1" || sp.get("all") === "1" || !!sp.get("find");
   const cacheKey = "hr_sync";
   if (!fresh) {
     try {
@@ -67,6 +67,25 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const isMine = (p: any) =>
       (Array.isArray(p.assignee_ids) && p.assignee_ids.includes(tid)) ||
       p.manager_id === tid || p.leader_id === tid || p.executive_id === tid;
+
+    // 진단: 이름으로 보드 직접 검색 (?find=AI 뉴스)
+    const findTerm = sp.get("find");
+    if (findTerm) {
+      const matches = await ceoStaff(env, "query", { table: "project_boards", select: "*", limit: 50, filters: { project_name: `ilike.*${findTerm}*` } });
+      const named = (Array.isArray(emps) ? emps : []).filter((e: any) => e && e.name === targetName).map((e: any) => ({ id: e.id, name: e.name }));
+      return json({
+        ok: true, debug: "find", findTerm, targetName, currentTargetId: tid,
+        employeesNamedTarget: named,
+        matches: (Array.isArray(matches) ? matches : []).map((p: any) => ({
+          name: p.project_name, status: p.status,
+          manager_id: p.manager_id, manager_name: nm(p.manager_id),
+          leader_id: p.leader_id, leader_name: nm(p.leader_id),
+          executive_id: p.executive_id, executive_name: nm(p.executive_id),
+          assignee_ids: p.assignee_ids, assignee_names: (p.assignee_ids || []).map(nm),
+          isMineByCurrentTid: isMine(p),
+        })),
+      });
+    }
 
     // 2) 차주용이 담당/리더/임원/실무자인 보드만 PostgREST or 필터로 조회 (limit 무관)
     const orFilter = `(manager_id.eq.${tid},leader_id.eq.${tid},executive_id.eq.${tid},assignee_ids.cs.{${tid}})`;
