@@ -921,6 +921,25 @@
   .topbar .header-meta strong { color: var(--ink) !important; }
   .top-btn { background: var(--ink) !important; color: #fff !important; border: 1px solid var(--ink) !important; border-radius: 8px !important; font-weight: 700 !important; padding: 9px 14px; transition: .14s; }
   .top-btn:hover { background: var(--accent) !important; border-color: var(--accent) !important; }
+  /* 브랜드 락 + 싱크 필 (appbar) */
+  .topbar .inner { align-items: center; }
+  .brand-lock { display: flex; align-items: center; gap: 13px; min-width: 0; }
+  .brand-mark { width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0; background: var(--ink); display: grid; place-items: center; color: #fff; font-weight: 800; letter-spacing: -.04em; font-size: 18px; }
+  .brand-text .eyebrow { font-size: 10.5px; font-weight: 800; letter-spacing: .18em; color: var(--ink-3); text-transform: uppercase; margin: 0; }
+  .brand-text h1 { font-size: 19px !important; font-weight: 800; letter-spacing: -.03em; color: var(--ink) !important; }
+  .brand-text h1 small { display: block; font-size: 11px; font-weight: 600; color: var(--ink-4) !important; margin-top: 2px; }
+  .meta-buttons { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .sync-pill { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); padding: 7px 13px; border-radius: 99px; }
+  .sync-pill strong { color: var(--ink); }
+  .sync-pill .live { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: bld-pulse 2.4s infinite; }
+  @keyframes bld-pulse { 0%{box-shadow:0 0 0 0 rgba(18,145,79,.45);} 70%{box-shadow:0 0 0 6px rgba(18,145,79,0);} 100%{box-shadow:0 0 0 0 rgba(18,145,79,0);} }
+  #hd-stats { font-size: 12px; font-weight: 700; color: var(--ink-3); background: var(--surface-2); border: 1px solid var(--line); padding: 7px 13px; border-radius: 99px; }
+  #hd-stats strong { color: var(--ink); }
+  /* 탭 아이콘 */
+  .tab { display: inline-flex !important; align-items: center; gap: 7px; }
+  .tab .tab-ic { display: inline-flex; opacity: .7; }
+  .tab .tab-ic svg { width: 16px; height: 16px; }
+  .tab.active .tab-ic { opacity: 1; }
 
   /* 탭바 — 밑줄 강조 */
   .tab-nav { background: #fff !important; border-bottom: 1px solid var(--border) !important; box-shadow: none !important; }
@@ -1004,19 +1023,19 @@
 <!-- ===== 헤더 ===== -->
 <header class="topbar">
   <div class="inner">
-    <div>
-      <div class="eyebrow">INTEROHRIGIN · Executive Briefing</div>
-      <h1>인터오리진 개발 프로젝트 종합 현황<small>2026년 3~5월 · 9개 프로젝트 · 임원진 검토용 · 지속 커뮤니케이션 페이지</small></h1>
+    <div class="brand-lock">
+      <div class="brand-mark">IO</div>
+      <div class="brand-text">
+        <div class="eyebrow">INTEROHRIGIN · 경영진 대시보드</div>
+        <h1>개발 프로젝트 종합 현황<small>9개 프로젝트 · 임원 검토 · 실시간 커뮤니케이션</small></h1>
+      </div>
     </div>
     <div class="meta-buttons">
-      <div class="header-meta">
-        <div>보고일 <strong>2026-05-27 (목)</strong> · 담당 <strong>차주용 (PM)</strong></div>
-        <div>의견 총 <strong id="hd-fb-total">0</strong> · ✅완료 <strong id="hd-fb-resolved">0</strong> · 👀확인중 <strong id="hd-fb-reviewing">0</strong> · <span style="color:#fca5a5;">🔴미확인 <strong id="hd-fb-open" style="color:#fff;">0</strong></span></div>
-        <div>갱신 <strong id="hd-updated">—</strong></div>
-      </div>
-      <button class="top-btn" onclick="hardReload()" title="브라우저 캐시까지 비우고 페이지를 새로 받아옴 (프로젝트 정보 최신화)">🔄 데이터 새로고침</button>
-      <button class="top-btn" onclick="openSettingsModal()">⚙️ 설정</button>
-      <button class="top-btn" onclick="window.print()">📄 PDF</button>
+      <span class="sync-pill"><span class="live"></span><span class="txt">실시간 동기화 · 갱신 <strong id="hd-updated">—</strong></span></span>
+      <span class="header-meta" id="hd-stats" title="의견 현황">미확인 <strong id="hd-fb-open">0</strong> · 확인중 <strong id="hd-fb-reviewing">0</strong> · 완료 <strong id="hd-fb-resolved">0</strong><span id="hd-fb-total" style="display:none"></span></span>
+      <button class="top-btn" onclick="hardReload()" title="캐시까지 비우고 페이지를 새로 받아옴">새로고침</button>
+      <button class="top-btn" onclick="openSettingsModal()">설정</button>
+      <button class="top-btn" onclick="window.print()">인쇄/PDF</button>
     </div>
   </div>
 </header>
@@ -2772,7 +2791,7 @@ function ensureHrProjectTab(p) {
     if (nav) {
       const tab = document.createElement("button");
       tab.className = "tab"; tab.dataset.panel = key;
-      tab.innerHTML = `<span class="tab-emoji">🆕</span>${escapeHTML(p.name)}<span class="unread-dot"></span>`;
+      tab.innerHTML = `<span class="tab-ic">${iconSvg("layers", 16)}</span>${escapeHTML(p.name)}<span class="unread-dot"></span>`;
       tab.addEventListener("click", () => activatePanel(key));
       nav.appendChild(tab);
     }
@@ -3475,9 +3494,10 @@ function enhanceProjectHeadlines() {
 // ======================================================
 // 탭
 // ======================================================
+const TAB_ICONS = { overview:"home", hr:"users", cs:"headset", finance:"wallet", ophe:"droplet", "ai-design":"palette", irc:"building", completed:"check", cost:"receipt", future:"rocket" };
 function buildTabs() {
   const c = document.getElementById("tab-nav-inner");
-  c.innerHTML = TABS.map(t => `<button class="tab ${t.key === "overview" ? "active" : ""}" data-panel="${t.key}"><span class="tab-emoji">${t.emoji}</span>${t.label}<span class="unread-dot"></span></button>`).join("");
+  c.innerHTML = TABS.map(t => `<button class="tab ${t.key === "overview" ? "active" : ""}" data-panel="${t.key}"><span class="tab-ic">${iconSvg(TAB_ICONS[t.key] || "dot", 16)}</span>${t.label}<span class="unread-dot"></span></button>`).join("");
   c.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
   });
