@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>인터오리진 개발 프로젝트 종합 현황 (경영진 보고)</title>
 <style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
   :root {
     --bg: #f5f7fa;
     --panel: #ffffff;
@@ -769,6 +770,118 @@
     .panel { display: block !important; page-break-before: always; }
     .panel:first-of-type { page-break-before: auto; }
   }
+
+  /* =======================================================================
+     BOLD 에디토리얼 스킨 (Claude Design 리뉴얼) — 기능/마크업 유지, 비주얼 전면 재정의
+     ======================================================================= */
+  :root {
+    --bg: #ffffff; --panel: #ffffff; --panel-2: #f3f4f7;
+    --border: #e7e9ef; --border-strong: #0e1116;
+    --text: #0e1116; --text-soft: #353b48; --text-dim: #696f7e; --text-mute: #9aa0ad;
+    --accent: #2b39c9; --accent-2: #1f2aa3; --accent-soft: #eceefc;
+    --green: #12914f; --green-soft: #e4f4eb;
+    --yellow: #d97a00; --yellow-soft: #fbeed8;
+    --orange: #d97a00; --orange-soft: #fbeed8;
+    --red: #e0271b; --red-soft: #fce6e4;
+    --purple: #7a35cc; --purple-soft: #efe4fb;
+    --pink: #db2777; --pink-soft: #fce7f3;
+    --teal: #12914f; --teal-soft: #e4f4eb;
+    --grey: #696f7e; --grey-soft: #f3f4f7;
+    --ink: #0e1116;
+  }
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, "Noto Sans KR", sans-serif;
+    font-size: 15px; letter-spacing: -0.012em; line-height: 1.55; background: var(--bg);
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--ink); color: #fff; }
+  a { font-weight: 600; }
+
+  /* 헤더 — 화이트 + 잉크 2px 라인 */
+  .topbar { background: #fff !important; color: var(--ink) !important; border-bottom: 2px solid var(--ink) !important; padding: 16px 28px !important; }
+  .topbar .eyebrow { color: var(--text-dim) !important; letter-spacing: .18em; font-weight: 800; }
+  .topbar h1 { color: var(--ink) !important; font-weight: 800; letter-spacing: -.03em; }
+  .topbar h1 small { color: var(--text-dim) !important; font-weight: 600; }
+  .topbar .header-meta, .topbar .header-meta div { color: var(--text-dim) !important; }
+  .topbar .header-meta strong { color: var(--ink) !important; }
+  .top-btn { background: var(--ink) !important; color: #fff !important; border: 1px solid var(--ink) !important; border-radius: 8px !important; font-weight: 700 !important; padding: 9px 14px; transition: .14s; }
+  .top-btn:hover { background: var(--accent) !important; border-color: var(--accent) !important; }
+
+  /* 탭바 — 밑줄 강조 */
+  .tab-nav { background: #fff !important; border-bottom: 1px solid var(--border) !important; box-shadow: none !important; }
+  .tab { color: var(--text-dim) !important; font-weight: 700 !important; border: none !important; border-bottom: 3px solid transparent !important; border-radius: 0 !important; background: none !important; padding: 15px 14px 13px !important; }
+  .tab:hover { color: var(--ink) !important; }
+  .tab.active { color: var(--ink) !important; background: none !important; border-bottom: 3px solid var(--ink) !important; box-shadow: none !important; }
+  .tab .unread-dot { background: var(--red) !important; color: #fff !important; }
+  .tab.has-unread .unread-dot { background: var(--red) !important; }
+
+  /* KPI — 에디토리얼 숫자 밴드 */
+  .kpi-row { gap: 0 !important; border: 2px solid var(--ink) !important; border-radius: 10px !important; overflow: hidden; }
+  .kpi { background: #fff !important; border: none !important; border-right: 1px solid var(--border) !important; border-radius: 0 !important; padding: 22px 20px !important; }
+  .kpi::before { display: none !important; }
+  .kpi .label { color: var(--text-dim) !important; font-weight: 800 !important; text-transform: uppercase; letter-spacing: .08em; }
+  .kpi .value { font-size: 42px !important; font-weight: 800 !important; letter-spacing: -.05em !important; color: var(--ink) !important; line-height: 1; }
+  .kpi.k-red .value, .kpi.k-orange .value { color: var(--red) !important; }
+  .kpi.k-green .value { color: var(--green) !important; }
+  .kpi.k-purple .value { color: var(--accent) !important; }
+  .kpi .sub { color: var(--text-mute) !important; }
+
+  /* 신호등 — 단색 솔리드 (.h-status) */
+  .exec-headline .h-status, .h-status { color: #fff !important; font-weight: 800 !important; border: none !important; }
+  .h-status .dot { background: rgba(255,255,255,.9) !important; }
+  .h-status.ontrack { background: var(--green) !important; }
+  .h-status.delayed { background: var(--yellow) !important; }
+  .h-status.attention { background: var(--red) !important; }
+  .h-status.done { background: #4a57d6 !important; }
+  .h-status.attention .dot { animation: bld-blink 1.4s infinite; }
+  @keyframes bld-blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+  /* 진행률 — 사각 솔리드 */
+  .hp-bar, .h-progress .hp-bar { border-radius: 0 !important; border: 1px solid var(--border) !important; background: var(--panel-2) !important; }
+  .hp-fill, .h-progress .hp-fill { border-radius: 0 !important; background: var(--ink) !important; }
+  .hp-fill.green { background: var(--green) !important; }
+  .hp-fill.yellow { background: var(--yellow) !important; }
+  .hp-fill.red { background: var(--red) !important; }
+  .h-progress .hp-pct { color: var(--ink) !important; font-weight: 800; }
+
+  /* 태그/칩 */
+  .exec-headline .h-tag, .h-tag { background: var(--ink) !important; color: #fff !important; border: none !important; border-radius: 6px !important; font-weight: 800 !important; }
+  .h-focus .hf { border: 1.5px solid var(--border) !important; border-radius: 10px !important; }
+
+  /* 헤드라인 카드 — 화이트 + 잉크 2px */
+  .exec-headline { background: #fff !important; border: 2px solid var(--ink) !important; border-radius: 12px !important; }
+  .exec-headline h2 { font-weight: 800; letter-spacing: -.035em; }
+  .exec-headline .h-eyebrow { color: var(--text-dim) !important; font-weight: 800; }
+
+  /* 일반 카드/박스 */
+  .card, .commits-box, .group-box, .stat, .db-node, .timeline-event, .hrs-card, .c-activity, .mile, .rm-card, .mod-box, .sys-mod { border-color: var(--border) !important; }
+  .card { border: 1.5px solid var(--border) !important; border-radius: 12px !important; }
+  .commits-box { border: 1.5px solid var(--border) !important; border-radius: 12px !important; }
+
+  /* 섹션 제목 */
+  .section-head h2, .exec-headline h2, .c-title, .group-head .title { letter-spacing: -.03em; }
+  .section-head h2 { border-bottom: 2px solid var(--ink); padding-bottom: 10px; font-weight: 800; }
+
+  /* 입력/버튼 (의견·답글) */
+  .d-input, .d-text, .d-select { border: 1.5px solid var(--border) !important; border-radius: 8px !important; font-family: inherit; }
+  .d-input:focus, .d-text:focus { border-color: var(--ink) !important; box-shadow: 0 0 0 3px rgba(14,17,22,.07) !important; }
+  .d-btn { border: 1.5px solid var(--border) !important; border-radius: 8px !important; font-weight: 700 !important; }
+  .d-btn.primary { background: var(--ink) !important; border-color: var(--ink) !important; color: #fff !important; }
+  .d-btn.primary:hover { background: var(--accent) !important; border-color: var(--accent) !important; }
+  .d-cat-chip { border-radius: 99px !important; font-weight: 800 !important; }
+  .d-cat-chip.active { background: var(--ink) !important; border-color: var(--ink) !important; color: #fff !important; }
+  .d-slackbox { border: 1.5px solid var(--border) !important; border-radius: 10px !important; }
+  .d-slackbox.focus { border-color: var(--ink) !important; box-shadow: 0 0 0 3px rgba(14,17,22,.07) !important; }
+
+  /* 의견 카드 — 카테고리 잉크 좌측 라인 */
+  .d-item { border: 1.5px solid var(--border) !important; border-left: 4px solid var(--ink) !important; border-radius: 10px !important; }
+  .d-item.cat-request { border-left-color: var(--accent) !important; }
+  .d-item.cat-decision { border-left-color: var(--red) !important; }
+  .d-item.cat-feedback { border-left-color: var(--green) !important; }
+  .badge, .b-completed, .b-progress, .b-warn { font-weight: 800 !important; }
+
+  /* 카드형 통계/타임라인 디테일 라인 강조 */
+  table.t th, .tbl th { border-bottom: 2px solid var(--ink) !important; }
 </style>
 </head>
 <body>
