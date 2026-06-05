@@ -776,9 +776,18 @@
      ======================================================================= */
   :root {
     --bg: #ffffff; --panel: #ffffff; --panel-2: #f3f4f7;
+    --surface: #ffffff; --surface-2: #f3f4f7; --line: #e7e9ef; --line-2: #0e1116;
     --border: #e7e9ef; --border-strong: #0e1116;
     --text: #0e1116; --text-soft: #353b48; --text-dim: #696f7e; --text-mute: #9aa0ad;
+    --ink: #0e1116; --ink-2: #353b48; --ink-3: #696f7e; --ink-4: #9aa0ad;
+    --brand: #2b39c9; --brand-2: #1f2aa3; --brand-ink: #1a2390; --brand-soft: #eceefc; --brand-line: #c9cef6;
     --accent: #2b39c9; --accent-2: #1f2aa3; --accent-soft: #eceefc;
+    --ok: #12914f; --ok-soft: #e4f4eb; --ok-line: #12914f; --ok-ink: #0c6e3c;
+    --warn: #d97a00; --warn-soft: #fbeed8; --warn-line: #d97a00; --warn-ink: #9c5800;
+    --alert: #e0271b; --alert-soft: #fce6e4; --alert-line: #e0271b; --alert-ink: #b21d13;
+    --done: #4a57d6; --done-soft: #e8eafc; --done-line: #4a57d6; --done-ink: #333fb0;
+    --info: #1f6fe0; --info-soft: #e6f0fd; --info-line: #1f6fe0; --info-ink: #1857b3;
+    --violet: #7a35cc; --violet-soft: #efe4fb; --violet-line: #7a35cc; --violet-ink: #5b249e;
     --green: #12914f; --green-soft: #e4f4eb;
     --yellow: #d97a00; --yellow-soft: #fbeed8;
     --orange: #d97a00; --orange-soft: #fbeed8;
@@ -787,8 +796,114 @@
     --pink: #db2777; --pink-soft: #fce7f3;
     --teal: #12914f; --teal-soft: #e4f4eb;
     --grey: #696f7e; --grey-soft: #f3f4f7;
-    --ink: #0e1116;
+    --r-sm: 6px; --r: 10px; --r-lg: 12px; --r-xl: 16px;
+    --sh-1: 0 1px 2px rgba(14,17,22,.04); --sh-2: 0 4px 14px rgba(14,17,22,.07); --sh-3: 0 14px 36px rgba(14,17,22,.13);
+    --maxw: 1240px;
   }
+
+  /* ── BOLD 프로토타입 컴포넌트 (종합현황/프로젝트 상세용) ── */
+  .stack { display: flex; flex-direction: column; gap: 44px; }
+  .block-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+  .block-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; color: var(--ink); display: inline-flex; align-items: center; gap: 10px; }
+  .block-head .desc { font-size: 13px; color: var(--ink-3); font-weight: 500; }
+  .block-head .kicker { font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
+  .block-head .kicker svg { color: var(--brand); width: 14px; height: 14px; }
+  .bgrid { display: grid; gap: 18px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .signal { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; font-size: 12px; font-weight: 800; padding: 6px 13px; border-radius: 99px; white-space: nowrap; color: #fff; letter-spacing: -.01em; }
+  .signal .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.9); flex-shrink: 0; }
+  .s-ok { background: var(--ok); } .s-warn { background: var(--warn); } .s-alert { background: var(--alert); } .s-done { background: var(--done); } .s-info { background: var(--info); } .s-violet { background: var(--violet); }
+  .s-alert .dot { animation: bld-blink 1.4s infinite; }
+  .prog { display: flex; flex-direction: column; gap: 7px; }
+  .prog-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .prog-top .lbl { font-size: 11px; color: var(--ink-3); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .prog-top .pct { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -.03em; }
+  .prog-track { height: 8px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--line); }
+  .prog-fill { height: 100%; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+  .f-ontrack, .f-ok { background: var(--ok); } .f-delayed, .f-warn { background: var(--warn); } .f-attention, .f-alert { background: var(--alert); } .f-done { background: var(--done); }
+  .kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border: 2px solid var(--ink); border-radius: var(--r); overflow: hidden; }
+  .kpi-strip .kpi { background: var(--surface); padding: 22px 20px; border-right: 1px solid var(--line); }
+  .kpi-strip .kpi:last-child { border-right: none; }
+  .kpi-strip .k-label { font-size: 11px; color: var(--ink-3); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+  .kpi-strip .k-value { font-size: 46px; font-weight: 800; letter-spacing: -.05em; color: var(--ink); line-height: 1; margin-top: 8px; }
+  .kpi-strip .kpi.k-alert .k-value { color: var(--alert); } .kpi-strip .kpi.k-warn .k-value { color: var(--warn); } .kpi-strip .kpi.k-done .k-value { color: var(--done); }
+  .kpi-strip .k-sub { font-size: 11px; color: var(--ink-4); margin-top: 8px; font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 99px; background: var(--surface); border: 1.5px solid var(--line); color: var(--ink-2); }
+  .chip svg { width: 13px; height: 13px; }
+  .hero { border: 2px solid var(--ink); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
+  .hero-grid { display: grid; grid-template-columns: 1fr 280px; }
+  .hero-main { padding: 34px 36px; border-right: 2px solid var(--ink); }
+  .hero-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .hero-h1 { font-size: 40px; font-weight: 800; letter-spacing: -.045em; line-height: 1.12; margin: 12px 0 18px; color: var(--ink); }
+  .hero-h1 .ok { color: var(--ok); } .hero-h1 .br { color: var(--brand); }
+  .hero-lead { font-size: 16px; color: var(--ink-2); line-height: 1.6; margin-bottom: 22px; max-width: 660px; }
+  .hero-lead strong { color: var(--alert); font-weight: 800; } .hero-lead .br { color: var(--brand); font-weight: 800; }
+  .hero-chips { display: flex; gap: 9px; flex-wrap: wrap; }
+  .hero-side { padding: 34px 32px; display: flex; flex-direction: column; justify-content: center; background: var(--surface-2); }
+  .hero-side .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+  .hero-pct { font-size: 76px; font-weight: 800; letter-spacing: -.06em; line-height: .95; color: var(--ink); margin: 6px 0 16px; }
+  .hero-side .note { font-size: 12px; color: var(--ink-3); margin-top: 12px; font-weight: 600; }
+  .pcard { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 0; cursor: pointer; transition: .16s; display: flex; flex-direction: column; text-align: left; overflow: hidden; width: 100%; }
+  .pcard .pc-bar { height: 6px; background: var(--ink); }
+  .pcard.st-attention .pc-bar { background: var(--alert); } .pcard.st-delayed .pc-bar { background: var(--warn); } .pcard.st-ontrack .pc-bar { background: var(--ok); } .pcard.st-done .pc-bar { background: var(--done); }
+  .pcard:hover { box-shadow: var(--sh-3); transform: translateY(-3px); border-color: var(--ink); }
+  .pcard-inner { padding: 20px 21px; display: flex; flex-direction: column; gap: 15px; }
+  .pcard-top { display: flex; align-items: flex-start; gap: 13px; }
+  .pcard-ic { width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; background: var(--ink); color: #fff; }
+  .pcard-ic svg { width: 22px; height: 22px; }
+  .pcard-ic.st-attention { background: var(--alert); } .pcard-ic.st-delayed { background: var(--warn); } .pcard-ic.st-ontrack { background: var(--ok); } .pcard-ic.st-done { background: var(--done); }
+  .pcard-title { flex: 1; min-width: 0; }
+  .pcard-title .nm { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -.03em; line-height: 1.25; }
+  .pcard-title .dp { font-size: 12px; color: var(--ink-4); font-weight: 700; margin-top: 3px; }
+  .pcard-what { font-size: 13px; color: var(--ink-3); line-height: 1.5; }
+  .pcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pcard-foot .due { font-size: 12px; color: var(--ink-2); font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+  .pcard-foot .due svg { width: 14px; height: 14px; opacity: .7; }
+  .openflag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 99px; background: var(--alert); color: #fff; }
+  .openflag svg { width: 13px; height: 13px; }
+  .inbox { border: 2px solid var(--alert); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
+  .inbox-head { display: flex; align-items: center; gap: 16px; padding: 22px 26px; background: var(--alert); color: #fff; }
+  .inbox-ic { width: 46px; height: 46px; border-radius: 10px; background: rgba(255,255,255,.18); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+  .inbox-ic svg { width: 24px; height: 24px; }
+  .inbox-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; color: #fff; }
+  .inbox-head .sub { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 2px; font-weight: 500; }
+  .inbox-count { margin-left: auto; font-size: 44px; font-weight: 800; color: #fff; letter-spacing: -.05em; line-height: 1; }
+  .inbox-count small { font-size: 15px; font-weight: 700; opacity: .85; }
+  .inbox-list { display: flex; flex-direction: column; }
+  .inbox-item { display: flex; align-items: center; gap: 16px; padding: 16px 26px; border-top: 1px solid var(--line); background: var(--surface); transition: .14s; text-align: left; width: 100%; border-left: none; border-right: none; border-bottom: none; cursor: pointer; }
+  .inbox-item:hover { background: var(--alert-soft); }
+  .inbox-item .ix-proj { font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 6px; flex-shrink: 0; background: var(--ink); color: #fff; min-width: 76px; text-align: center; }
+  .inbox-item .ix-text { flex: 1; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+  .inbox-item .ix-text strong { color: var(--ink); font-weight: 800; }
+  .inbox-item .ix-go { color: var(--ink-4); flex-shrink: 0; transition: .14s; }
+  .inbox-item:hover .ix-go { color: var(--alert); transform: translateX(3px); }
+  .inbox-item .ix-go svg { width: 20px; height: 20px; }
+  .mile-row { display: flex; gap: 16px; overflow-x: auto; padding: 2px 2px 10px; }
+  .mile { flex: 1 0 244px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 20px; position: relative; }
+  .mile.is-star { border: 2px solid var(--ink); background: var(--ink); }
+  .mile.is-star .m-date, .mile.is-star .m-title { color: #fff; } .mile.is-star .m-note { color: rgba(255,255,255,.8); } .mile.is-star .m-when { color: rgba(255,255,255,.7); } .mile.is-star .m-link { color: #fff; } .mile.is-star .star { color: #ffcb45; }
+  .mile .m-date { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -.03em; display: flex; align-items: center; gap: 6px; }
+  .mile .m-when { font-size: 11px; font-weight: 800; color: var(--ink-4); margin-left: auto; }
+  .mile .m-title { font-size: 16px; font-weight: 800; color: var(--ink); margin: 10px 0 6px; line-height: 1.3; letter-spacing: -.02em; }
+  .mile .m-note { font-size: 12.5px; color: var(--ink-3); line-height: 1.5; }
+  .mile .m-link { margin-top: 14px; font-size: 12px; font-weight: 800; color: var(--brand); display: inline-flex; align-items: center; gap: 5px; background: none; border: none; padding: 0; cursor: pointer; }
+  .mile .m-link svg { width: 14px; height: 14px; }
+  .sysmap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .sys-db { background: var(--ink); color: #fff; border-radius: var(--r); padding: 18px 28px; text-align: center; max-width: 440px; }
+  .sys-db .lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
+  .sys-db .nm { font-size: 17px; font-weight: 800; margin: 4px 0; letter-spacing: -.02em; }
+  .sys-db .id { font-size: 12px; opacity: .8; }
+  .sys-conn { width: 2px; height: 28px; background: var(--ink); }
+  .sys-mods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; }
+  .sys-mod { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 17px 18px; border-top: 5px solid var(--ink); }
+  .sys-mod.st-delayed { border-top-color: var(--warn); } .sys-mod.st-attention { border-top-color: var(--alert); } .sys-mod.st-ontrack { border-top-color: var(--ok); } .sys-mod.st-done { border-top-color: var(--done); }
+  .sys-mod .mn { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+  .sys-mod .ms { font-size: 12px; font-weight: 800; margin: 4px 0 7px; }
+  .sys-mod.st-delayed .ms { color: var(--warn); } .sys-mod.st-attention .ms { color: var(--alert); } .sys-mod.st-ontrack .ms { color: var(--ok); } .sys-mod.st-done .ms { color: var(--done); }
+  .sys-mod .md { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+  @media (max-width: 1080px) { .kpi-strip { grid-template-columns: repeat(3, 1fr); } .g3 { grid-template-columns: repeat(2, 1fr); } .hero-grid { grid-template-columns: 1fr; } .hero-main { border-right: none; border-bottom: 2px solid var(--ink); } .sys-mods { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 820px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } .g2, .g3 { grid-template-columns: 1fr; } .hero-h1 { font-size: 30px; } .hero-pct { font-size: 60px; } }
   html, body {
     font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, "Noto Sans KR", sans-serif;
     font-size: 15px; letter-spacing: -0.012em; line-height: 1.55; background: var(--bg);
@@ -918,133 +1033,10 @@
 <!-- ====================================================== -->
 <section class="panel active" data-panel="overview">
 
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">한 줄 요약</div>
-      <h2>9개 프로젝트 운영 — 3개 완료(붐앤잽·복지몰·Exhiboot), 6개 진행 평균 74%</h2>
-      <div class="h-summary">
-        가장 시급한 사항: <strong>AI 디자인 에이전트</strong>가 통합 테스트 단계에서 지연 중이고,
-        <strong>고객관리 CS 플랫폼</strong>은 마감(4/30) 초과 후 배포·교육 단계, <strong>HR 플랫폼</strong>은 4/13 마감 후 메뉴별 테스트 보완 중입니다.
-        가장 임박한 이벤트는 <strong>6월 9일 재무관리 자금계획 v1 베타 오픈</strong>입니다.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 6개</span>
-        <span class="h-tag">완료 3개</span>
-        <span class="h-tag">파이프라인 77% · 작업완료율 100%</span>
-        <span class="h-tag">지연 1건 (AI 디자인)</span>
-        <span class="h-tag">다음 마일스톤: 6/9 자금계획 베타</span>
-      </div>
-    </div>
+  <div id="ov-bold"></div>
 
-    <div class="section-head">
-      <h2>전체 KPI</h2>
-      <div class="desc">사내 프로젝트 대시보드 동기화 · 2026-05-28</div>
-    </div>
-    <div class="kpi-row">
-      <div class="kpi"><div class="label">총 프로젝트</div><div class="value">9</div><div class="sub">진행 6 · 완료 3</div></div>
-      <div class="kpi"><div class="label">진행중</div><div class="value">6</div><div class="sub">경영3 · 브랜드2 · 마케팅1</div></div>
-      <div class="kpi k-green"><div class="label">완료</div><div class="value">3</div><div class="sub">붐앤잽 · 복지몰 · Exhiboot</div></div>
-      <div class="kpi k-purple"><div class="label">파이프라인</div><div class="value">77%</div><div class="sub">작업 완료율 100%</div></div>
-      <div class="kpi k-orange"><div class="label">진행중 평균</div><div class="value">74%</div><div class="sub">6개 평균 진행률</div></div>
-      <div class="kpi k-red"><div class="label">지연 항목</div><div class="value">1</div><div class="sub">AI 디자인 (통합 테스트)</div></div>
-    </div>
-  </div>
-
-  <div class="section">
+  <div class="section" style="margin-top:44px">
     <div class="commits-box" id="hr-sync"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>진행중 프로젝트 (본부별)</h2>
-      <div class="desc">사내 대시보드와 동기화 (2026-05-28) · 행 클릭 시 상세 탭으로 이동</div>
-    </div>
-    <div class="group-box">
-      <div class="group-head">
-        <div class="title">📋 진행중 <span class="count">6개</span></div>
-        <div class="total">평균 진행률 <strong style="color:var(--accent);">74%</strong> · 경영관리 3 / 브랜드사업 2 / 마케팅영업 1</div>
-      </div>
-      <table class="ptable">
-        <thead>
-          <tr><th>프로젝트명</th><th>본부</th><th>진행상황</th><th class="center">우선순위</th><th class="center">마감일</th><th>현재단계</th><th class="right">작업</th></tr>
-        </thead>
-        <tbody id="ptable-active"></tbody>
-      </table>
-    </div>
-
-    <div class="group-box completed">
-      <div class="group-head">
-        <div class="title">✅ 완료된 프로젝트 <span class="count">3개</span></div>
-        <div class="total">평균 진행률 <strong style="color:var(--green);">100%</strong> · 작업 5개</div>
-      </div>
-      <table class="ptable">
-        <thead>
-          <tr><th>프로젝트명</th><th>본부</th><th>진행상황</th><th class="center">우선순위</th><th class="center">완료일</th><th>현재단계</th><th class="right">작업</th></tr>
-        </thead>
-        <tbody id="ptable-done"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>시각화</h2>
-      <div class="desc">프로젝트별 진행률 / 월별 의사결정 활동</div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📊</span> 프로젝트별 진행률</h3>
-        <div id="progress-chart"></div>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">📅</span> 월별 의사결정 문서 작성</h3>
-        <div id="activity-chart"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>인터오리진 통합 시스템 — 단일 Supabase, 4 모듈</h2>
-      <div class="desc">HR / CS / 복지몰 / 재무관리가 같은 데이터베이스를 공유 — 직원 마스터·권한 통합</div>
-    </div>
-    <div class="system-diagram">
-      <div class="db-node">
-        <div class="label">Shared Database</div>
-        <div class="name">통합 데이터베이스 (Pro $25/월)</div>
-        <div class="id">단일 인스턴스 · 직원/조직 마스터 공유</div>
-      </div>
-      <div class="module-row">
-        <div class="module-card">
-          <div class="mname">HR (메인)</div>
-          <div class="mstat" style="color:var(--green);">진행중 73%</div>
-          <div class="mdesc">채용 · 입사 · OJT · 평가 · 근태 · 결재 · 연차 · 임원 리포트</div>
-        </div>
-        <div class="module-card">
-          <div class="mname">CS (고객관리)</div>
-          <div class="mstat" style="color:var(--red);">진행중 75% · 긴급</div>
-          <div class="mdesc">고객 상담 · 문의 티켓 · AI 자동응답 보조 (배포·교육 단계)</div>
-        </div>
-        <div class="module-card">
-          <div class="mname">복지몰</div>
-          <div class="mstat" style="color:var(--purple);">완료 ✓ (4/24)</div>
-          <div class="mdesc">사내 복지몰 — 직원 포인트·주문·결제 (HR 통합 로그인)</div>
-        </div>
-        <div class="module-card">
-          <div class="mname">재무관리</div>
-          <div class="mstat" style="color:var(--accent);">진행중 63%</div>
-          <div class="mdesc">자금계획 · 고정비 · 자금이체 · 손익분석 (6/9 베타 예정)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="notice info">
-      <strong>이 페이지는 임원 검토용입니다.</strong>
-      각 프로젝트 탭에서 <strong>"이 프로젝트에 대한 의견·요청"</strong> 영역을 통해 차주용 PM과 직접 소통하실 수 있습니다.
-      작성한 의견은 서버에 저장되어 모든 임원에게 실시간으로 공유됩니다.
-    </div>
   </div>
 
   <!-- 전체 자유 의견 (overview discussion) -->
@@ -2596,6 +2588,160 @@ async function renderCommits(panel, fresh = false) {
 // ======================================================
 // HR 플랫폼 프로젝트 현황 라이브 동기화 (종합 현황 탭)
 // ======================================================
+// ====================================================================
+// BOLD 디자인 (Claude Design) — 아이콘 + 종합현황 데이터/렌더
+// ====================================================================
+const ICON_PATHS = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/>',
+  headset:'<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 16a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2Z"/><path d="M3 16a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2Z"/><path d="M18 18a4 4 0 0 1-4 4h-2"/>',
+  wallet:'<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M21 9v6h-5a3 3 0 0 1 0-6Z"/>',
+  droplet:'<path d="M12 2.7s6 5.4 6 10.3a6 6 0 0 1-12 0c0-4.9 6-10.3 6-10.3Z"/>',
+  palette:'<circle cx="13.5" cy="6.5" r="1.3"/><circle cx="17.5" cy="10.5" r="1.3"/><circle cx="8.5" cy="7.5" r="1.3"/><circle cx="6.5" cy="12.5" r="1.3"/><path d="M12 2a10 10 0 0 0 0 20 2.5 2.5 0 0 0 2.5-2.5c0-.7-.3-1.3-.7-1.8-.4-.5-.6-1-.6-1.5A2.2 2.2 0 0 1 15.4 14H18a4 4 0 0 0 4-4c0-4.4-4.5-8-10-8Z"/>',
+  building:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/>',
+  check:'<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  receipt:'<path d="M5 21V4a1 1 0 0 1 1-1l1.5 1L9 3l1.5 1L12 3l1.5 1L15 3l1.5 1L18 3a1 1 0 0 1 1 1v17l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2Z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  rocket:'<path d="M5 16c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.7a1.9 1.9 0 0 0-3 0Z"/><path d="M9 14c-1-3 1-9 7-11 0 6-3 9-6 10Z"/><path d="M14 7a2.5 2.5 0 1 0 3 3"/><path d="M9.5 13.5 6 12c.5-2 2-3 4-3"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/>',
+  bag:'<path d="M5 8h14l-1 12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 8Z"/><path d="M9 11V7a3 3 0 0 1 6 0v4"/>',
+  ticket:'<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/>',
+  alert:'<path d="M10.3 3.3 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
+  flag:'<path d="M4 21V4"/><path d="M4 4h13l-2.5 4L17 12H4"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  arrowR:'<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+  bell:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  star:'<path d="M12 3.5 14.6 9l6 .5-4.6 4 1.4 5.9L12 16.5 6.6 19.4 8 13.5l-4.6-4 6-.5Z"/>',
+  layers:'<path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/>',
+  print:'<path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/>',
+  dot:'<circle cx="12" cy="12" r="4"/>',
+};
+function iconSvg(name, size) { const p = ICON_PATHS[name] || ICON_PATHS.dot; return `<svg width="${size||24}" height="${size||24}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`; }
+
+const BOLD = {
+  STATUS: { ontrack:{label:"정상 진행",short:"정상"}, delayed:{label:"지연 · 보완",short:"지연"}, attention:{label:"주의 · 마감초과",short:"주의"}, done:{label:"완료 · 운영중",short:"운영"} },
+  KPI: { total:9, active:6, done:3, pipeline:77, avgActive:74, syncDate:"2026-05-28" },
+  SHORT: { overview:"종합", hr:"HR", cs:"CS", finance:"재무", ophe:"OPHE", "ai-design":"AI디자인", irc:"I&C", completed:"완료", cost:"과금", future:"향후" },
+  ACTIVE: [
+    { panel:"cs", icon:"headset", name:"고객관리 CS 플랫폼", dept:"경영관리본부", progress:75, status:"attention", due:"4월 30일", dueNote:"마감 초과", open:1, what:"고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템." },
+    { panel:"finance", icon:"wallet", name:"재무관리 시스템", dept:"경영관리본부", progress:83, status:"ontrack", due:"6월 30일", dueNote:"베타 6/9 ★", open:0, what:"매출·고정비·변동비를 통합해 월별 자금 계획을 자동 산출하는 시스템." },
+    { panel:"ophe", icon:"droplet", name:"OPHE 브랜드 런칭", dept:"브랜드사업본부", progress:83, status:"done", due:"6월 30일", dueNote:"정식 운영", open:0, what:"새 화장품 브랜드 OPHE 공식 사이트 — 구매는 Cafe24 연결." },
+    { panel:"hr", icon:"users", name:"HR 플랫폼", dept:"경영관리본부", progress:73, status:"delayed", due:"4월 13일", dueNote:"지연 보완 중", open:6, what:"채용·입사·OJT·평가·근태/연차/결재까지 HR 전 영역을 한 시스템에 통합." },
+    { panel:"irc", icon:"building", name:"인터오리진 I&C 리뉴얼", dept:"마케팅영업본부", progress:86, status:"delayed", due:"3월 31일", dueNote:"도메인 연결 잔여", open:3, what:"본사 공식 사이트(interohrigin.com)를 디자인·정보 구조 전면 개편." },
+    { panel:"ai-design", icon:"palette", name:"AI 디자인 에이전트", dept:"브랜드사업본부", progress:43, status:"attention", due:"4월 30일", dueNote:"마감 초과", open:3, what:"내부 디자인팀 전용 AI 브랜드 아이덴티티(로고·컬러·타이포) 자동 생성 도구." },
+  ],
+  DECISIONS: [
+    { panel:"hr", text:"1분기 인사 평가 정식 실행 시점 — 전사 확산 시점 결정 필요" },
+    { panel:"hr", text:"HR AI 디자인 플랫폼(Phase 3) 비용 합의 — 진행 여부·예산" },
+    { panel:"hr", text:"채용 면접 통합 페이지 우선순위 — 대표 단일 링크 페이지" },
+    { panel:"finance", text:"6/9 베타 결과 임원 보고 일정 — 베타 직후 시연·검토 일정 확보" },
+    { panel:"finance", text:"fn.interohrigin.com 서브도메인 확정" },
+    { panel:"ophe", text:"콘텐츠 업로드 담당자·일정 — 정식 운영(6/30) 전까지" },
+    { panel:"ai-design", text:"P2 재개 여부 — HR 80~90% 도달 시 재개할지" },
+    { panel:"ai-design", text:"이미지 생성 + 멀티 프로바이더 월 예산 한도 합의" },
+    { panel:"irc", text:"어드민 패널 개편 완료 시점 합의 (별개 트랙)" },
+    { panel:"irc", text:"interohrigin.io 도메인 추가연결 일정 확정" },
+  ],
+  MILESTONES: [
+    { date:"6월 9일", panel:"finance", title:"재무 자금계획 v1 베타 오픈", note:"직원-브랜드 매핑 + 고정비 자동채움 + 편집/감사로그", star:true, days:5 },
+    { date:"진행중", panel:"cs", title:"CS 플랫폼 배포 + 사용자 교육", note:"4/30 마감 초과분 해소", days:0 },
+    { date:"진행중", panel:"hr", title:"HR 4/13 마감 지연 해소", note:"잔여 보완 작업 15건 완료 시점 공유", days:0 },
+    { date:"6월 30일", panel:"ophe", title:"OPHE 정식 운영 전환", note:"콘텐츠 업로드 완료 → 정식 운영", days:26 },
+    { date:"미정", panel:"ai-design", title:"AI 디자인 통합 테스트 완료", note:"마감 정산 후 P2 재개 여부 결정", days:null },
+  ],
+  SYS: [
+    { name:"HR (메인)", stat:"진행중 73%", status:"delayed", desc:"채용·입사·OJT·평가·근태·결재·연차·임원 리포트" },
+    { name:"CS (고객관리)", stat:"진행중 75% · 긴급", status:"attention", desc:"고객 상담·문의 티켓·AI 자동응답 (배포·교육 단계)" },
+    { name:"복지몰", stat:"완료 (4/24)", status:"done", desc:"직원 포인트·주문·결제 (HR 통합 로그인)" },
+    { name:"재무관리", stat:"진행중 83%", status:"ontrack", desc:"자금계획·고정비·자금이체·손익분석 (6/9 베타)" },
+  ],
+};
+function ovTone(s){ return {ontrack:"ok",delayed:"warn",attention:"alert",done:"done"}[s]||"ok"; }
+function ovProg(value, status, label){ return `<div class="prog"><div class="prog-top"><span class="lbl">${label||"진행률"}</span><span class="pct">${value}%</span></div><div class="prog-track"><div class="prog-fill f-${status||"ontrack"}" style="width:${value}%"></div></div></div>`; }
+function ovSignal(status, label){ const d=BOLD.STATUS[status]||BOLD.STATUS.ontrack; return `<span class="signal s-${ovTone(status)}"><span class="dot"></span>${label||d.label}</span>`; }
+
+function renderOverviewBold(){
+  const box = document.getElementById("ov-bold"); if(!box) return;
+  const K = BOLD.KPI;
+  // 결정 인박스 — 라이브 결정형 의견 + PM 프리셋
+  const live=[];
+  for(const t of TABS){ const arr=STATE.discussions[t.key]||[]; for(const m of arr){ if(m.category==="decision" && (m.status||"open")!=="resolved") live.push({panel:t.key, text:escapeHTML((m.title?m.title+" — ":"")+(m.content||"")), live:true}); } }
+  const items=[...live, ...BOLD.DECISIONS];
+
+  let h = "";
+  // HERO
+  h += `<div class="hero"><div class="hero-grid">
+    <div class="hero-main">
+      <div class="hero-eyebrow">한 줄 요약 · ${K.syncDate} 동기화</div>
+      <h1 class="hero-h1">9개 프로젝트 운영<br><span class="ok">3개 완료</span>, <span class="br">6개 진행</span> · 평균 74%</h1>
+      <p class="hero-lead">가장 시급한 사항은 <strong>AI 디자인 에이전트</strong>의 통합 테스트 지연과 <strong>CS 플랫폼</strong>의 4/30 마감 초과입니다. 가장 임박한 이벤트는 <span class="br">6월 9일 재무 자금계획 v1 베타 오픈</span>입니다.</p>
+      <div class="hero-chips">
+        <span class="chip"><span style="color:var(--ok)">${iconSvg("check",13)}</span>완료 3개</span>
+        <span class="chip"><span style="color:var(--brand)">${iconSvg("layers",13)}</span>진행 6개</span>
+        <span class="chip"><span style="color:var(--alert)">${iconSvg("alert",13)}</span>지연·주의 3건</span>
+        <span class="chip"><span style="color:var(--warn)">${iconSvg("flag",13)}</span>다음 마일스톤 6/9</span>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="lbl">포트폴리오 진행률</div>
+      <div class="hero-pct">${K.pipeline}%</div>
+      ${ovProg(K.pipeline,"ontrack","파이프라인")}
+      <div class="note">작업 완료율 100% · 진행 평균 74%</div>
+    </div>
+  </div></div>`;
+
+  // DECISION INBOX
+  h += `<div class="inbox">
+    <div class="inbox-head"><div class="inbox-ic">${iconSvg("flag",22)}</div>
+      <div><h2>내가 답해야 할 것</h2><div class="sub">대표·이사 의사결정이 필요한 항목 — 클릭하면 해당 프로젝트로 이동합니다</div></div>
+      <div class="inbox-count">${items.length}<small>건</small></div></div>
+    <div class="inbox-list">${items.map(it=>`<button class="inbox-item" onclick="activatePanel('${it.panel}')"><span class="ix-proj">${ovShort(it.panel)}</span><span class="ix-text">${it.live?'<strong style="color:var(--alert-ink)">[새 의견] </strong>':""}${it.text}</span><span class="ix-go">${iconSvg("arrowR",18)}</span></button>`).join("")}</div>
+  </div>`;
+
+  // KPI STRIP
+  h += `<div><div class="block-head"><h2>전체 KPI</h2><span class="desc">사내 대시보드 동기화 · ${K.syncDate}</span></div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="k-label">총 프로젝트</div><div class="k-value">${K.total}</div><div class="k-sub">진행 6 · 완료 3</div></div>
+      <div class="kpi"><div class="k-label">진행중</div><div class="k-value">${K.active}</div><div class="k-sub">경영3 · 브랜드2 · 마케팅1</div></div>
+      <div class="kpi k-done"><div class="k-label">완료</div><div class="k-value">${K.done}</div><div class="k-sub">붐앤잽 · 복지몰 · Exhiboot</div></div>
+      <div class="kpi"><div class="k-label">파이프라인</div><div class="k-value">${K.pipeline}%</div><div class="k-sub">작업 완료율 100%</div></div>
+      <div class="kpi k-warn"><div class="k-label">진행중 평균</div><div class="k-value">${K.avgActive}%</div><div class="k-sub">6개 평균 진행률</div></div>
+      <div class="kpi k-alert"><div class="k-label">지연·주의</div><div class="k-value">3</div><div class="k-sub">CS · AI디자인 · HR</div></div>
+    </div></div>`;
+
+  // MILESTONES
+  h += `<div><div class="block-head"><h2>다음 중요 일정</h2><span class="desc">가장 임박한 마일스톤부터</span></div>
+    <div class="mile-row">${BOLD.MILESTONES.map(m=>`<div class="mile${m.star?" is-star":""}">
+      <div class="m-date">${m.star?`<span class="star">${iconSvg("star",14)}</span>`:""}${m.date}${m.days!=null&&m.days>0?`<span class="m-when">D-${m.days}</span>`:(m.days===0?`<span class="m-when">진행중</span>`:"")}</div>
+      <div class="m-title">${escapeHTML(m.title)}</div><div class="m-note">${escapeHTML(m.note)}</div>
+      <button class="m-link" onclick="activatePanel('${m.panel}')">${ovShort(m.panel)} 프로젝트 보기 ${iconSvg("arrowR",13)}</button>
+    </div>`).join("")}</div></div>`;
+
+  // PROJECT GRID (주의 먼저)
+  const pcard = (p)=>`<button class="pcard st-${p.status}" onclick="activatePanel('${p.panel}')"><div class="pc-bar"></div>
+    <div class="pcard-inner"><div class="pcard-top"><div class="pcard-ic st-${p.status}">${iconSvg(p.icon,22)}</div>
+      <div class="pcard-title"><div class="nm">${escapeHTML(p.name)}</div><div class="dp">${escapeHTML(p.dept)}</div></div>
+      ${p.open>0?`<span class="openflag">${iconSvg("bell",13)}${p.open}</span>`:""}</div>
+      <div class="pcard-what">${escapeHTML(p.what)}</div>${ovProg(p.progress,p.status)}
+      <div class="pcard-foot"><span class="due">${iconSvg("calendar",14)}${p.due} · ${p.dueNote}</span>${ovSignal(p.status,BOLD.STATUS[p.status].short)}</div></div></button>`;
+  const att = BOLD.ACTIVE.filter(p=>p.status==="attention"||p.status==="delayed");
+  const ok = BOLD.ACTIVE.filter(p=>p.status==="ontrack"||p.status==="done");
+  h += `<div class="stack" style="gap:24px">
+    <div><div class="block-head"><span class="kicker">${iconSvg("alert",13)}주의가 필요한 프로젝트</span><span class="desc">지연되었거나 마감을 초과한 항목 — 우선 확인</span></div><div class="bgrid g3">${att.map(pcard).join("")}</div></div>
+    <div><div class="block-head"><span class="kicker">${iconSvg("check",13)}정상 진행 프로젝트</span><span class="desc">일정대로 진행 중</span></div><div class="bgrid g3">${ok.map(pcard).join("")}</div></div>
+  </div>`;
+
+  // SYSTEM MAP
+  h += `<div><div class="block-head"><h2>인터오리진 통합 시스템</h2><span class="desc">HR·CS·복지몰·재무가 같은 데이터베이스를 공유 — 직원·권한 통합</span></div>
+    <div class="card" style="padding:24px 26px"><div class="sysmap">
+      <div class="sys-db"><div class="lbl">Shared Database</div><div class="nm">통합 데이터베이스 (Supabase Pro · $25/월)</div><div class="id">단일 인스턴스 · 직원/조직 마스터 공유</div></div>
+      <div class="sys-conn"></div>
+      <div class="sys-mods">${BOLD.SYS.map(m=>`<div class="sys-mod st-${m.status}"><div class="mn">${escapeHTML(m.name)}</div><div class="ms">${escapeHTML(m.stat)}</div><div class="md">${escapeHTML(m.desc)}</div></div>`).join("")}</div>
+    </div></div></div>`;
+
+  box.innerHTML = h;
+}
+function ovShort(p){ return BOLD.SHORT[p]||p; }
+
 const HR_STATUS = {
   active:    { label: "진행중", cls: "ontrack" },
   holding:   { label: "홀딩",   cls: "delayed" },
@@ -3351,10 +3497,10 @@ async function activatePanel(key) {
     commitsLoaded[key] = true;
     renderCommits(key, true);
   }
-  // 종합 현황 진입 시 HR 프로젝트 현황 자동 동기화 (첫 진입 1회, 캐시)
-  if (key === "overview" && !hrSyncLoaded) {
-    hrSyncLoaded = true;
-    renderHrSync();
+  // 종합 현황 진입 시 BOLD 종합현황 렌더 + HR 동기화
+  if (key === "overview") {
+    try { renderOverviewBold(); } catch (e) { console.warn("[overview] render 실패:", e); }
+    if (!hrSyncLoaded) { hrSyncLoaded = true; renderHrSync(); }
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
   history.replaceState(null, "", "#" + key);
@@ -3534,10 +3680,10 @@ async function migrateLocalDemo() {
       commitsLoaded[cur] = true;
       renderCommits(cur, true);
     }
-    // 첫 화면이 종합 현황이면 HR 프로젝트 현황 자동 동기화
-    if (cur === "overview" && !hrSyncLoaded) {
-      hrSyncLoaded = true;
-      renderHrSync();
+    // 첫 화면이 종합 현황이면 BOLD 렌더 + HR 동기화
+    if (cur === "overview") {
+      try { renderOverviewBold(); } catch (e) { console.warn("[init] overview render:", e); }
+      if (!hrSyncLoaded) { hrSyncLoaded = true; renderHrSync(); }
     }
   }
 })();
