@@ -1016,6 +1016,109 @@
 
   /* 카드형 통계/타임라인 디테일 라인 강조 */
   table.t th, .tbl th { border-bottom: 2px solid var(--ink) !important; }
+
+  /* ════ 프로토타입 상세 패널 구조 (panels.jsx 동일) ════ */
+  .pp .stack, .pp-bold .stack { display: flex; flex-direction: column; gap: 44px; }
+  .pp-card { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-lg); }
+  .pp-card.card-pad { padding: 24px 26px; }
+  .pp .grid.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pp .grid.g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  @media (max-width:880px){ .pp .grid.g2, .pp .grid.g3 { grid-template-columns: 1fr; } }
+  .pp .mono { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: .92em; }
+  /* phead */
+  .phead { background: var(--surface); border: 2px solid var(--ink); border-radius: var(--r-lg); overflow: hidden; }
+  .phead-top { padding: 30px 32px 26px; display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .phead-ic { width: 60px; height: 60px; border-radius: 13px; flex-shrink: 0; display: grid; place-items: center; color: #fff; background: var(--ink); }
+  .phead-ic svg { width: 30px; height: 30px; }
+  .phead-ic.ic-warn { background: var(--warn); } .phead-ic.ic-alert { background: var(--alert); }
+  .phead-ic.ic-done { background: var(--done); } .phead-ic.ic-ok { background: var(--ok); }
+  .phead-main { flex: 1; min-width: 280px; }
+  .phead-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .phead-main h2 { font-size: 30px; font-weight: 800; letter-spacing: -.04em; color: var(--ink); margin: 6px 0 14px; line-height: 1.18; }
+  .phead-main > p { font-size: 15px; color: var(--ink-2); line-height: 1.6; margin: 6px 0 14px; max-width: 720px; }
+  .phead-main > p strong { color: var(--ink); font-weight: 800; }
+  .phead-meta { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+  .phead-side { width: 230px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+  .phead-side > div { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r); padding: 15px 16px; }
+  .whatwhy { display: grid; grid-template-columns: repeat(3,1fr); border-top: 2px solid var(--ink); }
+  .ww { padding: 20px 24px; border-right: 1px solid var(--line); }
+  .ww:last-child { border-right: none; }
+  .ww .ww-lbl { font-size: 12px; font-weight: 800; letter-spacing: .02em; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; }
+  .ww .ww-lbl svg { width: 14px; height: 14px; }
+  .ww.ww-what .ww-lbl { color: var(--brand); } .ww.ww-why .ww-lbl { color: var(--violet); } .ww.ww-now .ww-lbl { color: var(--ok); }
+  .ww .ww-body { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+  .ww .ww-body strong { color: var(--ink); font-weight: 800; }
+  @media (max-width:880px){ .whatwhy { grid-template-columns: 1fr; } .ww { border-right: none; border-bottom: 1px solid var(--line); } .ww:last-child { border-bottom: none; } .phead-side { width: 100%; } .phead-main h2 { font-size: 24px; } }
+  /* chip / tag (prototype) */
+  .pp .chip, .phead-meta .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); padding: 5px 11px; border-radius: 99px; }
+  .pp .chip svg, .phead-meta .chip svg { width: 12px; height: 12px; }
+  .pp .tag, .phead-meta .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #fff; background: var(--ink); padding: 5px 11px; border-radius: 99px; }
+  /* signal */
+  .pp .signal { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 800; color: #fff; padding: 7px 13px; border-radius: 99px; }
+  .pp .signal .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.85); }
+  .pp .signal.s-ok { background: var(--ok); } .pp .signal.s-warn { background: var(--warn); } .pp .signal.s-alert { background: var(--alert); } .pp .signal.s-done { background: var(--done); }
+  /* bullet / kv */
+  .pp .bullet { list-style: none; display: flex; flex-direction: column; gap: 11px; margin: 0; padding: 0; }
+  .pp .bullet li { position: relative; padding-left: 20px; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+  .pp .bullet li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; background: var(--brand); }
+  .pp .bullet li strong { color: var(--ink); font-weight: 800; }
+  .pp .kv { display: grid; grid-template-columns: auto 1fr; gap: 11px 18px; align-items: baseline; margin: 0; }
+  .pp .kv dt { font-size: 11px; font-weight: 800; color: var(--ink-3); white-space: nowrap; text-transform: uppercase; letter-spacing: .04em; }
+  .pp .kv dd { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin: 0; }
+  .pp .kv dd strong { color: var(--ink); }
+  /* timeline */
+  .pp .tl { position: relative; padding-left: 28px; }
+  .pp .tl::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .pp .tl-item { position: relative; padding-bottom: 26px; }
+  .pp .tl-item:last-child { padding-bottom: 0; }
+  .pp .tl-dot { position: absolute; left: -28px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); border: 3px solid var(--line); }
+  .pp .tl-item.is-m .tl-dot { border-color: var(--ink); background: var(--ink); }
+  .pp .tl-date { font-size: 12px; font-weight: 800; color: var(--ink-4); letter-spacing: .02em; }
+  .pp .tl-item.is-m .tl-date { color: var(--ink); }
+  .pp .tl-title { font-size: 16px; font-weight: 800; color: var(--ink); margin: 3px 0 5px; line-height: 1.35; letter-spacing: -.02em; }
+  .pp .tl-body { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+  /* HR 모듈 */
+  .pp .mods-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  @media (max-width:880px){ .pp .mods-grid { grid-template-columns: 1fr; } }
+  .pp .mod-box { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 18px 20px; }
+  .pp .mod-box h4 { font-size: 15px; font-weight: 800; color: var(--ink); margin: 0 0 11px; display: flex; align-items: center; gap: 8px; letter-spacing: -.02em; }
+  .pp .mod-box h4 .n { width: 24px; height: 24px; border-radius: 6px; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+  .pp .mod-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; }
+  .pp .mod-box li { font-size: 12.5px; color: var(--ink-3); padding-left: 14px; position: relative; line-height: 1.45; }
+  .pp .mod-box li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; background: var(--brand); }
+  /* 표 (과금) */
+  .pp .tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .pp .tbl th { text-align: left; font-size: 11px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: .05em; padding: 13px 15px; border-bottom: 2px solid var(--ink); }
+  .pp .tbl th.r, .pp .tbl td.r { text-align: right; }
+  .pp .tbl td { padding: 13px 15px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+  .pp .tbl tr:last-child td { border-bottom: none; }
+  .pp .tbl .grp td { background: var(--ink); font-weight: 800; color: #fff; font-size: 13px; }
+  .pp .tbl .svc { font-weight: 800; color: var(--ink); }
+  .pp .tbl .num { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--ink); }
+  .pp .tbl .dim { color: var(--ink-4); }
+  /* notice */
+  .pp .notice { display: flex; gap: 13px; align-items: flex-start; padding: 17px 20px; border-radius: var(--r); font-size: 13.5px; line-height: 1.55; border: 2px solid; }
+  .pp .notice svg { width: 19px; height: 19px; flex-shrink: 0; margin-top: 1px; }
+  .pp .notice strong { font-weight: 800; }
+  .pp .notice.info { background: var(--info-soft); border-color: var(--info); color: var(--info-ink); }
+  .pp .notice.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok-ink); }
+  .pp .notice code { background: rgba(14,17,22,.07); padding: 1px 6px; border-radius: 4px; font-size: .9em; }
+  /* roadmap card */
+  .pp .rm-card { border: 1.5px solid var(--line); border-top: 6px solid var(--ink); }
+  .pp .rm-card.t-alert { border-top-color: var(--alert); } .pp .rm-card.t-warn { border-top-color: var(--warn); } .pp .rm-card.t-neutral { border-top-color: var(--ink-4); }
+  .pp .rm-card h3 { font-size: 17px; font-weight: 800; color: var(--ink); margin: 0 0 15px; display: flex; align-items: center; gap: 9px; letter-spacing: -.02em; }
+  .pp .rm-card h3 svg { width: 18px; height: 18px; }
+  .pp .rm-card.t-alert h3 svg { color: var(--alert); } .pp .rm-card.t-warn h3 svg { color: var(--warn); } .pp .rm-card.t-neutral h3 svg { color: var(--ink-3); }
+  /* inbox (future) */
+  .pp .inbox-list { display: flex; flex-direction: column; }
+  .pp .inbox-item { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: var(--surface); border: none; border-top: 1px solid var(--line); padding: 15px 18px; cursor: pointer; transition: .14s; }
+  .pp .inbox-item:first-child { border-top: none; }
+  .pp .inbox-item:hover { background: var(--alert-soft); }
+  .pp .inbox-item .ix-proj { font-size: 11px; font-weight: 800; color: #fff; background: var(--ink); padding: 4px 9px; border-radius: 6px; flex-shrink: 0; min-width: 54px; text-align: center; }
+  .pp .inbox-item .ix-text { flex: 1; font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+  .pp .inbox-item .ix-text strong { color: var(--ink); font-weight: 800; }
+  .pp .inbox-item .ix-go { color: var(--ink-4); flex-shrink: 0; }
+  .pp .pp-disc-head { margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -1069,230 +1172,7 @@
 <!-- 패널 2: HR 플랫폼 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="hr">
-
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">HR 플랫폼 · 임원 요약</div>
-      <h2>입사부터 퇴사까지 직원 전 과정을 시스템화 — 핵심 5단계 완료, AI 보조 기능 추가 중</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> 채용 · 입사 · OJT 교육 · 인사 평가 · 근태/연차/결재까지 HR 모든 영역을 한 시스템에 통합.
-        <strong>왜 중요?</strong> 직원 한 명당 평균 30분 걸리던 결재·연차 신청을 자동화로 0분에 수렴시키고, 채용 전 과정에 AI 분석을 붙여 신규 입사자 검증 시간을 단축.
-        <strong>지금 상황?</strong> 핵심 채용·평가·결재 기능 가동 중. 4/24 회의에서 합의한 "전자결재 AI 자동 작성", "면접 통합 페이지"가 다음 단계.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 73% · 우선순위 상</span>
-        <span class="h-tag">마감 4월 13일 (지연 보완 중)</span>
-        <span class="h-tag">작업 15건</span>
-        <span class="h-tag">미결 6건</span>
-        <span class="h-tag">시작 2026-03-19</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi"><div class="label">진행률</div><div class="value">73%</div><div class="sub">로드맵 41단계 중 28~30단계</div></div>
-      <div class="kpi k-green"><div class="label">완료된 모듈</div><div class="value">7</div><div class="sub">채용·평가·연차·결재·OJT 등</div></div>
-      <div class="kpi k-orange"><div class="label">진행 중 작업</div><div class="value">15</div><div class="sub">사내 대시보드 기준</div></div>
-      <div class="kpi k-red"><div class="label">미결 의사결정</div><div class="value">6</div><div class="sub">대표·이사 검토 필요</div></div>
-    </div>
-  </div>
-
-  <!-- HR 추가 요청사항 - 미리 PM 기재 -->
-  <div class="section">
-    <div class="section-head">
-      <h2>대표·이사 확인 요청 (미리 기재)</h2>
-      <div class="desc">이 영역은 PM이 미리 기재한 검토 요청 — 아래 토론 영역에서 답변 부탁드립니다</div>
-    </div>
-    <div class="grid-2">
-      <div class="card danger-card">
-        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
-        <ul class="bulleted">
-          <li><strong>1분기 인사 평가 정식 실행 시점</strong> — 현재 민지 + 차주용 2인 선행 테스트 중. 전사 확산 시점 결정 필요</li>
-          <li><strong>HR AI 디자인 플랫폼 (Phase 3) 비용 합의</strong> — 멀티 AI 프로바이더 운영 비용 영향 큼. 진행 여부와 예산 합의 필요</li>
-          <li><strong>채용 면접 통합 페이지 우선순위</strong> — 대표 단일 링크로 이력서·요약·질문·체크리스트를 보는 페이지. 4/24 미팅 미결</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
-        <ul class="bulleted">
-          <li><strong>4/13 마감 지연 해소</strong> — 잔여 보완 작업 15건 완료 시점 공유 예정</li>
-          <li><strong>채용 0507 Gap → 100%</strong> — 사전 질의서 / 면접 슬롯 예약 / AI 보조 면접 콘솔</li>
-          <li><strong>인수인계 자동화</strong> — 퇴사자 문서·자산·계약을 자동으로 후임자에게 전달 (착수 예정)</li>
-          <li><strong>SMS 알림 도입 여부</strong> — 이메일 외 SMS 발송 PoC. 개인정보 보안 비용 검토 필요</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- HR 기술 통계 -->
-  <div class="section">
-    <div class="section-head">
-      <h2>시스템 규모</h2>
-      <div class="desc">참고용 — 비개발자는 건너뛰셔도 됩니다</div>
-    </div>
-    <div class="stat-row">
-      <div class="stat"><div class="num">90+</div><div class="lbl">DB 테이블</div></div>
-      <div class="stat"><div class="num">154</div><div class="lbl">데이터 구조 업데이트</div></div>
-      <div class="stat"><div class="num">45+</div><div class="lbl">화면 페이지</div></div>
-      <div class="stat"><div class="num">5</div><div class="lbl">파일 저장소</div></div>
-    </div>
-    <div class="stat-row">
-      <div class="stat"><div class="num">8</div><div class="lbl">AI 분석 종류</div></div>
-      <div class="stat"><div class="num">5</div><div class="lbl">완료 PDCA 사이클</div></div>
-      <div class="stat"><div class="num">3</div><div class="lbl">AI 제공사</div></div>
-      <div class="stat"><div class="num">✓</div><div class="lbl">AI 비용 추적</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>직원 한 명의 입사부터 퇴사까지 전 과정을 한 시스템에서 관리</dd>
-          <dt>대상 사용자</dt><dd>전 직원 · 임원 · HR 담당자 · 면접관 · 멘토</dd>
-          <dt>도입 효과</dt><dd>결재·연차 신청 자동화 / CEO가 한 화면에서 회사 전반 파악 / 채용 시 AI 보조</dd>
-          <dt>운영 정책</dt><dd>경영지원팀 선행 테스트 → 키맨 → 전사 단계 확산 (4/16 회의 합의)</dd>
-          <dt>알림 채널</dt><dd>이메일 (메인) + 카카오워크 (사내 메신저 30명 무료 한도)</dd>
-          <dt>접속 URL</dt><dd><code>interohrigin-hr2.pages.dev</code> → 향후 <strong>hr.interohrigin.com</strong></dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">🤖</span> AI 기능 (어떻게 도와주나)</h3>
-        <ul class="bulleted">
-          <li><strong>이력서 분석</strong> — PDF 업로드 시 자동으로 점수·강점·약점·추천 여부 산출</li>
-          <li><strong>면접 분석</strong> — 면접 녹음을 듣고 답변 평가·종합 의견 작성</li>
-          <li><strong>평가 리포트</strong> — 평가 데이터를 받아 AI가 종합 리포트 자동 작성</li>
-          <li><strong>수습 평가</strong> — 짧은 코멘트를 입력하면 AI가 다듬어 확장된 피드백 생성</li>
-          <li><strong>인수인계 초안</strong> — 퇴사자 프로젝트·업무보고·자산 데이터를 받아 인수인계 초안 자동 작성</li>
-          <li><strong>회의록 받아쓰기</strong> — 회의 녹음을 텍스트로 변환 (한국어 정확도 27% 개선)</li>
-          <li><strong>CEO 임원 리포트</strong> — 회사 전반 데이터를 받아 한 페이지로 요약 (Claude API)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>HR 모듈 7개 영역</h2>
-      <div class="desc">각 영역에 어떤 기능이 있는지 — 임원이 이해하기 쉬운 표현으로</div>
-    </div>
-    <div class="grid-4">
-      <div class="card">
-        <h3>👥 인사 기본</h3>
-        <ul class="bulleted">
-          <li>직원 정보 관리</li>
-          <li>출퇴근 기록</li>
-          <li>전자 결재 (품의서·공문)</li>
-          <li>연차 신청·승인</li>
-          <li>급여 명세서 발급</li>
-          <li>교육 이수 관리</li>
-          <li>증명서 자동 발급 (인감 자동 날인)</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>🎯 채용</h3>
-        <ul class="bulleted">
-          <li>채용 공고 등록·관리</li>
-          <li>지원자 풀 + 인재 프로필</li>
-          <li>이력서 AI 분석</li>
-          <li>면접 일정·녹화·분석</li>
-          <li>합격 결정 기록</li>
-          <li>13단계 채용 프로세스 가이드</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📚 OJT · 수습</h3>
-        <ul class="bulleted">
-          <li>OJT 프로그램·등록</li>
-          <li>멘토 배정 + 일일 멘토 보고</li>
-          <li>수습 평가 (14일/42일/70일)</li>
-          <li>수습 90일 후 종료</li>
-          <li>AI 코멘트 자동 확장</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📊 평가</h3>
-        <ul class="bulleted">
-          <li>평가 기간 / 대상자 / 항목 설정</li>
-          <li>자기 평가</li>
-          <li>동료 평가 (10항목 × 10점)</li>
-          <li>월간 점검</li>
-          <li>대면 평가 기록</li>
-          <li>AI 종합 리포트 자동 작성</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>💬 사내 메신저</h3>
-        <ul class="bulleted">
-          <li>채팅방 · 메시지 · 멤버</li>
-          <li>메시지 반응 (이모지)</li>
-          <li>첨부파일 (7일 한정 링크)</li>
-          <li>외부 메신저: 카카오워크 채택 (4/24 결정)</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📁 인사노무</h3>
-        <ul class="bulleted">
-          <li>연차 자동 부여·촉진 (입사일 기준, 반차 4시간)</li>
-          <li><strong>긴급연차</strong> 신청·처리 (NEW, 5/28) — 임원 이메일·무급전환</li>
-          <li><strong>반복업무</strong> 자동화 (NEW, 5/28) — 주/월 반복 + 일일보고 자동반영</li>
-          <li>전자 계약 / 인사 명령 / 특이사항 / 퇴사 설문</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>🤝 인수인계 (예정)</h3>
-        <ul class="bulleted">
-          <li>퇴사자 인수인계 문서 (JSON)</li>
-          <li>자산 인벤토리 (계약·기기·계정)</li>
-          <li>후임자 Q&amp;A 챗봇</li>
-          <li>AI 초안 자동 생성</li>
-          <li>구글 드라이브 스캔 후 수동 검수 반영</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📡 AI 신뢰도 관리</h3>
-        <ul class="bulleted">
-          <li>AI 분석 정확도 추적</li>
-          <li>AI 신뢰 점수 관리</li>
-          <li>AI 응답 단계 전환 기록</li>
-          <li>사주·MBTI 분석 (인사 보조)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>개발 로드맵 — 41단계 중 어디까지 왔나</h2>
-      <div class="desc">큰 단위 진행 현황</div>
-    </div>
-    <div class="card">
-      <table class="t">
-        <thead>
-          <tr><th style="width:140px;">Phase</th><th>범위 (한국어 풀이)</th><th class="center" style="width:100px;">상태</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>1단계 (P-01~21)</strong></td><td>채용관리 + 인사평가 통합 — 핵심 21개 기능</td><td class="center"><span class="badge b-completed">완료</span></td></tr>
-          <tr><td><strong>1.5단계 (P-22~25)</strong></td><td>임원용 긴급 대시보드 + 평가 간소화</td><td class="center"><span class="badge b-completed">완료</span></td></tr>
-          <tr><td><strong>1.7단계 (P-26~31)</strong></td><td>인사노무 — 연차·근태·결재·증명서·조직도·급여·교육</td><td class="center"><span class="badge b-progress">진행중</span></td></tr>
-          <tr><td><strong>1.8단계</strong></td><td>수습평가 보강 + 인수인계 자동화 + 운영 피드백 31건 반영</td><td class="center"><span class="badge b-warn">착수 예정</span></td></tr>
-          <tr><td><strong>0507 Gap</strong></td><td>고도화 요구서 v1.0 대비 갭 분석 (사전 질의서·채용 자동화·디자인)</td><td class="center"><span class="badge b-progress">진행중</span></td></tr>
-          <tr><td><strong>0512 보완</strong></td><td>P0 채용 전환율 · P1 면접 품질 · P2 비용합의 후 디자인 플랫폼</td><td class="center"><span class="badge b-progress">실행중</span></td></tr>
-          <tr><td><strong>2단계 (P-32~41)</strong></td><td>시스템·업무 연동 (모듈 분리 — 메신저 제거, 채용 분리)</td><td class="center"><span class="badge b-planning">향후</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>최근 의사결정 흐름</h2>
-      <div class="desc">3월 19일 착수 → 5월 12일 보완 계획까지 9개 마일스톤</div>
-    </div>
-    <div class="timeline" id="tl-hr"></div>
-  </div>
-
-  <!-- HR 토론 -->
+  <div class="pp" id="pp-hr"></div>
   <div class="commits-box" id="commits-hr"></div>
 
   <div id="discussion-hr" data-discussion="hr"></div>
@@ -1302,90 +1182,7 @@
 <!-- 패널 3: CS 플랫폼 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="cs">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">CS 플랫폼 · 임원 요약</div>
-      <h2>고객 문의·상담 응대를 시스템화 — 배포·교육 단계, 4월 마감 초과</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> 고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템.
-        <strong>왜 중요?</strong> 상담 인원 의존도를 줄이고, 어떤 문의가 자주 들어오는지 데이터화. 처음 응답까지 걸리는 시간 단축.
-        <strong>지금 상황?</strong> 기능 개발은 75%까지 완료. <span style="color:var(--red);font-weight:700;">4/30 마감을 넘긴 상태</span>로 배포 + 사용자 교육 단계 진행 중.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 75% · 긴급</span>
-        <span class="h-tag">마감 4월 30일 (초과)</span>
-        <span class="h-tag">현재 단계: 배포·교육</span>
-        <span class="h-tag">작업 1건</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi k-red"><div class="label">진행률</div><div class="value">75%</div><div class="sub">긴급 우선순위</div></div>
-      <div class="kpi k-orange"><div class="label">마감 상태</div><div class="value">초과</div><div class="sub">4/30 → 진행중</div></div>
-      <div class="kpi"><div class="label">현재 단계</div><div class="value" style="font-size:18px;">배포·교육</div><div class="sub">사내 대시보드 표기</div></div>
-      <div class="kpi k-green"><div class="label">통합 DB</div><div class="value" style="font-size:18px;">HR 공유</div><div class="sub">직원/조직 마스터 공통</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>대표·이사 확인 요청 (미리 기재)</h2>
-      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
-    </div>
-    <div class="grid-2">
-      <div class="card danger-card">
-        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
-        <ul class="bulleted">
-          <li><strong>배포 일정 확정</strong> — 4/30 마감이 이미 초과. 새 배포일과 운영 진입일 합의 필요</li>
-          <li><strong>사용자 교육 대상 부서</strong> — 어느 부서부터 교육할지 (경영지원팀 선행 정책 적용 여부)</li>
-          <li><strong>운영 인력 배정</strong> — CS 티켓 처리 책임자와 백업 인원</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
-        <ul class="bulleted">
-          <li>AI 자동응답 보조 기능 — 자주 묻는 질문(FAQ) 우선 적용</li>
-          <li>티켓 우선순위 자동 분류 (긴급도/카테고리)</li>
-          <li>월간 CS 통계 리포트 자동 생성</li>
-          <li>HR 시스템과 단일 로그인 통합</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>고객 문의를 티켓으로 분류하고 AI가 응답을 도와주는 시스템</dd>
-          <dt>대상 사용자</dt><dd>CS 담당자 · 관리자 · 고객 (외부)</dd>
-          <dt>도입 효과</dt><dd>응답 누락 방지 / 응답 시간 단축 / 자주 묻는 질문 데이터화</dd>
-          <dt>통합 구조</dt><dd>HR과 같은 데이터베이스 → 직원·권한 마스터 공유 (iocs_access 권한)</dd>
-          <dt>도메인</dt><dd><strong>cs.interohrigin.com</strong> 확정 (2026-05-28)</dd>
-          <dt>현재 단계</dt><dd><strong>배포 준비 및 사용자 교육</strong></dd>
-          <dt>전제</dt><dd>HR 시스템 알림 정책과 동일 (이메일 우선)</dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">🎯</span> 핵심 범위 (4/24 회의 노트 기반)</h3>
-        <ul class="bulleted">
-          <li>고객 상담·문의 티켓 시스템 (생성·할당·진행·완료)</li>
-          <li>AI 자동응답 보조 (Gemini 활용)</li>
-          <li>HR 통합 로그인 + 직원 마스터 공유</li>
-          <li>월간 통계 + 처리 시간 측정</li>
-          <li>외부 채널 연동은 단계적 (이메일 우선)</li>
-        </ul>
-      </div>
-    </div>
-    <div class="notice" style="margin-top:16px;">
-      <strong>현재 상태.</strong>
-      사내 대시보드는 "배포 준비 및 교육" 단계로 표기되어 있습니다. 75% 진행 + 긴급 우선순위 / 4/30 마감 초과.
-      <strong>CS 전용 상세 기획서(docs)는 아직 별도 정리되지 않았습니다</strong> — 4/24 회의 노트 기반으로 작성되어 있어 추가 사양 정리가 필요합니다.
-      아래 토론 영역에서 추가 사양을 남겨주시면 PM이 정리하여 docs로 반영합니다.
-    </div>
-  </div>
-
+  <div class="pp" id="pp-cs"></div>
   <div class="commits-box" id="commits-cs"></div>
 
   <div id="discussion-cs" data-discussion="cs"></div>
@@ -1395,90 +1192,7 @@
 <!-- 패널 4: 재무관리 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="finance">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">재무관리 · 임원 요약</div>
-      <h2>월별 자금계획을 시스템으로 — 직원이 직접 매출 입력, 자동으로 손익 산출 (6/9 베타 오픈)</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> 매출·고정비·변동비를 통합하여 월별 자금 계획을 자동으로 산출하는 시스템.
-        <strong>왜 중요?</strong> 그간 엑셀로 부서별 취합하던 자금계획을 시스템화하여 임원 보고를 실시간 갱신.
-        <strong>지금 상황?</strong> 5월 21일 입력 모델·자동 채움·편집/감사 3가지를 확정. 베타 일정이 6/4 → 6/8 → <strong>6/9</strong>로 보정.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 63% · 상</span>
-        <span class="h-tag">마감 6월 30일</span>
-        <span class="h-tag">베타 6월 9일 ★</span>
-        <span class="h-tag">3가지 핵심 결정 완료 (5/21)</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi"><div class="label">진행률</div><div class="value">63%</div><div class="sub">우선순위 상</div></div>
-      <div class="kpi k-orange"><div class="label">베타 오픈</div><div class="value" style="font-size:20px;">6/9</div><div class="sub">기존 6/4 대비 5일 보정</div></div>
-      <div class="kpi k-green"><div class="label">데이터 구조 결정</div><div class="value">3</div><div class="sub">입력 / 자동채움 / 감사로그</div></div>
-      <div class="kpi k-purple"><div class="label">고정비 항목</div><div class="value">131</div><div class="sub">18개 카테고리로 자동 합산</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>대표·이사 확인 요청 (미리 기재)</h2>
-      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
-    </div>
-    <div class="grid-2">
-      <div class="card danger-card">
-        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
-        <ul class="bulleted">
-          <li><strong>6/9 베타 결과 임원 보고 일정</strong> — 베타 직후 임원 시연·검토 일정 사전 확보</li>
-          <li><strong>fn.interohrigin.com 서브도메인 확정</strong> — 현재 README의 finance.* 표기는 outdated. 최종 주소 합의</li>
-          <li><strong>변동비 자동 채움 시점</strong> — Stage 3로 미뤘는데 임원 보고에 변동비도 필요한지 확인</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
-        <ul class="bulleted">
-          <li><strong>입력 발송 모달</strong> — 부서별 토큰 → 직원별 + 직원-브랜드 매핑 (Migration 70)</li>
-          <li><strong>고정비 자동 채움</strong> — 18개 카테고리로 묶어서 자동 입력 (Migration 71)</li>
-          <li><strong>편집 + 변경 이력</strong> — 임원 보고 후에도 편집 가능 + 모든 변경 기록 (Migration 72)</li>
-          <li><strong>베타 후 손익분석 모듈</strong> — 자금계획 → 손익분석 자동 연계</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>월별 자금계획을 직원이 직접 입력하면 자동으로 손익이 산출되는 시스템</dd>
-          <dt>대상 사용자</dt><dd>대표 (임원 보고용) · 재무 담당자 · 매출 입력 담당 직원</dd>
-          <dt>도입 효과</dt><dd>엑셀 취합 시간 단축 / 실시간 손익 가시화 / 변경 이력 자동 기록</dd>
-          <dt>입력 방식</dt><dd>직원 단위로 입력 요청 발송 → 직원이 본인 담당 브랜드 매출만 입력</dd>
-          <dt>자동 채움</dt><dd>고정비 18개 카테고리는 자동 합산 (직원 입력 불필요)</dd>
-          <dt>편집 정책</dt><dd>임원 보고 후에도 편집 모드 토글로 수정 가능 + 모든 변경 기록</dd>
-          <dt>접속 URL</dt><dd>예정: <strong>fn.interohrigin.com</strong></dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">💰</span> 5월 21일 핵심 결정 (3가지)</h3>
-        <ul class="bulleted">
-          <li><strong>① 입력 모델</strong>: 부서장 한 명에게 부서 전체 매출 입력시키던 방식 → 직원 단위로 각자 본인 담당 브랜드만 입력</li>
-          <li><strong>② 자동 채움</strong>: 고정비 131개 항목을 18개 큰 카테고리로 묶어 자동 입력. 변동비는 향후 Stage 3에 도입</li>
-          <li><strong>③ 편집·감사</strong>: 임원 보고 후에도 편집 모드 켜면 수정 가능. 모든 변경은 자동으로 이력에 기록 (누가, 언제, 무엇을 바꿨는지)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>의사결정 흐름</h2>
-      <div class="desc">5월 21일 핵심 결정 3건 + 5월 15일 배포 준비</div>
-    </div>
-    <div class="timeline" id="tl-finance"></div>
-  </div>
-
+  <div class="pp" id="pp-finance"></div>
   <div class="commits-box" id="commits-finance"></div>
 
   <div id="discussion-finance" data-discussion="finance"></div>
@@ -1488,90 +1202,7 @@
 <!-- 패널 5: OPHE -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="ophe">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">OPHE 브랜드 런칭 · 임원 요약</div>
-      <h2>새 화장품 브랜드 OPHE 공식 웹사이트 — 4월 29일 베타 오픈 완료, 콘텐츠 운영 단계</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> OPHE 브랜드 공식 사이트 — 브랜드 스토리·제품 컬렉션 노출, 실제 구매는 Cafe24 쇼핑몰로 연결.
-        <strong>왜 중요?</strong> 브랜드 인지도 향상에 집중하고 쇼핑몰 운영 부담은 Cafe24에 위임하여 운영 부담 최소화.
-        <strong>지금 상황?</strong> 4월 29일 베타 오픈 성공. 현재는 콘텐츠 업로드와 운영 안정화 단계. 6월 30일 정식 운영 목표.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 63% · 상</span>
-        <span class="h-tag">베타 오픈 4월 29일 ✓</span>
-        <span class="h-tag">정식 운영 6월 30일</span>
-        <span class="h-tag">현재: 콘텐츠 업로드</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi"><div class="label">진행률</div><div class="value">63%</div><div class="sub">정식 운영까지 보완 중</div></div>
-      <div class="kpi k-green"><div class="label">베타 오픈</div><div class="value" style="font-size:20px;">4/29</div><div class="sub">완료 ✓</div></div>
-      <div class="kpi k-purple"><div class="label">레퍼런스</div><div class="value" style="font-size:16px;">Byredo</div><div class="sub">레이아웃·무드 기준</div></div>
-      <div class="kpi k-orange"><div class="label">정식 운영</div><div class="value" style="font-size:20px;">6/30</div><div class="sub">마감</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>대표·이사 확인 요청 (미리 기재)</h2>
-      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
-    </div>
-    <div class="grid-2">
-      <div class="card danger-card">
-        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
-        <ul class="bulleted">
-          <li><strong>콘텐츠 업로드 담당자·일정</strong> — 정식 운영(6/30) 전까지 채울 콘텐츠 양과 담당자</li>
-          <li><strong>NEWS / FAQ 페이지 강화</strong> — 베타 후 2차 보완안 (5/7)에 포함. 어디까지 자체 페이지로 만들지 vs Cafe24 위임</li>
-          <li><strong>다국어 정식 지원 시점</strong> — 베타는 한국어 중심. 영문/중문 도입 시점과 번역 방식</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
-        <ul class="bulleted">
-          <li>콘텐츠 업로드 완료 → 정식 운영 (6/30)</li>
-          <li>Web Vitals 자동 모니터링 도입</li>
-          <li>콘텐츠 관리 시스템(CMS) 도입 검토</li>
-          <li>2차 디자인 보완 (TalkFile 0507 기준)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>OPHE 브랜드 공식 사이트 (구매는 Cafe24로 연결)</dd>
-          <dt>대상 사용자</dt><dd>최종 소비자 · 잠재 고객</dd>
-          <dt>도입 효과</dt><dd>브랜드 이미지 강화 / 실구매 흐름은 Cafe24 활용으로 운영 부담 분산</dd>
-          <dt>벤치마크</dt><dd>Byredo (레이아웃·무드) · Nonfiction (제품 그리드) · Portrait Report (에디토리얼)</dd>
-          <dt>핵심 분기</dt><dd>홈 / 스토리 / 제품 컬렉션 / 푸터 (구매 클릭 시 Cafe24로 이동)</dd>
-          <dt>분석 도구</dt><dd>Google Analytics 4 + Microsoft Clarity (사용자 행동 측정)</dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">🎯</span> 역할 분담</h3>
-        <ul class="bulleted">
-          <li><strong>이 사이트가 하는 일</strong>: 홈 / 브랜드 스토리 / 제품 진열 / 메뉴·푸터 / Cafe24로 가는 링크</li>
-          <li><strong>Cafe24가 하는 일</strong>: 실제 제품 상세·장바구니·결제·마이페이지·주문/배송/교환/AS</li>
-          <li><strong>외부 이동 시</strong>: 새 탭 X (같은 탭) + 클릭 추적 정보 부착</li>
-          <li><strong>메뉴 구성</strong>: ITEM · NEW · BEST · JEWELRY · ABOUT · NEWS · LANG · WISHLIST · MYPAGE</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>의사결정·개발 흐름</h2>
-      <div class="desc">4월 20일 착수 → 4월 29일 베타 오픈 → 5월 7일 보완안</div>
-    </div>
-    <div class="timeline" id="tl-ophe"></div>
-  </div>
-
+  <div class="pp" id="pp-ophe"></div>
   <div class="commits-box" id="commits-ophe"></div>
 
   <div id="discussion-ophe" data-discussion="ophe"></div>
@@ -1581,90 +1212,7 @@
 <!-- 패널 6: AI 디자인 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="ai-design">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">AI 디자인 에이전트 · 임원 요약</div>
-      <h2>내부 디자인팀 전용 브랜드 아이덴티티 생성 도구 — 통합 테스트 단계, 마감 초과</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> 내부 디자인팀만 사용하는 AI 기반 브랜드 아이덴티티(로고·컬러·타이포 등) 자동 생성 도구.
-        <strong>왜 중요?</strong> 새 브랜드 출시·리뉴얼 시 초안 디자인 시간 단축. 디자이너의 반복 작업을 AI가 대신.
-        <strong>지금 상황?</strong> 4월 30일 마감 초과. 통합 테스트 단계. HR 핵심 안정화 후 재개하기로 한 P2 분류 항목.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행 43% · 중</span>
-        <span class="h-tag">마감 4월 30일 (초과)</span>
-        <span class="h-tag">현재: 통합 테스트</span>
-        <span class="h-tag">우선순위: HR 안정화 후</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi k-yellow"><div class="label">진행률</div><div class="value">43%</div><div class="sub">통합 테스트 단계</div></div>
-      <div class="kpi k-red"><div class="label">마감 상태</div><div class="value">초과</div><div class="sub">4/30 마감 미달성</div></div>
-      <div class="kpi"><div class="label">AI 제공사</div><div class="value">4</div><div class="sub">Claude · OpenAI · Gemini · OpenRouter</div></div>
-      <div class="kpi k-purple"><div class="label">접근</div><div class="value" style="font-size:16px;">내부 전용</div><div class="sub">사전 등록 사용자만</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>대표·이사 확인 요청 (미리 기재)</h2>
-      <div class="desc">아래 토론 영역에 답변 부탁드립니다</div>
-    </div>
-    <div class="grid-2">
-      <div class="card danger-card">
-        <h3><span class="emoji">⚠️</span> 결정이 필요한 사항</h3>
-        <ul class="bulleted">
-          <li><strong>P2 재개 여부</strong> — HR 핵심 안정화 전 착수 금지 분류. HR이 80~90%에 도달하면 재개할지 결정</li>
-          <li><strong>예산 합의</strong> — AI 이미지 생성(DALL-E 3) + 멀티 프로바이더 운영 비용. 월 예산 한도 사전 합의</li>
-          <li><strong>실제 사용 ROI</strong> — 디자인팀 실제 사용 빈도 측정 후 ROI 판단 필요. 시범 사용자 지정</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 진행 예정 사항</h3>
-        <ul class="bulleted">
-          <li>통합 테스트 완료 → 4/30 마감 정산</li>
-          <li>멀티 프로바이더 API 비용 모니터링 대시보드</li>
-          <li>이미지 생성 사용량 추적 (DALL-E 3 / Gemini)</li>
-          <li>디자인팀 시범 사용 + 피드백 수집</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>디자인팀이 AI에게 브랜드 키워드를 주면 로고·컬러·타이포 초안을 자동 생성</dd>
-          <dt>대상 사용자</dt><dd>내부 디자인팀만 (공개 회원가입 없음)</dd>
-          <dt>도입 효과</dt><dd>초안 디자인 시간 단축 / 멀티 AI로 비교 출력 가능 / 반복 디자인 자동화</dd>
-          <dt>접속</dt><dd><code>ai-design-agent-rosy.vercel.app</code></dd>
-          <dt>현재 단계</dt><dd>통합 테스트 및 품질 검증</dd>
-          <dt>대기 사유</dt><dd>HR 핵심 안정화 후 본격 운영 (P2 분류, 5/12 0512 보완계획)</dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">🤖</span> AI 4사 활용</h3>
-        <ul class="bulleted">
-          <li><strong>Anthropic Claude</strong> — 카피라이팅·브랜드 설명 자동 작성</li>
-          <li><strong>OpenAI</strong> — DALL-E 3 이미지 생성 (로고·일러스트)</li>
-          <li><strong>Google Gemini</strong> — 텍스트 보조</li>
-          <li><strong>OpenRouter</strong> — 가격·성능 비교 단일 진입점 (어떤 AI가 더 좋은지 자동 비교)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>의사결정 흐름</h2>
-      <div class="desc">3월 20일 착수 → 3월 23일 기능 명세 v1 완성</div>
-    </div>
-    <div class="timeline" id="tl-ai-design"></div>
-  </div>
-
+  <div class="pp" id="pp-ai-design"></div>
   <div class="commits-box" id="commits-ai-design"></div>
 
   <div id="discussion-ai-design" data-discussion="ai-design"></div>
@@ -1674,55 +1222,7 @@
 <!-- 패널 7: I&C 홈페이지 리뉴얼 (진행중) -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="irc">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">I&amp;C 홈페이지 리뉴얼 · 임원 요약</div>
-      <h2>인터오리진 본사 공식 사이트 리뉴얼 — 진행중 86%, 도메인 추가연결 단계 남음</h2>
-      <div class="h-summary">
-        <strong>무엇?</strong> 인터오리진 본사 공식 사이트(interohrigin.com)를 디자인·정보 구조 전면 개편.
-        <strong>왜 중요?</strong> 회사의 첫인상이 되는 공식 사이트의 신뢰도·브랜드 일관성 확보.
-        <strong>지금 상황?</strong> 요구사항~배포까지 5단계 완료, 사이트 운영 중. <strong>interohrigin.io 도메인 추가연결</strong>과 어드민 패널 개편이 남은 진행 항목.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">진행중 86%</span>
-        <span class="h-tag">마케팅영업본부</span>
-        <span class="h-tag">마감 3월 31일 (도메인 연결 잔여)</span>
-        <span class="h-tag">남은 작업: 도메인 연결 + 어드민 개편</span>
-      </div>
-    </div>
-
-    <div class="kpi-row k4">
-      <div class="kpi k-orange"><div class="label">진행률</div><div class="value">86%</div><div class="sub">5단계 완료, 도메인 연결만 잔여</div></div>
-      <div class="kpi"><div class="label">메인 사이트</div><div class="value" style="font-size:20px;">운영중</div><div class="sub">interohrigin.com</div></div>
-      <div class="kpi k-purple"><div class="label">남은 단계</div><div class="value" style="font-size:20px;">도메인</div><div class="sub">interohrigin.io 추가연결</div></div>
-      <div class="kpi k-red"><div class="label">병행 트랙</div><div class="value" style="font-size:20px;">어드민</div><div class="sub">콘텐츠 직접수정 + AI 보조</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-2">
-      <div class="card">
-        <h3><span class="emoji">📌</span> 한눈에 보기 (임원용)</h3>
-        <dl class="kv">
-          <dt>한 줄</dt><dd>본사 공식 사이트(interohrigin.com) 리뉴얼 — 디자인·정보 구조 전면 개편</dd>
-          <dt>현재 상태</dt><dd><strong>진행중 86%</strong> — 사이트 운영 중, <strong>interohrigin.io 도메인 추가연결</strong> 단계 남음 (사내 대시보드 기준)</dd>
-          <dt>5단계</dt><dd>요구사항 분석 → UI/UX 설계 → 개발/구현 → 품질보증 테스트 → 콘텐츠 확인</dd>
-          <dt>완료 단계</dt><dd>2026-03-31 (요구사항~배포 완료, 도메인 연결만 잔여)</dd>
-          <dt>도메인</dt><dd>interohrigin.com (운영 중) · interohrigin.io 추가연결 예정</dd>
-          <dt>후속 트랙</dt><dd><strong>어드민 패널 개편</strong> 진행 중 — 콘텐츠 직접 수정 + AI 카피라이팅 보조</dd>
-        </dl>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📋</span> 임원 확인 필요</h3>
-        <ul class="bulleted">
-          <li><strong>어드민 패널 개편 완료 시점</strong> 합의 (별개 트랙)</li>
-          <li><strong>콘텐츠 관리 책임자</strong> 지정</li>
-          <li><strong>interohrigin.io 도메인</strong> 추가연결 일정 확정</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
+  <div class="pp" id="pp-irc"></div>
   <div class="commits-box" id="commits-irc"></div>
 
   <div id="discussion-irc" data-discussion="irc"></div>
@@ -1732,68 +1232,7 @@
 <!-- 패널 8: 완료 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="completed">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">완료 프로젝트 · 임원 요약</div>
-      <h2>붐앤잽 · 사내 복지몰 · Exhiboot 박람회 시스템 — 모두 완료 운영 중</h2>
-      <div class="h-summary">
-        <strong>붐앤잽 · 복지몰 · Exhiboot</strong> 3개 프로젝트가 완료되어 운영 중입니다. (인터오리진 I&amp;C 홈페이지 리뉴얼은 도메인 연결 단계가 남은 <strong>진행중</strong>이라 별도 탭으로 분리했습니다.)
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">붐앤잽 완료 4/17</span>
-        <span class="h-tag">복지몰 완료 4/24</span>
-        <span class="h-tag">Exhiboot 완료 3/23</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="card" style="margin-bottom:16px;">
-      <h3><span class="emoji">💧</span> 붐앤잽 (신규 브랜드 웹사이트) — <span class="badge b-completed">완료 100%</span> · 브랜드사업본부 · 정식 오픈 4월 17일</h3>
-      <dl class="kv">
-        <dt>한 줄</dt><dd>인터오리진 신규 브랜드 붐앤잽 공식 사이트 + 콘텐츠 직접 편집 어드민(CMS)</dd>
-        <dt>완료일</dt><dd>2026-04-17 정식 오픈</dd>
-        <dt>특징</dt><dd>멀티 AI 통합(Claude·Gemini·OpenAI) + 토큰/비용 실시간 표시 (사내 시스템 중 유일)</dd>
-        <dt>웹사이트</dt><dd><code>boomnzap.interohrigin-dev.workers.dev</code></dd>
-        <dt>운영비</dt><dd><strong>월 $0</strong> (Cloudflare 무료 한도 + 기본 무료 AI 모델)</dd>
-        <dt>임원 확인 필요</dt><dd>운영 KPI(방문자/AI 비용) 기준 · 콘텐츠 업데이트 주기·담당자</dd>
-      </dl>
-    </div>
-
-    <div class="card" style="margin-bottom:16px;">
-      <h3><span class="emoji">🛍️</span> 인터오리진 복지몰 — <span class="badge b-completed">완료 100%</span> · 4월 24일 · 중</h3>
-      <dl class="kv">
-        <dt>한 줄</dt><dd>직원 포인트로 사내 복지품을 구매할 수 있는 사내 쇼핑몰</dd>
-        <dt>완료일</dt><dd>2026-04-24</dd>
-        <dt>특징</dt><dd>HR 시스템과 동일한 로그인 + 직원 마스터 자동 연동 (별도 회원가입 불필요)</dd>
-        <dt>운영 정책</dt><dd>경영지원팀 선행 → 키맨 → 전사 (4/16, 4/30 회의 합의)</dd>
-        <dt>관련 회의</dt><dd>4/16 HR + 복지몰 통합 점검 · 4/30 재무회계 + 복지몰 개발 미팅</dd>
-        <dt>임원 확인 필요</dt><dd>전사 확산 일정 / 복지품 카테고리 추가 정책</dd>
-      </dl>
-    </div>
-
-    <div class="card">
-      <h3><span class="emoji">💄</span> Exhiboot — <span class="badge b-completed">완료 100%</span> · 3월 23일 · 하</h3>
-      <dl class="kv">
-        <dt>한 줄</dt><dd>해외 뷰티 박람회 현장 운영 시스템 (QR 리드 수집 + 바이어 응대 + 주문 결제)</dd>
-        <dt>완료일</dt><dd>2026-03-23</dd>
-        <dt>차별점</dt><dd>박람회 부스에 태블릿 키오스크 — 방문자 4~5단계 Q&amp;A → AI 맞춤 추천 + 뷰티 분석 리포트 즉시 발송</dd>
-        <dt>결제 수단</dt><dd>PayPal (해외 결제) · EMS 배송비 통합 결제</dd>
-        <dt>SNS 연결</dt><dd>WhatsApp · LINE · 카카오톡 · Instagram</dd>
-        <dt>최근 활동</dt><dd><strong>5/27~28 박람회 현장 키오스크 대응</strong> (git 활발) — offline-first 등록 페이지, PWA 오프라인, 오프라인 큐 중복 차단, 이메일 스팸 점수 개선. 사내 대시보드는 완료지만 박람회 대비 보강 진행 중.</dd>
-        <dt>임원 확인 필요</dt><dd>다음 박람회 일정 / 운영 인력 배정 / 시즌별 콘텐츠 업데이트</dd>
-      </dl>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>완료 프로젝트 통합 타임라인</h2>
-      <div class="desc">붐앤잽 · 복지몰 · Exhiboot 완료 프로젝트의 핵심 마일스톤</div>
-    </div>
-    <div class="timeline" id="tl-completed"></div>
-  </div>
-
+  <div class="pp" id="pp-completed"></div>
   <div class="commits-box" id="commits-completed"></div>
 
   <div id="discussion-completed" data-discussion="completed"></div>
@@ -1803,63 +1242,7 @@
 <!-- 패널 9: 과금 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="cost">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">과금 구조 · 임원 요약</div>
-      <h2>5월 확정 비용 약 $155 + 사용량 기반 변동분 — 토큰 단위 추적은 일부만 가능</h2>
-      <div class="h-summary">
-        비용은 3개 카테고리로 구분: <strong>① 개발자 도구</strong> (월 $130, 차주용 본인 도구) · <strong>② 시스템 운영 AI 호출</strong> (각 콘솔 청구서 기준) · <strong>③ 인프라</strong> (Supabase Pro $25 + Cloudflare 무료 한도).
-        토큰 단위 정확한 비용 추적은 Anthropic·Google·OpenAI 콘솔 청구서를 직접 확인해야 합니다.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">5월 확정 $155 + α</span>
-        <span class="h-tag">6개월 누계 $940 + α</span>
-        <span class="h-tag">단일 Supabase Pro 공유 ($25)</span>
-        <span class="h-tag">붐앤잽만 토큰 실시간 표시</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;margin-bottom:12px;line-height:1.6;">
-      <div>✏️ <strong>표 전체 편집 가능</strong> — 서비스명·플랜·단가·비고는 <strong>클릭해서 바로 수정</strong>, 각 월(3~12월) 칸은 금액 입력 → <strong>합계·소계·총계 자동 계산</strong>. 각 그룹 끝 <strong>＋항목 추가</strong>, 행 끝 <strong>× 삭제</strong>. 모든 변경은 이 브라우저에 저장(새로고침·PDF 유지). 좌우 스크롤 가능.</div>
-      <button onclick="resetCostOverrides()" style="flex-shrink:0;margin-left:12px;background:white;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">입력값 초기화</button>
-    </div>
-    <div style="overflow-x:auto;">
-      <table class="t" style="min-width:1100px;">
-        <thead>
-          <tr>
-            <th style="min-width:130px;">서비스</th>
-            <th style="min-width:120px;">플랜/항목</th>
-            <th class="right">단가</th>
-            <th class="right">3월</th>
-            <th class="right">4월</th>
-            <th class="right">5월</th>
-            <th class="right">6월</th>
-            <th class="right">7월</th>
-            <th class="right">8월</th>
-            <th class="right">9월</th>
-            <th class="right">10월</th>
-            <th class="right">11월</th>
-            <th class="right">12월</th>
-            <th class="right" style="background:var(--accent-soft);">합계</th>
-            <th style="min-width:120px;">비고</th>
-          </tr>
-        </thead>
-        <tbody id="cost-table"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="notice success">
-      <strong>✅ HR 시스템 AI 비용 추적 구현됨 (2026-05-28, PDCA #3).</strong>
-      이전엔 미구현이던 토큰 단위 추적이 <code>ai_usage_log</code> 테이블 + <code>logAiUsage</code>로 실제 구현되어,
-      HR 시스템의 모든 AI 호출 비용이 자동 적재됩니다. HR 관리자 화면(billing)에서 <strong>기간별·시스템별·모델별·월별 실사용 AI 비용</strong>을 직접 확인할 수 있습니다.
-      붐앤잽도 자체 토큰/비용 실시간 표시 보유. <strong>HR/붐앤잽 외 프로젝트(Exhiboot·OPHE·AI디자인)</strong>의 정확한 합산은 각 콘솔(Anthropic·Google Cloud·OpenAI) 청구서 기준 입력이 필요합니다.
-    </div>
-  </div>
-
+  <div class="pp" id="pp-cost"></div>
   <div id="discussion-cost" data-discussion="cost"></div>
 </section>
 
@@ -1867,87 +1250,7 @@
 <!-- 패널 10: 향후 -->
 <!-- ====================================================== -->
 <section class="panel" data-panel="future">
-  <div class="section">
-    <div class="exec-headline">
-      <div class="h-eyebrow">향후 계획 · 임원 요약</div>
-      <h2>다음 6주 핵심 일정 — 6/9 자금계획 베타가 가장 임박, 미결 의사결정 12건</h2>
-      <div class="h-summary">
-        2주 안에 (P0): <strong>자금계획 v1 베타 (6/9)</strong> · <strong>CS 배포 + 교육 완료</strong> · <strong>HR 마감 지연 해소</strong>.
-        4주 안에 (P1): HR AI 보조 면접 · OPHE 정식 운영 · AI 디자인 통합 테스트 완료.
-        보류 (P2): HR Phase 3 디자인 플랫폼, 모듈 분리, SMS PoC, 보안 강화.
-      </div>
-      <div class="h-tags">
-        <span class="h-tag">P0 (2주): 3건</span>
-        <span class="h-tag">P1 (4주): 5건</span>
-        <span class="h-tag">P2 (비용 합의 후): 5건</span>
-        <span class="h-tag">미결 결정: 12건</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="grid-3">
-      <div class="card danger-card">
-        <h3><span class="emoji">🔥</span> P0 — 5/27 ~ 6/9 (2주)</h3>
-        <ul class="bulleted">
-          <li><strong>재무관리 자금계획 v1 베타</strong> (6/9) — 직원-브랜드 매핑 + 고정비 자동채움 + 편집/감사로그</li>
-          <li><strong>CS 플랫폼 배포 + 교육</strong> — 4/30 마감 초과분 해소</li>
-          <li><strong>HR 4/13 마감 지연 해소</strong> + 잔여 보완 작업 15건</li>
-        </ul>
-      </div>
-      <div class="card warn-card">
-        <h3><span class="emoji">📈</span> P1 — 6/10 ~ 7/7 (4주)</h3>
-        <ul class="bulleted">
-          <li>HR — AI 보조 면접 콘솔 본격화 + 보직 추천 AI 기본값 적용</li>
-          <li>OPHE — 정식 운영(6/30) + NEWS/FAQ 강화 + 콘텐츠 CMS 도입 검토</li>
-          <li>재무관리 — 베타 후 손익분석 모듈 자동 연계</li>
-          <li>I&amp;C 어드민 — Tiptap/Lexical 리치 에디터 + Claude 카피라이팅</li>
-          <li>AI 디자인 — 마감 통합 테스트 완료 후 P2 재개 여부 결정</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="emoji">⏸️</span> P2 — 비용·합의 후</h3>
-        <ul class="bulleted">
-          <li>HR Phase 3 (AI 디자인 플랫폼) — 비용 영향 큼</li>
-          <li>HR Phase 2 (P-32~41) — 시스템·업무 연동, 모듈 분리</li>
-          <li>SMS PoC + 컬럼 단위 암호화</li>
-          <li>CS 본격 운영 (배포 후)</li>
-          <li>붐앤잽 운영 안정화 + AI 사용량 모니터링</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2>미결 의사결정 (대표·이사 검토 12건)</h2>
-      <div class="desc">인프라 · 운영 · 정책 · 기술 — 아래 토론 영역에서 회신 부탁드립니다</div>
-    </div>
-    <div class="card">
-      <ul class="bulleted">
-        <li>📌 <strong>fn.interohrigin.com 서브도메인 확정</strong></li>
-        <li>📌 <strong>카카오워크 30명 무료 한도 초과 후 유료 전환</strong> 시기</li>
-        <li>📌 <strong>HR AI 디자인 플랫폼 (Phase 3) 비용 합의</strong></li>
-        <li>📌 <strong>채용 면접 통합 페이지 우선순위</strong> (대표 단일 링크)</li>
-        <li>📌 <strong>디자인 레퍼런스 아카이브 위치</strong> (강 이사 검토)</li>
-        <li>📌 <strong>Vercel Hobby → Pro 전환</strong> (AI 디자인)</li>
-        <li>📌 <strong>Supabase Free → Pro 전환</strong> (트래픽 한도)</li>
-        <li>📌 <strong>Cloudflare Workers 유료 한도</strong> (붐앤잽 운영 안정화 후)</li>
-        <li>📌 <strong>SMS PoC 도입 여부</strong> (개인정보 보안 비용)</li>
-        <li>📌 <strong>CS 본격 운영 → 키맨 확산 시점</strong></li>
-        <li>📌 <strong>1분기 인사 평가 정식 실행</strong> (현재 민지 + JY 2인 선행 중)</li>
-        <li>📌 <strong>AI 컬럼 단위 암호화 도입</strong></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="notice info">
-      <strong>다음 보고 권고.</strong>
-      (1) 6/9 자금계획 베타 결과 · (2) HR Gap 100% 달성 + 4/13 지연 해소 · (3) CS 배포·교육 완료 · (4) 정확한 5월 API 비용 (각 콘솔 청구서 마감 후).
-    </div>
-  </div>
-
+  <div class="pp" id="pp-future"></div>
   <div id="discussion-future" data-discussion="future"></div>
 </section>
 
@@ -2611,6 +1914,13 @@ async function renderCommits(panel, fresh = false) {
 // BOLD 디자인 (Claude Design) — 아이콘 + 종합현황 데이터/렌더
 // ====================================================================
 const ICON_PATHS = {
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3"/><path d="M12 17h.01"/>',
+  clipboard:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2"/><path d="M9 12h6M9 16h4"/>',
+  thumb:'<path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z"/><path d="M7 11l4-7a2 2 0 0 1 3 1.8V9h4.5a2 2 0 0 1 2 2.4l-1.3 6A2 2 0 0 1 17.2 19H7"/>',
+  sparkle:'<path d="M12 3v4M12 17v4M5 12H1M23 12h-4M6.3 6.3 9 9M15 15l2.7 2.7M6.3 17.7 9 15M15 9l2.7-2.7"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
   users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/>',
   headset:'<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 16a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2Z"/><path d="M3 16a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2Z"/><path d="M18 18a4 4 0 0 1-4 4h-2"/>',
@@ -2641,23 +1951,46 @@ const BOLD = {
   KPI: { total:9, active:6, done:3, pipeline:77, avgActive:74, syncDate:"2026-05-28" },
   SHORT: { overview:"종합", hr:"HR", cs:"CS", finance:"재무", ophe:"OPHE", "ai-design":"AI디자인", irc:"I&C", completed:"완료", cost:"과금", future:"향후" },
   ACTIVE: [
-    { panel:"cs", icon:"headset", name:"고객관리 CS 플랫폼", dept:"경영관리본부", progress:75, status:"attention", due:"4월 30일", dueNote:"마감 초과", open:1, what:"고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템." },
-    { panel:"finance", icon:"wallet", name:"재무관리 시스템", dept:"경영관리본부", progress:83, status:"ontrack", due:"6월 30일", dueNote:"베타 6/9 ★", open:0, what:"매출·고정비·변동비를 통합해 월별 자금 계획을 자동 산출하는 시스템." },
-    { panel:"ophe", icon:"droplet", name:"OPHE 브랜드 런칭", dept:"브랜드사업본부", progress:83, status:"done", due:"6월 30일", dueNote:"정식 운영", open:0, what:"새 화장품 브랜드 OPHE 공식 사이트 — 구매는 Cafe24 연결." },
-    { panel:"hr", icon:"users", name:"HR 플랫폼", dept:"경영관리본부", progress:73, status:"delayed", due:"4월 13일", dueNote:"지연 보완 중", open:6, what:"채용·입사·OJT·평가·근태/연차/결재까지 HR 전 영역을 한 시스템에 통합." },
-    { panel:"irc", icon:"building", name:"인터오리진 I&C 리뉴얼", dept:"마케팅영업본부", progress:86, status:"delayed", due:"3월 31일", dueNote:"도메인 연결 잔여", open:3, what:"본사 공식 사이트(interohrigin.com)를 디자인·정보 구조 전면 개편." },
-    { panel:"ai-design", icon:"palette", name:"AI 디자인 에이전트", dept:"브랜드사업본부", progress:43, status:"attention", due:"4월 30일", dueNote:"마감 초과", open:3, what:"내부 디자인팀 전용 AI 브랜드 아이덴티티(로고·컬러·타이포) 자동 생성 도구." },
+    { panel:"cs", icon:"headset", name:"고객관리 CS 플랫폼", dept:"경영관리본부", progress:75, status:"attention", priority:"긴급", due:"4월 30일", dueNote:"마감 초과", stage:"배포 준비 및 사용자 교육", open:1, start:"—", url:"cs.interohrigin.com",
+      what:"고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템.",
+      why:"상담 인원 의존도를 줄이고, 어떤 문의가 자주 들어오는지 데이터화. 첫 응답 시간 단축.",
+      now:"기능 개발은 75%까지 완료. 4/30 마감을 넘긴 상태로 배포 + 사용자 교육 단계 진행 중." },
+    { panel:"finance", icon:"wallet", name:"재무관리 시스템", dept:"경영관리본부", progress:83, status:"ontrack", priority:"상", due:"6월 30일", dueNote:"베타 6/9 ★", stage:"보안 및 성능 최적화", open:0, start:"—", url:"fn.interohrigin.com (예정)",
+      what:"매출·고정비·변동비를 통합해 월별 자금 계획을 자동 산출하는 시스템.",
+      why:"엑셀로 부서별 취합하던 자금계획을 시스템화해 임원 보고를 실시간 갱신.",
+      now:"5/21 입력 모델·자동 채움·편집/감사 3가지 확정. 베타가 6/4 → 6/8 → 6/9로 보정." },
+    { panel:"ophe", icon:"droplet", name:"OPHE 브랜드 런칭", dept:"브랜드사업본부", progress:83, status:"done", priority:"상", due:"6월 30일", dueNote:"정식 운영", stage:"콘텐츠 업로드 및 마케팅", open:0, start:"2026-04-20", url:"byredo 레퍼런스 · Cafe24 핸드오프",
+      what:"새 화장품 브랜드 OPHE 공식 사이트 — 브랜드 스토리·제품 노출, 구매는 Cafe24 연결.",
+      why:"브랜드 인지도에 집중하고 쇼핑몰 운영 부담은 Cafe24에 위임해 운영 부담 최소화.",
+      now:"4/29 베타 오픈 성공. 현재 콘텐츠 업로드와 운영 안정화 단계. 6/30 정식 운영 목표." },
+    { panel:"hr", icon:"users", name:"HR 플랫폼", dept:"경영관리본부", progress:73, status:"delayed", priority:"상", due:"4월 13일", dueNote:"지연 보완 중", stage:"메뉴별 테스트 및 기능 보완", open:6, start:"2026-03-19", url:"hr.interohrigin.com (예정)",
+      what:"채용·입사·OJT·평가·근태/연차/결재까지 HR 모든 영역을 한 시스템에 통합.",
+      why:"결재·연차 신청 30분을 자동화로 0분에 수렴시키고, 채용 전 과정에 AI 분석을 붙여 검증 시간 단축.",
+      now:"핵심 채용·평가·결재 기능 가동 중. 4/24 합의한 '전자결재 AI 자동작성', '면접 통합 페이지'가 다음 단계." },
+    { panel:"irc", icon:"building", name:"인터오리진 I&C 리뉴얼", dept:"마케팅영업본부", progress:86, status:"delayed", priority:"상", due:"3월 31일", dueNote:"도메인 연결 잔여", stage:"interohrigin.io 도메인 추가연결", open:3, start:"—", url:"interohrigin.com (운영중)",
+      what:"인터오리진 본사 공식 사이트(interohrigin.com)를 디자인·정보 구조 전면 개편.",
+      why:"회사의 첫인상이 되는 공식 사이트의 신뢰도·브랜드 일관성 확보.",
+      now:"요구사항~배포 5단계 완료, 사이트 운영 중. interohrigin.io 도메인 연결과 어드민 개편이 잔여 항목." },
+    { panel:"ai-design", icon:"palette", name:"AI 디자인 에이전트", dept:"브랜드사업본부", progress:43, status:"attention", priority:"중", due:"4월 30일", dueNote:"마감 초과", stage:"통합 테스트 및 품질 검증", open:3, start:"2026-03-20", url:"ai-design-agent-rosy.vercel.app",
+      what:"내부 디자인팀 전용 AI 기반 브랜드 아이덴티티(로고·컬러·타이포) 자동 생성 도구.",
+      why:"새 브랜드 출시·리뉴얼 시 초안 디자인 시간 단축. 디자이너의 반복 작업을 AI가 대신.",
+      now:"4/30 마감 초과. 통합 테스트 단계. HR 핵심 안정화 후 재개하기로 한 P2 분류 항목." },
   ],
   DECISIONS: [
-    { panel:"hr", text:"1분기 인사 평가 정식 실행 시점 — 전사 확산 시점 결정 필요" },
-    { panel:"hr", text:"HR AI 디자인 플랫폼(Phase 3) 비용 합의 — 진행 여부·예산" },
-    { panel:"hr", text:"채용 면접 통합 페이지 우선순위 — 대표 단일 링크 페이지" },
-    { panel:"finance", text:"6/9 베타 결과 임원 보고 일정 — 베타 직후 시연·검토 일정 확보" },
-    { panel:"finance", text:"fn.interohrigin.com 서브도메인 확정" },
-    { panel:"ophe", text:"콘텐츠 업로드 담당자·일정 — 정식 운영(6/30) 전까지" },
-    { panel:"ai-design", text:"P2 재개 여부 — HR 80~90% 도달 시 재개할지" },
-    { panel:"ai-design", text:"이미지 생성 + 멀티 프로바이더 월 예산 한도 합의" },
+    { panel:"hr", text:"1분기 인사 평가 정식 실행 시점 — 현재 민지+JY 2인 선행 테스트 중. 전사 확산 시점 결정 필요" },
+    { panel:"hr", text:"HR AI 디자인 플랫폼(Phase 3) 비용 합의 — 멀티 AI 운영 비용 영향 큼. 진행 여부·예산 합의" },
+    { panel:"hr", text:"채용 면접 통합 페이지 우선순위 — 대표 단일 링크로 이력서·요약·질문을 보는 페이지" },
+    { panel:"finance", text:"6/9 베타 결과 임원 보고 일정 — 베타 직후 임원 시연·검토 일정 사전 확보" },
+    { panel:"finance", text:"fn.interohrigin.com 서브도메인 확정 — 최종 주소 합의" },
+    { panel:"finance", text:"변동비 자동 채움 시점 — Stage 3로 미뤘는데 임원 보고에 변동비도 필요한지" },
+    { panel:"ophe", text:"콘텐츠 업로드 담당자·일정 — 정식 운영(6/30) 전까지 채울 콘텐츠 양·담당자" },
+    { panel:"ophe", text:"NEWS / FAQ 페이지 강화 — 자체 페이지 vs Cafe24 위임 범위" },
+    { panel:"ophe", text:"다국어 정식 지원 시점 — 영문/중문 도입 시점과 번역 방식" },
+    { panel:"ai-design", text:"P2 재개 여부 — HR이 80~90% 도달 시 재개할지 결정" },
+    { panel:"ai-design", text:"예산 합의 — 이미지 생성 + 멀티 프로바이더 월 예산 한도" },
+    { panel:"ai-design", text:"실제 사용 ROI — 디자인팀 시범 사용자 지정 후 사용 빈도 측정" },
     { panel:"irc", text:"어드민 패널 개편 완료 시점 합의 (별개 트랙)" },
+    { panel:"irc", text:"콘텐츠 관리 책임자 지정" },
     { panel:"irc", text:"interohrigin.io 도메인 추가연결 일정 확정" },
   ],
   MILESTONES: [
@@ -2673,6 +2006,191 @@ const BOLD = {
     { name:"복지몰", stat:"완료 (4/24)", status:"done", desc:"직원 포인트·주문·결제 (HR 통합 로그인)" },
     { name:"재무관리", stat:"진행중 83%", status:"ontrack", desc:"자금계획·고정비·자금이체·손익분석 (6/9 베타)" },
   ],
+  PLANNED: {
+    hr: [
+      "4/13 마감 지연 해소 — 잔여 보완 작업 15건 완료 시점 공유 예정",
+      "채용 0507 Gap → 100% — 사전 질의서 / 면접 슬롯 예약 / AI 보조 면접 콘솔",
+      "인수인계 자동화 — 퇴사자 문서·자산·계약을 후임자에게 자동 전달 (착수 예정)",
+      "SMS 알림 도입 여부 — 이메일 외 SMS 발송 PoC (개인정보 보안 비용 검토)",
+    ],
+    finance: [
+      "입력 발송 모달 — 부서별 토큰 → 직원별 + 직원-브랜드 매핑",
+      "고정비 자동 채움 — 18개 카테고리로 묶어 자동 입력",
+      "편집 + 변경 이력 — 임원 보고 후에도 편집 + 모든 변경 기록",
+      "베타 후 손익분석 모듈 — 자금계획 → 손익분석 자동 연계",
+    ],
+    ophe: [
+      "콘텐츠 업로드 완료 → 정식 운영 (6/30)",
+      "Web Vitals 자동 모니터링 도입",
+      "콘텐츠 관리 시스템(CMS) 도입 검토",
+      "2차 디자인 보완 (TalkFile 0507 기준)",
+    ],
+    "ai-design": [
+      "통합 테스트 완료 → 4/30 마감 정산",
+      "멀티 프로바이더 API 비용 모니터링 대시보드",
+      "이미지 생성 사용량 추적 (DALL-E 3 / Gemini)",
+      "디자인팀 시범 사용 + 피드백 수집",
+    ],
+  },
+  FACTS: {
+    hr: [
+      ["한 줄", "직원 한 명의 입사부터 퇴사까지 전 과정을 한 시스템에서 관리"],
+      ["대상 사용자", "전 직원 · 임원 · HR 담당자 · 면접관 · 멘토"],
+      ["도입 효과", "결재·연차 자동화 / CEO 한 화면 파악 / 채용 시 AI 보조"],
+      ["운영 정책", "경영지원팀 선행 → 키맨 → 전사 단계 확산 (4/16 합의)"],
+      ["알림 채널", "이메일(메인) + 카카오워크(사내 메신저, 30명 무료)"],
+    ],
+    finance: [
+      ["한 줄", "월별 자금계획을 직원이 입력하면 자동으로 손익이 산출되는 시스템"],
+      ["대상 사용자", "대표(임원 보고용) · 재무 담당자 · 매출 입력 직원"],
+      ["도입 효과", "엑셀 취합 단축 / 실시간 손익 가시화 / 변경 이력 자동 기록"],
+      ["입력 방식", "직원 단위 입력 요청 → 본인 담당 브랜드 매출만 입력"],
+      ["자동 채움", "고정비 18개 카테고리는 자동 합산 (직원 입력 불필요)"],
+    ],
+    ophe: [
+      ["한 줄", "OPHE 브랜드 사이트 — 인지도는 자체 사이트, 결제는 Cafe24"],
+      ["대상 사용자", "일반 고객 · 브랜드 마케팅 담당"],
+      ["레퍼런스", "Byredo / Nonfiction / Portrait Report (무드·레이아웃)"],
+      ["베타 오픈", "2026-04-29 완료 · 정식 운영 6/30 목표"],
+      ["기술", "Next.js 14 + GSAP/Lenis + Cafe24 URL 빌더 + GA4/Clarity"],
+    ],
+    "ai-design": [
+      ["한 줄", "디자인팀이 키워드를 주면 로고·컬러·타이포 초안을 AI가 자동 생성"],
+      ["대상 사용자", "내부 디자인팀만 (공개 회원가입 없음)"],
+      ["도입 효과", "초안 디자인 단축 / 멀티 AI 비교 출력 / 반복 작업 자동화"],
+      ["현재 단계", "통합 테스트 및 품질 검증"],
+      ["대기 사유", "HR 핵심 안정화 후 본격 운영 (P2 분류, 0512 보완계획)"],
+    ],
+    irc: [
+      ["한 줄", "본사 공식 사이트(interohrigin.com) 리뉴얼 — 전면 개편"],
+      ["현재 상태", "진행중 86% — 사이트 운영 중, interohrigin.io 도메인 연결 잔여"],
+      ["5단계", "요구사항 → UI/UX → 개발 → 품질보증 → 콘텐츠 확인"],
+      ["도메인", "interohrigin.com(운영중) · interohrigin.io 추가연결 예정"],
+      ["후속 트랙", "어드민 패널 개편 — 콘텐츠 직접 수정 + AI 카피라이팅 보조"],
+    ],
+    cs: [
+      ["한 줄", "고객 문의를 티켓으로 관리하고 AI가 자동응답을 보조하는 시스템"],
+      ["대상 사용자", "CS 상담 담당 · 경영관리본부"],
+      ["도입 효과", "첫 응답 시간 단축 / 문의 유형 데이터화 / 상담 인원 의존도 감소"],
+      ["현재 단계", "기능 75% 완료 — 배포 준비 및 사용자 교육"],
+      ["접속", "cs.interohrigin.com"],
+    ],
+  },
+  AI_FEATURES: {
+    hr: [
+      ["이력서 분석", "PDF 업로드 시 자동으로 점수·강점·약점·추천 여부 산출"],
+      ["면접 분석", "면접 녹음을 듣고 답변 평가·종합 의견 작성"],
+      ["평가 리포트", "평가 데이터를 받아 AI가 종합 리포트 자동 작성"],
+      ["인수인계 초안", "퇴사자 데이터를 받아 인수인계 초안 자동 작성"],
+      ["회의록 받아쓰기", "회의 녹음을 텍스트로 변환 (한국어 정확도 27% 개선)"],
+      ["CEO 임원 리포트", "회사 전반 데이터를 한 페이지로 요약 (Claude API)"],
+    ],
+    "ai-design": [
+      ["Anthropic Claude", "카피라이팅·브랜드 설명 자동 작성"],
+      ["OpenAI", "DALL-E 3 이미지 생성 (로고·일러스트)"],
+      ["Google Gemini", "텍스트 보조"],
+      ["OpenRouter", "가격·성능 비교 단일 진입점 (어떤 AI가 더 좋은지 자동 비교)"],
+    ],
+  },
+  HR_MODULES: [
+    { name:"인사 기본", items:["직원 정보·출퇴근","전자결재(품의·공문)","연차 신청·승인","급여명세·교육·증명서 자동발급"] },
+    { name:"채용", items:["공고 등록·관리","지원자 풀·인재 프로필","이력서 AI 분석","면접 일정·녹화·분석","13단계 채용 가이드"] },
+    { name:"OJT · 수습", items:["OJT 프로그램·등록","멘토 배정 + 일일 보고","수습 평가(14/42/70일)","AI 코멘트 자동 확장"] },
+    { name:"평가", items:["기간·대상·항목 설정","자기/동료 평가(10×10)","월간 점검·대면 기록","AI 종합 리포트 자동작성"] },
+    { name:"사내 메신저", items:["채팅방·메시지·멤버","메시지 반응(이모지)","첨부(7일 한정 링크)","외부: 카카오워크 채택"] },
+    { name:"인사노무", items:["연차 자동부여·촉진","긴급연차 신청·처리 (NEW)","반복업무 자동화 (NEW)","전자계약·인사명령·퇴사설문"] },
+    { name:"인수인계 (예정)", items:["인수인계 문서·자산 인벤토리","후임자 Q&A 챗봇","AI 초안 자동 생성","구글 드라이브 스캔 검수"] },
+  ],
+  TIMELINE: {
+    hr: [
+      { date:"03-19", m:true, title:"프로젝트 착수 — 차주용 입사 첫 주", body:"DB 마이그레이션 / 페이팔 결제 라이브 / 인사노무 착수. Phase 1 범위 P-01~P-21 정의." },
+      { date:"03-24", m:true, title:"Phase 1 완료 — 핵심 모듈 1차 가동", body:"대시보드 UI / 채용관리 Phase 1 / CEO 긴급 대시보드 / 인사평가 간소화 / 연차·전자결재." },
+      { date:"04-16", title:"HR + 복지몰 개발 점검 회의", body:"전사 일괄 오픈 X → 경영지원팀 선행 → 단계별 확산. 알림 = 이메일." },
+      { date:"04-24", title:"CS + 경영 전반 업무 점검", body:"KPI 수치화 / 전자결재 AI 자동작성 / 면접 통합 페이지 / 메신저 카카오워크 채택." },
+      { date:"05-07", m:true, title:"Gap Analysis — 현재 80%, FR별 갭 매트릭스", body:"고도화 요구서 v1.0 전 FR 대조. 80% → 100% 단계별 실행 계획 확정." },
+      { date:"05-13~16", title:"사전질의서 v2.0 대규모 보강 (11 commit)", body:"메타정보 + 통합해석 + 면접질문 도입. 결과 공유 페이지 추가. RLS 저장실패 문제 해결." },
+      { date:"05-26~27", m:true, title:"인터랙티브 온라인 매뉴얼 (PDCA #1)", body:"직원용 Help Center + 스포트라이트 투어. 신규 입사자 온보딩 시간 단축. Match 97.4%." },
+      { date:"05-28", m:true, title:"통합 AI 비용 대시보드 (PDCA #3)", body:"ai_usage_log 테이블 신설. 모든 AI 호출 토큰/비용 자동 적재. 기간·시스템·모델별 표시." },
+      { date:"05-28", m:true, title:"긴급연차 + 반복업무 (PDCA #4·#5)", body:"긴급연차 신청·처리 흐름 + 매주/매월 반복업무 자동화 + 일일보고 자동 반영." },
+    ],
+    finance: [
+      { date:"05-15", title:"재무관리 자동 배포 준비 — Cloudflare Pages", body:"main 푸시 시 자동 빌드. 서브도메인 fn.interohrigin.com 예정." },
+      { date:"05-21", m:true, title:"자금계획 v1 — 3개 핵심 결정", body:"① 입력: 직원 단위 + 직원-브랜드 매핑 ② 자동 채움: 고정비 18개 카테고리 ③ 편집·감사: 보고 후 편집 + 변경 자동 기록. 베타 6/4 → 6/9." },
+    ],
+    ophe: [
+      { date:"04-20", m:true, title:"프로젝트 착수 — 요구사항 정렬", body:"OPHE 자사몰(랜딩 + Cafe24 핸드오프). 벤치마크 Byredo / Nonfiction." },
+      { date:"04-22~25", title:"레이아웃·히어로·제품진열", body:"헤더/푸터 + 홈 히어로 스토리텔링 + 컬렉션 페이지·필터. 분석 GA4 + Clarity." },
+      { date:"04-29", m:true, title:"🚀 베타 오픈", body:"배포 리허설 + Beta Open. Cloudflare Pages 도메인 + 분석 점검 완료." },
+      { date:"05-07", title:"수정안 — 베타 후 피드백 반영", body:"NEWS/FAQ 진입 강화 + 다국어 검토." },
+    ],
+    "ai-design": [
+      { date:"03-20", m:true, title:"프로젝트 시작 — 멀티 AI 셋업", body:"내부 디자인팀 전용 BI Generator. 공개 회원가입 없음 — 사전 등록만." },
+      { date:"03-23", title:"기능명세서 v1 완성", body:"배포 ai-design-agent-rosy.vercel.app. 0512 보완계획에서 P2 분류 — HR 안정화 전 착수 금지." },
+    ],
+    completed: [
+      { date:"03-23", m:true, title:"I&C v1 / Exhiboot 완료", body:"I&C v1 — 5단계 모두 완료. Exhiboot — 개발 완료 단계 진입." },
+      { date:"04-17", m:true, title:"🚀 붐앤잽 정식 오픈", body:"Cloudflare Workers + D1 + KV / 멀티 AI 통합 / 어드민 CMS / 영상 자산." },
+      { date:"04-24", m:true, title:"인터오리진 복지몰 완료 100%", body:"HR 통합 DB · SSO · 직원 마스터/포인트 연결. 단계별 오픈 정책." },
+      { date:"05-27~28", m:true, title:"Exhiboot 박람회 현장 키오스크 대응", body:"엣지캐싱 + PWA 오프라인 + 오프라인 큐 중복 차단 + 이메일 스팸 점수 개선." },
+    ],
+  },
+  DONE: [
+    { id:"boomzap", panel:"completed", icon:"globe", name:"신규브랜드(붐앤잽) 웹사이트", dept:"브랜드사업본부", due:"4월 17일", dueNote:"정식 오픈", url:"boomnzap.interohrigin-dev.workers.dev",
+      what:"인터오리진 신규 브랜드 붐앤잽 공식 사이트 + 콘텐츠 직접 편집 어드민(CMS).",
+      why:"멀티 AI 통합(Claude·Gemini·OpenAI) + 토큰/비용 실시간 표시 (사내 시스템 중 유일).",
+      now:"월 $0 운영 (Cloudflare 무료 한도 + 기본 무료 AI 모델)." },
+    { id:"mall", panel:"completed", icon:"bag", name:"인터오리진 복지몰", dept:"경영관리본부", due:"4월 24일", dueNote:"완료", url:"HR 통합 로그인",
+      what:"직원 포인트로 사내 복지품을 구매할 수 있는 사내 쇼핑몰.",
+      why:"HR 시스템과 동일한 로그인 + 직원 마스터 자동 연동 (별도 회원가입 불필요).",
+      now:"경영지원팀 선행 → 키맨 → 전사 단계별 오픈 정책 (4/16·4/30 회의 합의)." },
+    { id:"exhiboot", panel:"completed", icon:"ticket", name:"Exhiboot 박람회 시스템", dept:"경영관리본부", due:"3월 23일", dueNote:"완료", url:"PayPal · EMS · WhatsApp/LINE/카카오/IG",
+      what:"해외 뷰티 박람회 현장 운영 시스템 (QR 리드 수집 + 바이어 응대 + 주문 결제).",
+      why:"부스 태블릿 키오스크 — 방문자 Q&A → AI 맞춤 추천 + 뷰티 분석 리포트 즉시 발송.",
+      now:"5/27~28 현장 키오스크 대응(git 활발) — offline-first 등록, PWA 오프라인, 이메일 스팸 점수 개선." },
+  ],
+  COSTS: [
+    { group:"1. 개발자 직접 사용 (차주용 본인 도구)", monthly:130, items:[
+      { service:"Anthropic Claude", plan:"Max Plan 5x", unit:"$100/월", m5:100 },
+      { service:"OpenAI Codex", plan:"API 종량제", unit:"사용량 기반", m5:null },
+      { service:"GitHub Copilot", plan:"Pro", unit:"$10/월", m5:10 },
+      { service:"Cursor / Antigravity", plan:"Pro", unit:"$20/월", m5:20 },
+    ]},
+    { group:"2. 시스템 운영 (프로덕션 API 호출)", monthly:0, items:[
+      { service:"HR — Gemini API", plan:"2.5 Flash · 이력서/면접/평가", unit:"무료 (분당 15건)", m5:0 },
+      { service:"HR — Claude API", plan:"Sonnet · CEO 리포트·결재", unit:"토큰당", m5:null },
+      { service:"HR — Deepgram", plan:"Nova-3 · 회의록 받아쓰기", unit:"$0.0043/분", m5:null },
+      { service:"Exhiboot — Claude/Resend/PayPal", plan:"번역·메일·결제", unit:"사용량 기반", m5:null },
+      { service:"붐앤잽 — Gemini 2.5", plan:"Flash Lite 무료", unit:"토큰당", m5:0 },
+    ]},
+    { group:"3. 인프라", monthly:25, items:[
+      { service:"Supabase PRO (HR·CS·복지몰·재무)", plan:"Pro (단일 인스턴스)", unit:"$25/월", m5:25 },
+      { service:"Cloudflare Pages·Workers", plan:"Free Tier", unit:"$0", m5:0 },
+      { service:"Vercel (AI Design)", plan:"Hobby", unit:"Pro $20 검토중", m5:0 },
+      { service:"Google Workspace", plan:"Business Starter", unit:"$6/유저/월", m5:null },
+      { service:"도메인 (interohrigin.com 외)", plan:"연간", unit:"~$20/년", m5:null },
+    ]},
+  ],
+  ROADMAP: {
+    p0: { label:"P0 — 5/27 ~ 6/9 (2주)", tone:"alert", items:[
+      "재무관리 자금계획 v1 베타 (6/9) — 직원-브랜드 매핑 + 고정비 자동채움 + 편집/감사로그",
+      "CS 플랫폼 배포 + 교육 — 4/30 마감 초과분 해소",
+      "HR 4/13 마감 지연 해소 + 잔여 보완 작업 15건",
+    ]},
+    p1: { label:"P1 — 6/10 ~ 7/7 (4주)", tone:"warn", items:[
+      "HR — AI 보조 면접 콘솔 본격화 + 보직 추천 AI 기본값",
+      "OPHE — 정식 운영(6/30) + NEWS/FAQ 강화 + CMS 도입 검토",
+      "재무관리 — 베타 후 손익분석 모듈 자동 연계",
+      "I&C 어드민 — 리치 에디터 + Claude 카피라이팅",
+      "AI 디자인 — 통합 테스트 완료 후 P2 재개 여부 결정",
+    ]},
+    p2: { label:"P2 — 비용·합의 후", tone:"neutral", items:[
+      "HR Phase 3 (AI 디자인 플랫폼) — 비용 영향 큼",
+      "HR Phase 2 (P-32~41) — 시스템·업무 연동, 모듈 분리",
+      "SMS PoC + 컬럼 단위 암호화",
+      "CS 본격 운영 (배포 후)",
+      "붐앤잽 운영 안정화 + AI 사용량 모니터링",
+    ]},
+  },
 };
 function ovTone(s){ return {ontrack:"ok",delayed:"warn",attention:"alert",done:"done"}[s]||"ok"; }
 function ovProg(value, status, label){ return `<div class="prog"><div class="prog-top"><span class="lbl">${label||"진행률"}</span><span class="pct">${value}%</span></div><div class="prog-track"><div class="prog-fill f-${status||"ontrack"}" style="width:${value}%"></div></div></div>`; }
@@ -2760,6 +2278,185 @@ function renderOverviewBold(){
   box.innerHTML = h;
 }
 function ovShort(p){ return BOLD.SHORT[p]||p; }
+function ppTabLabel(panel){ return (TABS.find(t=>t.key===panel)||{}).label || panel; }
+function ppSplit(t){ const m=(t||"").match(/^(.+?) — (.+)$/); return m?`<strong>${escapeHTML(m[1])}</strong> — ${escapeHTML(m[2])}`:escapeHTML(t); }
+function ppBlockHead(title, desc, kickerIcon){
+  const t = kickerIcon ? `<span class="kicker">${iconSvg(kickerIcon,13)}${escapeHTML(title)}</span>` : `<h2>${escapeHTML(title)}</h2>`;
+  return `<div class="block-head">${t}${desc?`<span class="desc">${escapeHTML(desc)}</span>`:""}</div>`;
+}
+
+/* 프로젝트 상세 패널 — panels.jsx 구조 동일 */
+function renderProjectPanelBold(panel){
+  const box = document.getElementById("pp-"+panel); if(!box) return;
+  const p = BOLD.ACTIVE.find(x=>x.panel===panel); if(!p) return;
+  const tone = ovTone(p.status);
+  let h = '<div class="stack">';
+
+  // 1) phead
+  h += `<div class="phead"><div class="phead-top">
+    <div class="phead-ic ic-${tone}">${iconSvg(p.icon,27)}</div>
+    <div class="phead-main">
+      <div class="phead-eyebrow">${escapeHTML(ppTabLabel(panel))} · 임원 요약</div>
+      <h2>${escapeHTML(p.name)}</h2>
+      <div class="phead-meta">
+        <span class="tag">${escapeHTML(p.dept)}</span>
+        <span class="chip">${iconSvg("target",12)}우선순위 ${escapeHTML(p.priority)}</span>
+        <span class="chip">${iconSvg("calendar",12)}마감 ${escapeHTML(p.due)} · ${escapeHTML(p.dueNote)}</span>
+        ${p.start && p.start!=="—" ? `<span class="chip">${iconSvg("clock",12)}시작 ${escapeHTML(p.start)}</span>` : ""}
+      </div>
+    </div>
+    <div class="phead-side">
+      <div style="background:transparent;border:none;padding:0">${ovSignal(p.status)}</div>
+      <div>${ovProg(p.progress,p.status)}</div>
+      <div style="font-size:11.5px;color:var(--ink-3);line-height:1.5"><strong style="color:var(--ink-2)">접속:</strong> <span class="mono">${escapeHTML(p.url)}</span></div>
+    </div>
+  </div>
+  <div class="whatwhy">
+    <div class="ww ww-what"><div class="ww-lbl">${iconSvg("info",13)}무엇인가요?</div><div class="ww-body">${escapeHTML(p.what)}</div></div>
+    <div class="ww ww-why"><div class="ww-lbl">${iconSvg("target",13)}왜 중요한가요?</div><div class="ww-body">${escapeHTML(p.why)}</div></div>
+    <div class="ww ww-now"><div class="ww-lbl">${iconSvg("dot",13)}지금 상황은?</div><div class="ww-body">${escapeHTML(p.now)}</div></div>
+  </div></div>`;
+
+  // 2) 결정필요 / 진행예정
+  const decisions = BOLD.DECISIONS.filter(d=>d.panel===panel);
+  const planned = BOLD.PLANNED[panel] || [];
+  if(decisions.length || planned.length){
+    h += `<div>${ppBlockHead("대표·이사 확인 요청","PM이 미리 기재한 검토 요청 — 아래 의견 영역에서 답변 부탁드립니다")}
+      <div class="grid g2">
+        ${decisions.length?`<div class="pp-card card-pad" style="border-top:4px solid var(--alert)">
+          <h3 style="font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 12px;display:flex;align-items:center;gap:8px"><span style="color:var(--alert)">${iconSvg("alert",17)}</span>결정이 필요한 사항</h3>
+          <ul class="bullet">${decisions.map(d=>`<li>${ppSplit(d.text)}</li>`).join("")}</ul></div>`:""}
+        ${planned.length?`<div class="pp-card card-pad" style="border-top:4px solid var(--warn)">
+          <h3 style="font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 12px;display:flex;align-items:center;gap:8px"><span style="color:var(--warn)">${iconSvg("clipboard",17)}</span>진행 예정 사항</h3>
+          <ul class="bullet">${planned.map(t=>`<li>${ppSplit(t)}</li>`).join("")}</ul></div>`:""}
+      </div></div>`;
+  }
+
+  // 3) 한눈에 보기 + AI 기능
+  const facts = BOLD.FACTS[panel];
+  const ai = BOLD.AI_FEATURES[panel];
+  if(facts || ai){
+    h += `<div class="grid g2">
+      ${facts?`<div class="pp-card card-pad">
+        <h3 style="font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 13px;display:flex;align-items:center;gap:8px"><span style="color:var(--brand)">${iconSvg("info",17)}</span>한눈에 보기</h3>
+        <dl class="kv">${facts.map(([k,v])=>`<dt>${escapeHTML(k)}</dt><dd>${linkify(escapeHTML(v))}</dd>`).join("")}</dl></div>`:""}
+      ${ai?`<div class="pp-card card-pad">
+        <h3 style="font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 13px;display:flex;align-items:center;gap:8px"><span style="color:var(--violet)">${iconSvg("sparkle",17)}</span>AI 기능 (어떻게 도와주나)</h3>
+        <ul class="bullet">${ai.map(([k,v])=>`<li><strong>${escapeHTML(k)}</strong> — ${escapeHTML(v)}</li>`).join("")}</ul></div>`:""}
+    </div>`;
+  }
+
+  // 4) HR 모듈 (hr 전용)
+  if(panel==="hr"){
+    h += `<div>${ppBlockHead("HR 모듈 7개 영역","각 영역에 어떤 기능이 있는지 — 임원이 이해하기 쉬운 표현으로")}
+      <div class="mods-grid">${BOLD.HR_MODULES.map((m,i)=>`<div class="mod-box">
+        <h4><span class="n">${i+1}</span>${escapeHTML(m.name)}</h4>
+        <ul>${m.items.map(it=>`<li>${escapeHTML(it)}</li>`).join("")}</ul></div>`).join("")}</div></div>`;
+  }
+
+  // 5) 타임라인
+  const tl = BOLD.TIMELINE[panel];
+  if(tl && tl.length){
+    h += `<div>${ppBlockHead("의사결정 흐름", panel==="hr"?"3월 19일 착수부터 핵심 마일스톤":null)}
+      <div class="pp-card card-pad"><div class="tl">${tl.map(t=>`<div class="tl-item${t.m?" is-m":""}">
+        <div class="tl-dot"></div><div class="tl-date">${escapeHTML(t.date)}${t.m?" · 마일스톤":""}</div>
+        <div class="tl-title">${escapeHTML(t.title)}</div><div class="tl-body">${escapeHTML(t.body)}</div></div>`).join("")}</div></div></div>`;
+  }
+
+  // (의견 모듈은 #discussion-<panel> 가 자체 헤더와 함께 이어서 렌더)
+  h += '</div>';
+  box.innerHTML = h;
+}
+
+/* 완료 프로젝트 패널 */
+function renderCompletedBold(){
+  const box = document.getElementById("pp-completed"); if(!box) return;
+  let h = '<div class="stack">';
+  h += `<div class="phead"><div class="phead-top">
+    <div class="phead-ic ic-done">${iconSvg("check",27)}</div>
+    <div class="phead-main"><div class="phead-eyebrow">완료 프로젝트 · 임원 요약</div>
+      <h2>붐앤잽 · 복지몰 · Exhiboot — 모두 완료 운영 중</h2>
+      <div class="phead-meta">
+        <span class="chip"><span style="color:var(--done)">${iconSvg("check",12)}</span>붐앤잽 4/17</span>
+        <span class="chip"><span style="color:var(--done)">${iconSvg("check",12)}</span>복지몰 4/24</span>
+        <span class="chip"><span style="color:var(--done)">${iconSvg("check",12)}</span>Exhiboot 3/23</span>
+      </div></div></div></div>`;
+  h += `<div class="stack" style="gap:14px">${BOLD.DONE.map(p=>`<div class="pp-card card-pad" style="border-left:4px solid var(--done)">
+    <div style="display:flex;align-items:flex-start;gap:14px">
+      <div class="phead-ic ic-done" style="width:42px;height:42px;border-radius:10px">${iconSvg(p.icon,22)}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:16px;font-weight:800;color:var(--ink)">${escapeHTML(p.name)}</span>
+          <span class="signal s-done"><span class="dot"></span>완료 100%</span>
+          <span class="chip">${escapeHTML(p.dept)}</span>
+          <span class="chip">${iconSvg("calendar",12)}${escapeHTML(p.due)} ${escapeHTML(p.dueNote)}</span>
+        </div>
+        <p style="font-size:13.5px;color:var(--ink-2);line-height:1.6;margin:10px 0 6px">${escapeHTML(p.what)}</p>
+        <p style="font-size:12.5px;color:var(--ink-3);line-height:1.55">${escapeHTML(p.why)}</p>
+        <p style="font-size:12.5px;color:var(--ink-3);line-height:1.55;margin-top:4px">${escapeHTML(p.now)}</p>
+        <div style="font-size:11.5px;color:var(--ink-4);margin-top:8px"><strong style="color:var(--ink-3)">접속:</strong> <span class="mono">${escapeHTML(p.url)}</span></div>
+      </div></div></div>`).join("")}</div>`;
+  const tl = BOLD.TIMELINE.completed;
+  if(tl&&tl.length) h += `<div>${ppBlockHead("완료 프로젝트 통합 타임라인","핵심 마일스톤")}
+    <div class="pp-card card-pad"><div class="tl">${tl.map(t=>`<div class="tl-item${t.m?" is-m":""}">
+      <div class="tl-dot"></div><div class="tl-date">${escapeHTML(t.date)}${t.m?" · 마일스톤":""}</div>
+      <div class="tl-title">${escapeHTML(t.title)}</div><div class="tl-body">${escapeHTML(t.body)}</div></div>`).join("")}</div></div></div>`;
+  h += '</div>';
+  box.innerHTML = h;
+}
+
+/* 과금 구조 패널 */
+function renderCostBold(){
+  const box = document.getElementById("pp-cost"); if(!box) return;
+  let h = '<div class="stack">';
+  h += `<div class="phead"><div class="phead-top">
+    <div class="phead-ic">${iconSvg("receipt",27)}</div>
+    <div class="phead-main"><div class="phead-eyebrow">과금 구조 · 임원 요약</div>
+      <h2>5월 확정 비용 약 $155 + 사용량 기반 변동분</h2>
+      <p>비용은 3개로 구분: <strong>① 개발자 도구</strong> (월 $130) · <strong>② 시스템 운영 AI 호출</strong> (각 콘솔 청구 기준) · <strong>③ 인프라</strong> (Supabase Pro $25 + Cloudflare 무료 한도).</p>
+      <div class="phead-meta"><span class="tag">5월 확정 $155 + α</span><span class="chip">단일 Supabase Pro 공유 ($25)</span><span class="chip">붐앤잽만 토큰 실시간 표시</span></div>
+    </div></div></div>`;
+  h += `<div class="pp-card" style="overflow:hidden"><table class="tbl">
+    <thead><tr><th>서비스</th><th>플랜 / 항목</th><th class="r">단가</th><th class="r">5월</th></tr></thead>
+    <tbody>${BOLD.COSTS.map(g=>`<tr class="grp"><td colspan="3">${escapeHTML(g.group)}</td><td class="r">${g.monthly>0?"$"+g.monthly:"—"}</td></tr>
+      ${g.items.map(it=>`<tr><td class="svc">${escapeHTML(it.service)}</td><td class="dim">${escapeHTML(it.plan)}</td><td class="r dim">${escapeHTML(it.unit)}</td><td class="r num">${it.m5==null?'<span class="dim">—</span>':(it.m5===0?"$0":"$"+it.m5)}</td></tr>`).join("")}`).join("")}
+    </tbody></table></div>`;
+  h += `<div class="notice ok">${iconSvg("check",18)}<span><strong>HR 시스템 AI 비용 추적 구현됨 (5/28).</strong> 모든 AI 호출 비용이 <code>ai_usage_log</code>에 자동 적재되어, HR 관리자 화면에서 기간·시스템·모델별 실사용 AI 비용을 확인할 수 있습니다. HR/붐앤잽 외 프로젝트의 정확한 합산은 각 콘솔 청구서 기준 입력이 필요합니다.</span></div>`;
+  h += '</div>';
+  box.innerHTML = h;
+}
+
+/* 향후 계획 패널 */
+function renderFutureBold(){
+  const box = document.getElementById("pp-future"); if(!box) return;
+  const R = BOLD.ROADMAP, D = BOLD.DECISIONS, icons = {p0:"rocket",p1:"target",p2:"clock"};
+  let h = '<div class="stack">';
+  h += `<div class="phead"><div class="phead-top">
+    <div class="phead-ic">${iconSvg("rocket",27)}</div>
+    <div class="phead-main"><div class="phead-eyebrow">향후 계획 · 임원 요약</div>
+      <h2>다음 6주 핵심 일정 — 6/9 자금계획 베타가 가장 임박</h2>
+      <p>2주 안에(P0): 자금계획 v1 베타(6/9) · CS 배포+교육 · HR 마감 지연 해소. 4주 안에(P1): HR AI 면접 · OPHE 정식 운영 · AI 디자인 테스트 완료.</p>
+      <div class="phead-meta"><span class="tag">P0 ${R.p0.items.length}건</span><span class="chip">P1 ${R.p1.items.length}건</span><span class="chip">P2 ${R.p2.items.length}건</span>
+        <span class="chip"><span style="color:var(--alert)">${iconSvg("flag",12)}</span>미결 결정 ${D.length}건</span></div>
+    </div></div></div>`;
+  h += `<div class="grid g3">${["p0","p1","p2"].map(k=>`<div class="pp-card card-pad rm-card t-${R[k].tone}">
+    <h3>${iconSvg(icons[k],17)}${escapeHTML(R[k].label)}</h3>
+    <ul class="bullet">${R[k].items.map(t=>`<li>${ppSplit(t)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  h += `<div>${ppBlockHead("미결 의사결정 (대표·이사 검토 "+D.length+"건)","클릭하면 해당 프로젝트의 의견 영역으로 이동합니다")}
+    <div class="pp-card" style="overflow:hidden"><div class="inbox-list">${D.map(d=>`<button class="inbox-item" onclick="activatePanel('${d.panel}')">
+      <span class="ix-proj">${ovShort(d.panel)}</span><span class="ix-text">${ppSplit(d.text)}</span><span class="ix-go">${iconSvg("arrowR",18)}</span></button>`).join("")}</div></div></div>`;
+  h += `<div class="notice info">${iconSvg("info",18)}<span><strong>다음 보고 권고.</strong> (1) 6/9 자금계획 베타 결과 · (2) HR Gap 100% 달성 + 4/13 지연 해소 · (3) CS 배포·교육 완료 · (4) 정확한 5월 API 비용.</span></div>`;
+  h += '</div>';
+  box.innerHTML = h;
+}
+
+/* 패널 진입 시 BOLD 상세 렌더 라우터 */
+function renderPanelBold(panel){
+  if(panel==="completed") return renderCompletedBold();
+  if(panel==="cost") return renderCostBold();
+  if(panel==="future") return renderFutureBold();
+  if(BOLD.ACTIVE.some(p=>p.panel===panel)) return renderProjectPanelBold(panel);
+}
 
 const HR_STATUS = {
   active:    { label: "진행중", cls: "ontrack" },
@@ -3521,6 +3218,9 @@ async function activatePanel(key) {
   if (key === "overview") {
     try { renderOverviewBold(); } catch (e) { console.warn("[overview] render 실패:", e); }
     if (!hrSyncLoaded) { hrSyncLoaded = true; renderHrSync(); }
+  } else {
+    // 프로젝트 상세/완료/과금/향후 — BOLD 상세 패널 렌더 (panels.jsx 구조)
+    try { renderPanelBold(key); } catch (e) { console.warn("[panel] render 실패:", key, e); }
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
   history.replaceState(null, "", "#" + key);
@@ -3704,6 +3404,8 @@ async function migrateLocalDemo() {
     if (cur === "overview") {
       try { renderOverviewBold(); } catch (e) { console.warn("[init] overview render:", e); }
       if (!hrSyncLoaded) { hrSyncLoaded = true; renderHrSync(); }
+    } else {
+      try { renderPanelBold(cur); } catch (e) { console.warn("[init] panel render:", cur, e); }
     }
   }
 })();
