@@ -1119,6 +1119,30 @@
   .pp .inbox-item .ix-text strong { color: var(--ink); font-weight: 800; }
   .pp .inbox-item .ix-go { color: var(--ink-4); flex-shrink: 0; }
   .pp .pp-disc-head { margin-top: 4px; }
+
+  /* ════ 완료 의견 — 아래로 접기(제목만) ════ */
+  .d-resolved-group { margin-top: 20px; border-top: 2px dashed var(--line); padding-top: 14px; }
+  .d-resolved-grouphead { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-size: 12.5px; font-weight: 800; color: var(--ink-3); padding: 4px 2px 10px; }
+  .d-resolved-grouphead:hover { color: var(--ink); }
+  .d-resolved-grouphead strong { color: var(--ink); }
+  .d-resolved-grouphead .drg-chev { display: inline-block; transition: transform .15s; font-size: 13px; }
+  .d-resolved-grouphead.collapsed .drg-chev { transform: rotate(-90deg); }
+  .d-resolved-list { display: flex; flex-direction: column; gap: 6px; }
+  .d-resolved { border: 1.5px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+  .d-resolved-bar { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 10px 14px; }
+  .d-resolved-bar:hover { background: var(--ok-soft); }
+  .d-resolved-bar .d-cat-badge { flex-shrink: 0; }
+  .d-resolved-bar .dr-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .d-resolved-bar .dr-meta { font-size: 11.5px; color: var(--ink-4); white-space: nowrap; flex-shrink: 0; }
+  .d-resolved-bar .dr-chev { color: var(--ink-4); transition: transform .15s; flex-shrink: 0; }
+  .d-resolved.open { background: var(--surface); }
+  .d-resolved.open .dr-chev { transform: rotate(180deg); }
+  .d-resolved-full { display: none; padding: 0 14px 12px; }
+  .d-resolved.open .d-resolved-full { display: block; }
+  /* 펼친 카드 안의 원본 d-item — 중복 테두리/헤더 제거 */
+  .d-resolved-full .d-item { border: none !important; border-left: none !important; border-radius: 0 !important; padding: 4px 0 0 !important; margin: 0 !important; background: none !important; }
+  .d-resolved-full .d-item-head { display: none; }
+  @media (max-width: 600px) { .d-resolved-bar .dr-meta { display: none; } }
 </style>
 </head>
 <body>
@@ -2770,12 +2794,13 @@ function renderDiscussionThread(panel) {
   if (list.length === 0) {
     c.innerHTML = '<div class="empty-thread">아직 의견이 없습니다.<br>위 <strong>✏️ 이 프로젝트에 의견·요청 남기기</strong>에서 첫 의견을 작성해주세요. 작성한 의견은 모든 임원에게 실시간 공유됩니다.</div>';
   } else {
-    c.innerHTML = list.slice().reverse().map((it) => {
+    const statusOf = (it) => it.status || (it.resolved ? "resolved" : "open");
+    // 단일 의견 카드 HTML (기존 마크업 동일)
+    const itemHTML = (it) => {
       const cat = CATS[it.category] || CATS.question;
       const replies = it.replies || [];
       const imgRefs = (it.imageRefs || it.images || []).filter(Boolean);
-      const beBase = backendBase();
-      const status = it.status || (it.resolved ? "resolved" : "open");
+      const status = statusOf(it);
       return `
         <div class="d-item cat-${it.category} ${status === "resolved" ? "resolved" : ""} ${status === "reviewing" ? "reviewing" : ""}">
           <div class="d-item-head">
@@ -2820,7 +2845,40 @@ function renderDiscussionThread(panel) {
           </div>
         </div>
       `;
-    }).join("");
+    };
+    // 정렬: 미완료(검토중·새 의견)는 위로(최신순), 완료(resolved)는 아래로 접기
+    const ordered = list.slice().reverse(); // 최신 우선
+    const active = ordered.filter(it => statusOf(it) !== "resolved");
+    const resolved = ordered.filter(it => statusOf(it) === "resolved");
+    let html = "";
+    if (active.length) {
+      html += active.map(itemHTML).join("");
+    } else if (resolved.length) {
+      html += '<div class="empty-thread" style="padding:14px;">미완료 의견이 없습니다. 모든 의견이 완료 처리되었습니다 ✅<br>완료된 의견은 아래에서 펼쳐볼 수 있습니다.</div>';
+    }
+    if (resolved.length) {
+      html += `<div class="d-resolved-group">
+        <button type="button" class="d-resolved-grouphead" id="drg-head-${panel}" onclick="toggleResolvedGroup('${panel}')">
+          <span class="drg-chev">⌄</span> 완료된 의견 <strong>${resolved.length}</strong>건 — 제목만 표시 (클릭하면 펼침)
+        </button>
+        <div class="d-resolved-list" id="drg-list-${panel}">${resolved.map(it => {
+          const cat = CATS[it.category] || CATS.question;
+          const raw = (it.title || (it.content || "").replace(/\s+/g, " ").trim()) || "(내용 없음)";
+          const titleText = raw.length > 90 ? raw.slice(0, 90) + "…" : raw;
+          return `<div class="d-resolved" id="dr-${panel}-${it.id}">
+            <button type="button" class="d-resolved-bar" onclick="toggleResolvedItem('${panel}','${it.id}')">
+              <span class="d-cat-badge cat-${it.category}">${cat.emoji} ${cat.label}</span>
+              <span class="dr-title">${escapeHTML(titleText)}</span>
+              <span class="dr-meta">${escapeHTML(it.author || "익명")} · ${fmtKST(it._ts, it.at)}</span>
+              <span class="badge b-completed">✅ 완료</span>
+              <span class="dr-chev">⌄</span>
+            </button>
+            <div class="d-resolved-full">${itemHTML(it)}</div>
+          </div>`;
+        }).join("")}</div>
+      </div>`;
+    }
+    c.innerHTML = html;
     // Inbox 체크박스 핸들러
     c.querySelectorAll(".inbox-pick").forEach(cb => {
       cb.addEventListener("change", () => {
@@ -2996,6 +3054,20 @@ async function deleteDiscussion(panel, id) {
 function toggleMove(panel, id) {
   const row = document.getElementById(`move-row-${panel}-${id}`);
   if (row) row.style.display = row.style.display === "none" ? "" : "none";
+}
+// 완료된 의견 — 개별 카드 펼치기/접기 (제목 클릭)
+function toggleResolvedItem(panel, id) {
+  const el = document.getElementById(`dr-${panel}-${id}`);
+  if (el) el.classList.toggle("open");
+}
+// 완료된 의견 — 그룹 전체 펼치기/접기
+function toggleResolvedGroup(panel) {
+  const listEl = document.getElementById(`drg-list-${panel}`);
+  const head = document.getElementById(`drg-head-${panel}`);
+  if (!listEl) return;
+  const collapsed = listEl.style.display === "none";
+  listEl.style.display = collapsed ? "" : "none";
+  if (head) head.classList.toggle("collapsed", !collapsed);
 }
 async function moveDiscussion(panel, id) {
   const sel = document.getElementById(`move-sel-${panel}-${id}`);
