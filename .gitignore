@@ -11,3 +11,6 @@ build/
 # 개인 설정/시크릿
 worker/.dev.vars
 worker/secrets.json
+
+# bkit 플러그인 로컬 상태
+.bkit/
