@@ -1154,7 +1154,7 @@
       <div class="brand-mark">IO</div>
       <div class="brand-text">
         <div class="eyebrow">INTEROHRIGIN · 경영진 대시보드</div>
-        <h1>개발 프로젝트 종합 현황<small>9개 프로젝트 · 임원 검토 · 실시간 커뮤니케이션</small></h1>
+        <h1>개발 프로젝트 종합 현황<small>10개 프로젝트 · 임원 검토 · 실시간 커뮤니케이션</small></h1>
       </div>
     </div>
     <div class="meta-buttons">
@@ -1278,6 +1278,16 @@
   <div id="discussion-future" data-discussion="future"></div>
 </section>
 
+<!-- ====================================================== -->
+<!-- 패널 11: IO Press (AI 뉴스제작 툴) -->
+<!-- ====================================================== -->
+<section class="panel" data-panel="io-press">
+  <div class="pp" id="pp-io-press"></div>
+  <div class="commits-box" id="commits-io-press"></div>
+
+  <div id="discussion-io-press" data-discussion="io-press"></div>
+</section>
+
 </main>
 
 <footer>
@@ -1396,7 +1406,8 @@ const ACTIVE_PROJECTS = [
   { id: "hr",         name: "HR 플랫폼 개발",                dept: "경영관리본부",   tasks: 16, progress: 73, priority: "high",   priorityLabel: "상",   due: "4월 13일", stage: "메뉴별 테스트 및 기능보완", panel: "hr" },
   { id: "ophe",       name: "ophe 브랜드 런칭",            dept: "브랜드사업본부", tasks: 0,  progress: 83, priority: "high",   priorityLabel: "상",   due: "6월 30일", stage: "콘텐츠 업로드 및 마케팅", panel: "ophe" },
   { id: "ai-design",  name: "AI 디자인 에이전트",            dept: "브랜드사업본부", tasks: 0,  progress: 43, priority: "med",    priorityLabel: "중",   due: "4월 30일", stage: "통합 테스트 및 품질 검증 (지연)", panel: "ai-design" },
-  { id: "irc",        name: "인터오리진 I&C 홈페이지 리뉴얼", dept: "마케팅영업본부", tasks: 3,  progress: 86, priority: "high",   priorityLabel: "상",   due: "3월 31일", stage: "interohrigin.io 도메인 추가연결", panel: "irc" }
+  { id: "irc",        name: "인터오리진 I&C 홈페이지 리뉴얼", dept: "마케팅영업본부", tasks: 3,  progress: 86, priority: "high",   priorityLabel: "상",   due: "3월 31일", stage: "interohrigin.io 도메인 추가연결", panel: "irc" },
+  { id: "io-press",   name: "AI 뉴스제작 툴 (IO Press)",     dept: "마케팅영업본부", tasks: 0,  progress: 70, priority: "med",    priorityLabel: "중",   due: "—",       stage: "외부 연동 설정 + 런칭 준비", panel: "io-press" }
 ];
 
 const DONE_PROJECTS = [
@@ -1682,7 +1693,8 @@ const TABS = [
   { key: "irc",       emoji: "🏢", label: "I&C 리뉴얼" },
   { key: "completed", emoji: "✅", label: "완료 프로젝트" },
   { key: "cost",      emoji: "💵", label: "과금 구조" },
-  { key: "future",    emoji: "🚀", label: "향후 계획" }
+  { key: "future",    emoji: "🚀", label: "향후 계획" },
+  { key: "io-press",  emoji: "📰", label: "IO Press" }
 ];
 
 const CATS = {
@@ -1701,6 +1713,7 @@ const PANEL_REPOS = {
   ophe:      [{ repo: "interohrigindev/ophe", label: "OPHE" }],
   "ai-design": [{ repo: "interohrigindev/ai-design-agent", label: "AI 디자인 에이전트" }],
   irc:       [{ repo: "interohrigindev/interohrigin-ir", label: "I&C 리뉴얼" }],
+  "io-press": [{ repo: "interohrigindev/io-press", label: "IO Press" }],
   completed: [{ repo: "interohrigindev/exhiboot", label: "Exhiboot" }, { repo: "interohrigindev/boomnzap", label: "붐앤잽" }],
 };
 
@@ -2008,8 +2021,8 @@ function iconSvg(name, size) { const p = ICON_PATHS[name] || ICON_PATHS.dot; ret
 
 const BOLD = {
   STATUS: { ontrack:{label:"정상 진행",short:"정상"}, delayed:{label:"지연 · 보완",short:"지연"}, attention:{label:"주의 · 마감초과",short:"주의"}, done:{label:"완료 · 운영중",short:"운영"} },
-  KPI: { total:9, active:6, done:3, pipeline:77, avgActive:74, syncDate:"2026-05-28" },
-  SHORT: { overview:"종합", hr:"HR", cs:"CS", finance:"재무", ophe:"OPHE", "ai-design":"AI디자인", irc:"I&C", completed:"완료", cost:"과금", future:"향후" },
+  KPI: { total:10, active:7, done:3, pipeline:77, avgActive:74, syncDate:"2026-05-28" },
+  SHORT: { overview:"종합", hr:"HR", cs:"CS", finance:"재무", ophe:"OPHE", "ai-design":"AI디자인", irc:"I&C", completed:"완료", cost:"과금", future:"향후", "io-press":"IO Press" },
   ACTIVE: [
     { panel:"cs", icon:"headset", name:"고객관리 CS 플랫폼", dept:"경영관리본부", progress:75, status:"attention", priority:"긴급", due:"4월 30일", dueNote:"마감 초과", stage:"배포 준비 및 사용자 교육", open:1, start:"—", url:"cs.interohrigin.com",
       what:"고객 문의를 티켓 단위로 관리하고 AI 자동응답 보조를 받는 시스템.",
@@ -2035,6 +2048,10 @@ const BOLD = {
       what:"내부 디자인팀 전용 AI 기반 브랜드 아이덴티티(로고·컬러·타이포) 자동 생성 도구.",
       why:"새 브랜드 출시·리뉴얼 시 초안 디자인 시간 단축. 디자이너의 반복 작업을 AI가 대신.",
       now:"4/30 마감 초과. 통합 테스트 단계. HR 핵심 안정화 후 재개하기로 한 P2 분류 항목." },
+    { panel:"io-press", icon:"bell", name:"AI 뉴스제작 툴 (IO Press)", dept:"마케팅영업본부", progress:70, status:"ontrack", priority:"중", due:"—", dueNote:"기획·개발", stage:"외부 연동 설정 + 런칭 준비", open:0, start:"2026-06", url:"interohrigindev/io-press · Cloudflare Pages",
+      what:"보도자료·뉴스레터·카드뉴스를 한 번에 만들고, 동의받은 기자에게 배포 + 인스타그램까지 자동 발행하는 사내 미디어 자동화 콘솔.",
+      why:"홍보 콘텐츠 제작·배포를 AI로 자동화해 미디어 운영 인력 부담을 줄이고, 공개 뉴스룸으로 검색·AI 인용(GEO) 노출까지 확보.",
+      now:"인증·온보딩, AI 스튜디오(Gemini 연동), 클라이언트·연락처 관리, 콘텐츠 히스토리, 공개 뉴스룸까지 구현 완료. Gmail 실발송·인스타 발행 키·명함 OCR(GCP 결제) 등 외부 연동 설정만 남음." },
   ],
   DECISIONS: [
     { panel:"hr", text:"1분기 인사 평가 정식 실행 시점 — 현재 민지+JY 2인 선행 테스트 중. 전사 확산 시점 결정 필요" },
@@ -2093,6 +2110,14 @@ const BOLD = {
     ],
   },
   FACTS: {
+    "io-press": [
+      ["한 줄", "보도자료·뉴스레터·카드뉴스 동시 생성 + 동의 기반 기자 배포 + 인스타 자동발행"],
+      ["대상 사용자", "홍보·마케팅 담당자 · 콘텐츠 운영자"],
+      ["핵심 가치", "공개 뉴스룸(JSON-LD)으로 검색·AI 인용(GEO) 노출 확보"],
+      ["기술 스택", "Vite + React · Cloudflare Pages · Supabase · Gemini"],
+      ["배포", "interohrigindev/io-press → Cloudflare Pages 자동배포"],
+      ["남은 작업", "Gmail 실발송 · 인스타 발행 키 · 명함 OCR(GCP 결제 연결)"],
+    ],
     hr: [
       ["한 줄", "직원 한 명의 입사부터 퇴사까지 전 과정을 한 시스템에서 관리"],
       ["대상 사용자", "전 직원 · 임원 · HR 담당자 · 면접관 · 멘토"],
@@ -2137,6 +2162,12 @@ const BOLD = {
     ],
   },
   AI_FEATURES: {
+    "io-press": [
+      ["키워드 → 토픽", "키워드만 입력하면 SEO·AEO·GEO 모드로 콘텐츠 토픽 자동 생성"],
+      ["멀티 포맷 생성", "한 번에 보도자료·뉴스레터·카드뉴스를 동시 작성"],
+      ["명함 OCR", "기자 명함을 촬영하면 연락처를 자동 추출·등록 (결제 연결 시)"],
+      ["검수 전 편집", "AI 초안을 인라인으로 수정한 뒤 승인하면 발송 자산으로 확정"],
+    ],
     hr: [
       ["이력서 분석", "PDF 업로드 시 자동으로 점수·강점·약점·추천 여부 산출"],
       ["면접 분석", "면접 녹음을 듣고 답변 평가·종합 의견 작성"],
@@ -2269,11 +2300,11 @@ function renderOverviewBold(){
   h += `<div class="hero"><div class="hero-grid">
     <div class="hero-main">
       <div class="hero-eyebrow">한 줄 요약 · ${K.syncDate} 동기화</div>
-      <h1 class="hero-h1">9개 프로젝트 운영<br><span class="ok">3개 완료</span>, <span class="br">6개 진행</span> · 평균 74%</h1>
+      <h1 class="hero-h1">10개 프로젝트 운영<br><span class="ok">3개 완료</span>, <span class="br">7개 진행</span> · 평균 74%</h1>
       <p class="hero-lead">가장 시급한 사항은 <strong>AI 디자인 에이전트</strong>의 통합 테스트 지연과 <strong>CS 플랫폼</strong>의 4/30 마감 초과입니다. 가장 임박한 이벤트는 <span class="br">6월 9일 재무 자금계획 v1 베타 오픈</span>입니다.</p>
       <div class="hero-chips">
         <span class="chip"><span style="color:var(--ok)">${iconSvg("check",13)}</span>완료 3개</span>
-        <span class="chip"><span style="color:var(--brand)">${iconSvg("layers",13)}</span>진행 6개</span>
+        <span class="chip"><span style="color:var(--brand)">${iconSvg("layers",13)}</span>진행 7개</span>
         <span class="chip"><span style="color:var(--alert)">${iconSvg("alert",13)}</span>지연·주의 3건</span>
         <span class="chip"><span style="color:var(--warn)">${iconSvg("flag",13)}</span>다음 마일스톤 6/9</span>
       </div>
@@ -2301,7 +2332,7 @@ function renderOverviewBold(){
       <div class="kpi"><div class="k-label">진행중</div><div class="k-value">${K.active}</div><div class="k-sub">경영3 · 브랜드2 · 마케팅1</div></div>
       <div class="kpi k-done"><div class="k-label">완료</div><div class="k-value">${K.done}</div><div class="k-sub">붐앤잽 · 복지몰 · Exhiboot</div></div>
       <div class="kpi"><div class="k-label">파이프라인</div><div class="k-value">${K.pipeline}%</div><div class="k-sub">작업 완료율 100%</div></div>
-      <div class="kpi k-warn"><div class="k-label">진행중 평균</div><div class="k-value">${K.avgActive}%</div><div class="k-sub">6개 평균 진행률</div></div>
+      <div class="kpi k-warn"><div class="k-label">진행중 평균</div><div class="k-value">${K.avgActive}%</div><div class="k-sub">7개 평균 진행률</div></div>
       <div class="kpi k-alert"><div class="k-label">지연·주의</div><div class="k-value">3</div><div class="k-sub">CS · AI디자인 · HR</div></div>
     </div></div>`;
 
@@ -2536,6 +2567,7 @@ function hrMatchPanel(name) {
   if (n.includes("AI 디자인")) return "ai-design";
   if (n.includes("I&C") || n.includes("리뉴얼")) return "irc";
   if (n.includes("붐앤잽") || n.includes("복지몰") || n.includes("Exhiboot")) return "completed";
+  if (/io[ -]?press/i.test(n) || n.includes("뉴스제작")) return "io-press";
   return null;
 }
 function hrPanelKey(p) { return "hrp_" + String(p.id || "").replace(/[^a-zA-Z0-9_-]/g, ""); }
@@ -3581,7 +3613,7 @@ function enhanceProjectHeadlines() {
 // ======================================================
 // 탭
 // ======================================================
-const TAB_ICONS = { overview:"home", hr:"users", cs:"headset", finance:"wallet", ophe:"droplet", "ai-design":"palette", irc:"building", completed:"check", cost:"receipt", future:"rocket" };
+const TAB_ICONS = { overview:"home", hr:"users", cs:"headset", finance:"wallet", ophe:"droplet", "ai-design":"palette", irc:"building", completed:"check", cost:"receipt", future:"rocket", "io-press":"bell" };
 function buildTabs() {
   const c = document.getElementById("tab-nav-inner");
   c.innerHTML = TABS.map(t => `<button class="tab ${t.key === "overview" ? "active" : ""}" data-panel="${t.key}"><span class="tab-ic">${iconSvg(TAB_ICONS[t.key] || "dot", 16)}</span>${t.label}<span class="unread-dot"></span></button>`).join("");
